@@ -98,7 +98,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             listArgs.remove(0);
             CommandOutput output = cmd.getExecutor().execute(sender, new ArgumentsImpl(listArgs));
             if (output.getResult() == CommandResult.FAILURE) {
-                sender.sendMessage(ChatColor.RED + output.getMessage());
+                for (String message : output.getMessages()) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
                 sender.sendMessage(getUsagesFor(args[0], 1).toArray(new String[0]));
             }
