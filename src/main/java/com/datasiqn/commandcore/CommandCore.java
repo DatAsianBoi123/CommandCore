@@ -45,7 +45,6 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
 
     public static @NotNull CommandCore init(JavaPlugin plugin, String rootCommand) {
         if (instance != null) throw new RuntimeException("An instance of CommandCore has already been created!");
-        instance = new CommandCore(plugin);
 
         PluginCommand command = plugin.getCommand(rootCommand);
         if (command == null) {
