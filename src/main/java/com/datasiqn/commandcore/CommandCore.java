@@ -113,8 +113,8 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String[] args) {
         List<String> tabComplete = new ArrayList<>();
         if (args.length == 1) {
-            commandManager.allCommands().forEach((s, command1) -> {
-                if (command1.getPermissionString() == null || sender.hasPermission(command1.getPermissionString())) tabComplete.add(s);
+            commandManager.allCommands().forEach((s, cmd) -> {
+                if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) tabComplete.add(s);
             });
         } else {
             Command cmd = commandManager.getCommand(args[0]);
@@ -143,8 +143,8 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
     public void sendHelpMenu(@NotNull CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + plugin.getName() + " Commands");
         commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
-            Command cmd = commandManager.getCommand(name);
-            if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + cmd.getDescription());
+            Command command = commandManager.getCommand(name);
+            if (command.getPermissionString() == null || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
         });
     }
 
