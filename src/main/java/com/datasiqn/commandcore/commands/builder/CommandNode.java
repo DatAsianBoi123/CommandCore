@@ -1,6 +1,8 @@
 package com.datasiqn.commandcore.commands.builder;
 
-import com.datasiqn.commandcore.commands.builder.impl.CommandContextImpl;
+import com.datasiqn.commandcore.ArgumentParseException;
+import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +13,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public abstract class CommandNode<S extends CommandSender, This extends CommandNode<S, This>> implements Comparable<CommandNode<S, This>> {
+public abstract class CommandNode<S extends CommandSender, This extends CommandNode<S, This>> {
+    private static final Comparator<CommandNode<?, ?>> comparator = Comparator.comparingInt(CommandNode::getPriority);
+
     protected final Set<CommandNode<S, ?>> children = new HashSet<>();
 
     protected Consumer<CommandContext<S>> executor;
@@ -72,8 +76,7 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
     @NotNull
     protected abstract This getThis();
 
-    @Override
-    public final int compareTo(@NotNull CommandNode<S, This> o) {
-        return o.getPriority() - getPriority();
+    public static Comparator<CommandNode<?, ?>> getComparator() {
+        return comparator;
     }
 }
