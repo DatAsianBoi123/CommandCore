@@ -97,7 +97,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            CommandOutput output = cmd.execute(sender, new ArgumentsImpl(listArgs));
+            CommandOutput output = cmd.getExecutor().execute(sender, new ArgumentsImpl(listArgs));
             if (output.getResult() == CommandResult.FAILURE) {
                 sender.sendMessage(ChatColor.RED + output.getMessage());
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
@@ -122,7 +122,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            tabComplete.addAll(cmd.tabComplete(sender, new ArgumentsImpl(listArgs)));
+            tabComplete.addAll(cmd.getExecutor().tabComplete(sender, new ArgumentsImpl(listArgs)));
         }
 
         List<String> partialMatches = new ArrayList<>();
