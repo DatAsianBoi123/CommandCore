@@ -25,13 +25,15 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class CommandCore implements CommandExecutor, TabCompleter {
+public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompleter {
     private static CommandCore instance;
     private final CommandManager commandManager = new CommandManager();
     private final JavaPlugin plugin;
+    private final org.bukkit.command.Command bukkitCommand;
 
-    private CommandCore(JavaPlugin plugin) {
+    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command) {
         this.plugin = plugin;
+        this.bukkitCommand = command;
     }
 
     public CommandManager getCommandManager() {
@@ -60,6 +62,7 @@ public class CommandCore implements CommandExecutor, TabCompleter {
             Bukkit.getLogger().info("[CommandCore] Successfully injected the command into Bukkit");
         }
 
+        instance = new CommandCore(plugin, command);
         command.setExecutor(instance);
         command.setTabCompleter(instance);
 
@@ -152,7 +155,7 @@ public class CommandCore implements CommandExecutor, TabCompleter {
             for (int i = 0; i < spaces; i++) {
                 addedUsage.append(" ");
             }
-            addedUsage = new StringBuilder(addedUsage.toString().concat(ChatColor.YELLOW + "/arcadia " + ChatColor.WHITE + commandName + " " + usage));
+            addedUsage = new StringBuilder(addedUsage.toString().concat(ChatColor.YELLOW + "/" + this.bukkitCommand.getName() + " " + ChatColor.WHITE + commandName + " " + usage));
             usages.add(addedUsage.toString());
         });
         return usages;
