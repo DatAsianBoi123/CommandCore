@@ -1,4 +1,4 @@
-package com.datasiqn.commandcore.commands.builder;
+package com.datasiqn.commandcore.commands.context;
 
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import org.bukkit.command.CommandSender;

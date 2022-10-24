@@ -1,7 +1,8 @@
-package com.datasiqn.commandcore.commands.builder.impl;
+package com.datasiqn.commandcore.commands.context.impl;
 
+import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.commands.builder.CommandContext;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +26,10 @@ public class CommandContextImpl<S extends CommandSender> implements CommandConte
     }
 
     public <T> T parseArgument(@NotNull ArgumentType<T> type, int index) {
-        return type.fromString(arguments.get(index)).orElseThrow(IllegalArgumentException::new);
+        try {
+            return type.parse(arguments.get(index));
+        } catch (ArgumentParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
