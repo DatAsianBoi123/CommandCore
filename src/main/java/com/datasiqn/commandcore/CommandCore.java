@@ -157,7 +157,11 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             for (int i = 0; i < spaces; i++) {
                 addedUsage.append(" ");
             }
-            addedUsage = new StringBuilder(addedUsage.toString().concat(ChatColor.YELLOW + "/" + this.bukkitCommand.getName() + " " + ChatColor.WHITE + commandName + " " + usage));
+            addedUsage.append(ChatColor.YELLOW)
+                    .append("/")
+                    .append(this.bukkitCommand.getName())
+                    .append(" ").append(ChatColor.WHITE).append(commandName)
+                    .append(" ").append(usage);
             usages.add(addedUsage.toString());
         });
         return usages;
