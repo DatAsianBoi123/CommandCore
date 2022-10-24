@@ -4,6 +4,7 @@ import com.datasiqn.commandcore.commands.builder.impl.CommandContextImpl;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -41,7 +42,8 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
         return Collections.unmodifiableSet(children);
     }
 
-    public abstract boolean isApplicable(String arg);
+    @Nullable
+    public abstract ArgumentParseException getParsingException(String arg);
 
     protected List<String> getUsages(boolean isOptional) {
         List<String> usages = new ArrayList<>();

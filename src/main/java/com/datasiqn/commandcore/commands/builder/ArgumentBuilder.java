@@ -1,10 +1,12 @@
 package com.datasiqn.commandcore.commands.builder;
 
+import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -19,12 +21,17 @@ public class ArgumentBuilder<S extends CommandSender, T> extends CommandNode<S, 
 
     @Override
     public @NotNull List<String> getTabComplete() {
-        return type.all();
+        return type.getTabComplete();
     }
 
     @Override
-    public boolean isApplicable(String arg) {
-        return type.fromString(arg).isPresent();
+    public @Nullable ArgumentParseException getParsingException(String arg) {
+        try {
+            type.parse(arg);
+        } catch (ArgumentParseException e) {
+            return e;
+        }
+        return null;
     }
 
     @Override

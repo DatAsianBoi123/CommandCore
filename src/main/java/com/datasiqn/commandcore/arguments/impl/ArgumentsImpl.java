@@ -1,5 +1,6 @@
 package com.datasiqn.commandcore.arguments.impl;
 
+import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.arguments.Arguments;
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +8,6 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class ArgumentsImpl implements Arguments {
     protected final List<String> allArguments;
@@ -20,10 +20,18 @@ public class ArgumentsImpl implements Arguments {
         return allArguments.size();
     }
 
-    @NotNull
-    public <T> Optional<T> get(int i, ArgumentType<T> type) {
-        if (i >= allArguments.size()) return Optional.empty();
-        return type.fromString(allArguments.get(i));
+    public <T> @NotNull T get(int i, ArgumentType<T> type) throws ArgumentParseException {
+        if (i >= allArguments.size()) throw new IllegalArgumentException("i is greater than total length of arguments");
+        return type.parse(allArguments.get(i));
+    }
+
+    @Override
+    public @NotNull String getString(int i) {
+        try {
+            return get(i, ArgumentType.STRING);
+        } catch (ArgumentParseException e) {
+            return "";
+        }
     }
 
     public @Unmodifiable @NotNull List<String> asList() {

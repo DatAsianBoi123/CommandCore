@@ -1,9 +1,11 @@
 package com.datasiqn.commandcore.commands.builder;
 
+import com.datasiqn.commandcore.ArgumentParseException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +19,9 @@ public class LiteralBuilder<S extends CommandSender> extends CommandNode<S, Lite
     }
 
     @Override
-    public boolean isApplicable(String arg) {
-        return literal.equals(arg);
+    public @Nullable ArgumentParseException getParsingException(String arg) {
+        if (!literal.equals(arg)) return new ArgumentParseException("Invalid literal '" + arg + "'");
+        return null;
     }
 
     @Override
