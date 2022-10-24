@@ -55,7 +55,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
                 CommandMap commandMap = (CommandMap) mapField.get(Bukkit.getServer());
                 Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
                 constructor.setAccessible(true);
-                command = constructor.newInstance(plugin.getName(), plugin);
+                command = constructor.newInstance(rootCommand, plugin);
                 commandMap.register(rootCommand, plugin.getName(), command);
             } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
                      InstantiationException | NoSuchMethodException e) {
