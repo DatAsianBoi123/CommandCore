@@ -1,11 +1,13 @@
 package com.datasiqn.commandcore.commands.builder;
 
-import com.datasiqn.commandcore.arguments.ArgumentType;
+import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.CommandOutput;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,10 +47,56 @@ public class CommandBuilder<S extends CommandSender> {
     }
 
     public Command build() {
-        return new Command() {
+        List<String> usages = new ArrayList<>();
+        if (executor != null) usages.add("");
+        boolean hasOptional = false;
+        boolean canBeOptional = false;
+        for (CommandNode<S, ?> node : nodes) {
+            if (node.executor != null) hasOptional = true;
+            if (node.canBeOptional()) canBeOptional = true;
+            usages.addAll(node.getUsages(executor != null));
+        }
+        if (executor != null && hasOptional && canBeOptional) usages.remove(0);
+
+        return new BuilderCommand(usages);
+    }
+
+    private class BuilderCommand implements Command {
+        private final String description;
+        private final String permission;
+        private final List<String> usages;
+        private final CommandExecutor commandExecutor = new BuilderExecutor();
+
+        public BuilderCommand(List<String> usages) {
+            this.description = CommandBuilder.this.description;
+            this.permission = CommandBuilder.this.permission;
+            this.usages = usages;
+        }
+
+        @Override
+        public @NotNull CommandExecutor getExecutor() {
+            return commandExecutor;
+        }
+
+        @Override
+        public @Nullable String getPermissionString() {
+            return permission;
+        }
+
+        @Override
+        public @NotNull String getDescription() {
+            return description;
+        }
+
+        @Override
+        public List<String> getUsages() {
+            return usages;
+        }
+
+        private class BuilderExecutor implements CommandExecutor {
             private final List<String> currentTabComplete = new ArrayList<>();
-            private Set<CommandNode<S, ?>> currentNodes;
-            private int argsSize;
+            private Set<CommandNode<S, ?>> currentNodes = nodes;
+            private int lastSeenSize;
 
             @Override
             public CommandOutput execute(@NotNull CommandSender sender, @NotNull Arguments args) {
@@ -61,22 +109,39 @@ public class CommandBuilder<S extends CommandSender> {
                 S castedSender = senderClass.cast(sender);
 
                 if (args.size() >= 1) {
-                    if (nodes.isEmpty()) return CommandOutput.failure("Invalid argument size: expected 1 but got " + args.size());
+                    if (nodes.isEmpty()) return CommandOutput.failure("Expected no parameters, but got " + args.size() + " parameters instead");
 
-                    Optional<CommandNode<S, ?>> optionalNode = checkAt(args, argsSize - 1, currentNodes);
-                    if (currentNodes == null || !optionalNode.isPresent()) {
-
-                        Optional<String> optionalArg = args.get(argsSize - 1, ArgumentType.STRING);
-                        return optionalArg.map(s -> CommandOutput.failure("Invalid parameter '" + s + "' at position " + argsSize)).orElseGet(() -> CommandOutput.failure("Invalid parameter at position " + argsSize));
+                    // If the user adds an extra space on the end of the command
+                    if (lastSeenSize > args.size()) {
+                        lastSeenSize = args.size();
+                        ParseResult result = findCurrentNode(nodes, args, args.size() - 1);
+                        if (result == null || !result.foundNode()) currentNodes = nodes;
+                        else currentNodes = result.node.children;
                     }
-                    Optional<String> optionalArg = args.get(args.size() - 1, ArgumentType.STRING);
-                    if (!optionalArg.isPresent()) return CommandOutput.failure("An unexpected error occurred");
-                    boolean hasExecutor = optionalNode.get().executeWith(castedSender, args.asList());
+
+                    if (currentNodes == null) {
+                        String arg = args.getString(lastSeenSize - 1);
+                        return CommandOutput.failure("Expected end of input, but instead got '" + arg + "' at position " + lastSeenSize + " instead");
+                    }
+
+                    ParseResult result = checkApplicable(args.getString(lastSeenSize - 1), currentNodes);
+                    if (!result.foundNode()) {
+                        String arg = args.getString(lastSeenSize - 1);
+                        String[] messages = new String[result.exceptions.size() + 1];
+                        messages[0] = "Invalid parameter '" + arg + "' at position " + lastSeenSize + ": ";
+                        int i = 1;
+                        for (ArgumentParseException exception : result.exceptions) {
+                            messages[i] = exception.getMessage();
+                            i++;
+                        }
+                        return CommandOutput.failure(messages);
+                    }
                     Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
+                    boolean hasExecutor = result.node.executeWith(castedSender, args.asList());
                     return hasExecutor ? CommandOutput.success() : CommandOutput.failure();
                 }
 
-                if (executor == null) return CommandOutput.failure("Invalid argument size: 1");
+                if (executor == null) return CommandOutput.failure("Expected parameters, but got no parameters instead");
                 Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
                 executor.accept(castedSender);
                 return CommandOutput.success();
@@ -85,75 +150,80 @@ public class CommandBuilder<S extends CommandSender> {
             @Override
             public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull Arguments args) {
                 if (args.size() >= 1) {
-                    if (argsSize != args.size()) {
-                        argsSize = args.size();
-                        FoundNode<S> foundNode = findCurrentNode(args, args.size() - 1);
-                        if (args.size() == 1) {
-                            currentNodes = nodes;
-                            currentTabComplete.clear();
-                            currentNodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete()));
-                        } else if (foundNode.node == null) {
-                            currentNodes = null;
-                            return Command.super.tabComplete(sender, args);
-                        } else {
-                            currentNodes = foundNode.node.getChildren();
-                            currentTabComplete.clear();
-                            currentNodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete()));
+                    if (args.size() == 1) {
+                        currentNodes = nodes;
+                        lastSeenSize = 1;
+                        populateTabComplete(currentTabComplete, currentNodes);
+                    }
+                    boolean movedBack = lastSeenSize > args.size();
+                    if (lastSeenSize != args.size()) {
+                        if (args.size() != 1) {
+                            if (!movedBack && currentNodes == null) return CommandExecutor.super.tabComplete(sender, args);
+                            lastSeenSize = args.size();
+                            ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, args.size() - 1);
+                            if (result == null || !result.foundNode()) {
+                                currentNodes = null;
+                                currentTabComplete.clear();
+                                return CommandExecutor.super.tabComplete(sender, args);
+                            }
+                            currentNodes = result.node.children;
                         }
+                        populateTabComplete(currentTabComplete, currentNodes);
                     }
                     return currentTabComplete;
                 }
-                return Command.super.tabComplete(sender, args);
+                return CommandExecutor.super.tabComplete(sender, args);
             }
 
-            @Override
-            public @Nullable String getPermissionString() {
-                return permission;
+            @Contract(mutates = "param1")
+            private void populateTabComplete(@NotNull List<String> currentTabComplete, @NotNull Set<CommandNode<S, ?>> nodes) {
+                currentTabComplete.clear();
+                nodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete()));
             }
 
-            @Override
-            public @NotNull String getDescription() {
-                return description;
-            }
-
-            @Override
-            public List<String> getUsages() {
-                List<String> usages = new ArrayList<>();
-                if (executor != null) usages.add("");
-                boolean hasOptional = false;
-                boolean canBeOptional = false;
+            private @NotNull ParseResult checkApplicable(@NotNull String argToCheck, @NotNull Collection<CommandNode<S, ?>> nodes) {
+                List<CommandNode<S, ?>> options = new ArrayList<>();
+                List<ArgumentParseException> exceptions = new ArrayList<>();
                 for (CommandNode<S, ?> node : nodes) {
-                    if (node.executor != null) hasOptional = true;
-                    if (node.canBeOptional()) canBeOptional = true;
-                    usages.addAll(node.getUsages(executor != null));
+                    ArgumentParseException exception = node.getParsingException(argToCheck);
+                    if (exception == null) {
+                        options.add(node);
+                        continue;
+                    }
+                    exceptions.add(exception);
                 }
-                if (executor != null && hasOptional && canBeOptional) usages.remove(0);
-                return usages;
+                if (options.isEmpty()) return new ParseResult(exceptions);
+                options.sort(CommandNode.getComparator());
+                return new ParseResult(options.get(0));
             }
-        };
-    }
 
-    private Optional<CommandNode<S, ?>> checkAt(@NotNull Arguments args, int index, Collection<CommandNode<S, ?>> nodes) {
-        return args.get(index, ArgumentType.STRING).flatMap(s -> nodes.stream().filter(node -> node.isApplicable(s)).sorted().findFirst());
-    }
+            private ParseResult findCurrentNode(@NotNull Set<CommandNode<S, ?>> nodeSet, @NotNull Arguments args, int iterations) {
+                ParseResult result = null;
+                for (int i = 0; i < iterations; i++) {
+                    ParseResult parseResult = checkApplicable(args.getString(i), nodeSet);
+                    if (!parseResult.foundNode()) return parseResult;
+                    nodeSet = parseResult.node.children;
+                    result = parseResult;
+                }
+                return result;
+            }
 
-    private @NotNull FoundNode<S> findCurrentNode(@NotNull Arguments args, int iterations) {
-        Set<CommandNode<S, ?>> nodeSet = nodes;
-        CommandNode<S, ?> currentNode = null;
-        for (int i = 0; i < iterations; i++) {
-            Optional<CommandNode<S, ?>> commandNode = checkAt(args, i, nodeSet);
-            if (!commandNode.isPresent()) return new FoundNode<>(null);
-            nodeSet = commandNode.get().getChildren();
-            currentNode = commandNode.get();
-        }
-        return new FoundNode<>(currentNode);
-    }
+            private class ParseResult {
+                private final List<ArgumentParseException> exceptions = new ArrayList<>();
+                private final CommandNode<S, ?> node;
 
-    private static class FoundNode<S extends CommandSender> {
-        private final CommandNode<S, ?> node;
+                private ParseResult(Collection<ArgumentParseException> exceptions) {
+                    this((CommandNode<S, ?>) null);
+                    this.exceptions.addAll(exceptions);
+                }
+                private ParseResult(CommandNode<S, ?> node) {
+                    this.node = node;
+                }
 
-        public FoundNode(@Nullable CommandNode<S, ?> node) {
-            this.node = node;
+                public boolean foundNode() {
+                    return node != null;
+                }
+            }
         }
     }
 }
