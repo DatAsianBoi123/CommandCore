@@ -8,7 +8,7 @@ CommandCore is a simple, yet powerful command framework for the Spigot API.
 **If you are using JitPack, you can skip this step.**
 
 Clone this repository onto your local computer and run the command `mvn clean install` in that directory.
-This will install CommandCore onto your local .m2 folder so you can use the dependency.
+This will install CommandCore onto your local .m2 folder, so you can use the dependency.
 
 
 ### 2) Add the dependency
