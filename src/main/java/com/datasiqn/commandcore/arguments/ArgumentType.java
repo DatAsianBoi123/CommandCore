@@ -109,7 +109,7 @@ public interface ArgumentType<T> {
         }
 
         @FunctionalInterface
-        private interface ParseFunction<T> {
+        public interface ParseFunction<T> {
             T apply(String str) throws ArgumentParseException;
         }
     }
