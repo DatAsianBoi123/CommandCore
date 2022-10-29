@@ -131,7 +131,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         return partialMatches;
     }
 
-    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
+    private void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
         if (!commandManager.hasCommand(commandName)) throw new RuntimeException("Command " + commandName + " does not exist");
         Command command = commandManager.getCommand(commandName);
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
@@ -140,7 +140,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
     }
 
-    public void sendHelpMenu(@NotNull CommandSender sender) {
+    private void sendHelpMenu(@NotNull CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + plugin.getName() + " Commands");
         commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
             Command command = commandManager.getCommand(name);
