@@ -110,7 +110,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
 
     @Nullable
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tabComplete = new ArrayList<>();
         if (args.length == 1) {
             commandManager.allCommands().forEach((s, cmd) -> {
