@@ -93,7 +93,7 @@ public interface ArgumentType<T> {
             try {
                 return T.valueOf(enumClass, str.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new ArgumentParseException("Invalid " + enumClass.getEnclosingClass().getTypeName() + " '" + str + "'");
+                throw new ArgumentParseException("Invalid " + (enumClass.getEnclosingClass() == null ? enumClass.getTypeName() : enumClass.getEnclosingClass().getTypeName()) + " '" + str + "'");
             }
         }
 
