@@ -11,6 +11,10 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * Represents an argument type
+ * @param <T> The type of the argument
+ */
 public interface ArgumentType<T> {
     ArgumentType<String> STRING = new StringArgumentType();
 
@@ -51,17 +55,35 @@ public interface ArgumentType<T> {
         return executor;
     }, () -> new ArrayList<>(CommandCore.getInstance().getCommandManager().allCommands().keySet()));
 
+    /**
+     * Parses a string
+     * @param str The string to parse
+     * @return The parsed string
+     * @throws ArgumentParseException If an exception occurs when parsing
+     */
     @NotNull
     T parse(@NotNull String str) throws ArgumentParseException;
 
+    /**
+     * Gets the tabcomplete for this {@code ArgumentType}
+     * @return The tabcomplete
+     */
     @NotNull
     default List<String> getTabComplete() {
         return new ArrayList<>();
     }
 
+    /**
+     * Represents a custom argument type that parses to an enum value
+     * @param <T> The type of the enum
+     */
     class EnumArgumentType<T extends Enum<T>> implements ArgumentType<T> {
         private final Class<T> enumClass;
 
+        /**
+         * Creates a new {@code ArgumentType}
+         * @param enumClass The enum's class
+         */
         public EnumArgumentType(Class<T> enumClass) {
             this.enumClass = enumClass;
         }
@@ -81,18 +103,38 @@ public interface ArgumentType<T> {
         }
     }
 
+    /**
+     * Represents a custom argument type
+     * @param <T> The type of the argument
+     */
     class CustomArgumentType<T> implements ArgumentType<T> {
         private final ParseFunction<T> asStringFunction;
         private List<String> values;
         private Supplier<List<String>> valueSupplier;
 
+        /**
+         * Creates a new {@link ArgumentType}
+         * @param parseFunction The function to use when parsing a string
+         */
         public CustomArgumentType(ParseFunction<T> parseFunction) {
             this(parseFunction, Collections.emptyList());
         }
+
+        /**
+         * Creates a new {@link ArgumentType}
+         * @param asStringFunction The function to use when parsing a string
+         * @param values The tabcomplete values
+         */
         public CustomArgumentType(ParseFunction<T> asStringFunction, List<String> values) {
             this.asStringFunction = asStringFunction;
             this.values = values;
         }
+
+        /**
+         * Creates a new {@link ArgumentType}
+         * @param parseFunction The function to use when parsing a string
+         * @param valueSupplier A supplier of tabcomplete values
+         */
         public CustomArgumentType(ParseFunction<T> parseFunction, Supplier<List<String>> valueSupplier) {
             this.asStringFunction = parseFunction;
             this.valueSupplier = valueSupplier;
@@ -108,12 +150,25 @@ public interface ArgumentType<T> {
             return values == null ? valueSupplier.get() : values;
         }
 
+        /**
+         * Represents the function used when parsing a string
+         * @param <T> The type of the argument
+         */
         @FunctionalInterface
         public interface ParseFunction<T> {
+            /**
+             * Parses a string
+             * @param str The string
+             * @return The parsed string
+             * @throws ArgumentParseException If there's a parsing error
+             */
             T apply(String str) throws ArgumentParseException;
         }
     }
 
+    /**
+     * Represents a string argument type
+     */
     class StringArgumentType implements ArgumentType<String> {
         @Override
         public @NotNull String parse(@NotNull String str) {

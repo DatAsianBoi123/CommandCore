@@ -10,6 +10,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * Represents an argument node
+ * @param <S> The type of the sender
+ * @param <T> The type of the argument
+ */
 public class ArgumentBuilder<S extends CommandSender, T> extends CommandNode<S, ArgumentBuilder<S, T>> {
     private final ArgumentType<T> type;
     private final String argName;
@@ -54,6 +59,14 @@ public class ArgumentBuilder<S extends CommandSender, T> extends CommandNode<S, 
         return this;
     }
 
+    /**
+     * Creates a new {@code ArgumentBuilder}
+     * @param type The argument type
+     * @param argName The name of the argument
+     * @return The created {@code ArgumentBuilder} instance
+     * @param <S> The type of the sender
+     * @param <T> The type of the argument
+     */
     @Contract("_, _ -> new")
     public static <S extends CommandSender, T> @NotNull ArgumentBuilder<S, T> argument(ArgumentType<T> type, String argName) {
         return new ArgumentBuilder<>(type, argName);

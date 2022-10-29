@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents a literal node
+ * @param <S> The type of the sender
+ */
 public class LiteralBuilder<S extends CommandSender> extends CommandNode<S, LiteralBuilder<S>> {
     private final String literal;
 
@@ -44,6 +48,12 @@ public class LiteralBuilder<S extends CommandSender> extends CommandNode<S, Lite
         return this;
     }
 
+    /**
+     * Creates a new {@link LiteralBuilder}
+     * @param literal The literal string
+     * @return The created {@link LiteralBuilder} instance
+     * @param <S> The type of the sender
+     */
     @Contract("_ -> new")
     public static <S extends CommandSender> @NotNull LiteralBuilder<S> literal(String literal) {
         return new LiteralBuilder<>(literal);

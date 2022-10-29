@@ -28,6 +28,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Main class of {@code CommandCore}
+ */
 public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompleter {
     private static CommandCore instance;
     private final CommandManager commandManager = new CommandManager();
@@ -39,10 +42,21 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         this.bukkitCommand = command;
     }
 
+    /**
+     * Gets the command manager
+     * @return The command manager
+     */
     public CommandManager getCommandManager() {
         return commandManager;
     }
 
+    /**
+     * Initializes CommandCore so that it can be accessed using {@link CommandCore#getInstance()}
+     * @param plugin Your plugin instance
+     * @param rootCommand The name of your root command
+     * @throws RuntimeException If it has already been initialized
+     * @return The instance
+     */
     public static @NotNull CommandCore init(JavaPlugin plugin, String rootCommand) {
         if (instance != null) throw new RuntimeException("An instance of CommandCore has already been created");
 
@@ -78,6 +92,10 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         return instance;
     }
 
+    /**
+     * Gets this instance of {@code CommandCore}
+     * @return This instance
+     */
     public static CommandCore getInstance() {
         return instance;
     }

@@ -14,6 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * Represents a builder that creates commands
+ * @param <S> The type of the sender
+ */
 public class CommandBuilder<S extends CommandSender> {
     private final Set<CommandNode<S, ?>> nodes = new HashSet<>();
     private final Class<S> senderClass;
@@ -22,30 +26,58 @@ public class CommandBuilder<S extends CommandSender> {
     private Consumer<S> executor;
     private String description = "No description provided";
 
+    /**
+     * Creates a new {@code CommandBuilder}
+     * @param senderClass The class of the required sender
+     */
     public CommandBuilder(Class<S> senderClass) {
         this.senderClass = senderClass;
     }
 
+    /**
+     * Sets the permission of the command
+     * @param permission The permission
+     * @return The builder for chaining
+     */
     public CommandBuilder<S> permission(String permission) {
         this.permission = permission;
         return this;
     }
 
+    /**
+     * Sets the description of the command
+     * @param description The description
+     * @return The builder for chaining
+     */
     public CommandBuilder<S> description(String description) {
         this.description = description;
         return this;
     }
 
+    /**
+     * Adds a new node onto this command builder
+     * @param node The node
+     * @return The builder for chaining
+     */
     public CommandBuilder<S> then(CommandNode<S, ?> node) {
         nodes.add(node);
         return this;
     }
 
+    /**
+     * Sets the executor for this command
+     * @param executor The executor
+     * @return The builder for chaining
+     */
     public CommandBuilder<S> executes(Consumer<S> executor) {
         this.executor = executor;
         return this;
     }
 
+    /**
+     * Creates a new {@link Command} instance using the supplied values
+     * @return The built {@link Command} instance
+     */
     public Command build() {
         List<String> usages = new ArrayList<>();
         if (executor != null) usages.add("");
