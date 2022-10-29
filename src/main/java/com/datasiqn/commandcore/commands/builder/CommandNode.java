@@ -54,7 +54,8 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
         if (executor != null) usages.add(getUsageArgument(isOptional));
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        for (CommandNode<S, ?> node : children) {
+        List<CommandNode<S, ?>> sortedChildren = children.stream().sorted(comparator).collect(Collectors.toList());
+        for (CommandNode<S, ?> node : sortedChildren) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
             usages.addAll(node.getUsages(executor != null).stream().map(str -> getUsageArgument(isOptional) + " " + str).collect(Collectors.toList()));
