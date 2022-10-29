@@ -17,7 +17,6 @@ Add the CommandCore dependency
 
 **If you are using JitPack, follow their instructions [here](https://jitpack.io/#DatAsianBoi123/CommandCore/)**
 ```xml
-...
 <dependency>
   <groupId>com.datasiqn</groupId>
   <artifactId>CommandCore</artifactId>
@@ -25,12 +24,10 @@ Add the CommandCore dependency
   <version>{version}</version>
   <scope>compile</scope>
 </dependency>
-...
 ```
 
 Finally, add the maven shade plugin to shade in CommandCore
 ```xml
-...
 <build>
   <plugins>
       <plugin>
@@ -48,7 +45,6 @@ Finally, add the maven shade plugin to shade in CommandCore
       </plugin>
   </plugins>
 </build>
-...
 ```
 
 ## Usage
@@ -94,7 +90,7 @@ On the next line, we make a `.then` call. It adds another 'branch' to the comman
 When creating another branch, you need to supply it with a `CommandNode`. In this case, we give it a `LiteralBuilder`. A literal is a string that the user must type.
 An example of a literal is Minecraft's `/time` command. After typing `/time`, you can either type `set`, `query`, or `add`. Those are all examples of a literal.
 
-Notice how the literal `CommandNode` doesn't have an `.executes` call. This tells ComandCore that this specific branch cannot be executed without any further parameters.
+Notice how the literal `CommandNode` doesn't have an `.executes` call. This tells CommandCore that this specific branch cannot be executed without any further parameters.
 
 On the next line, we create a new branch under the literal. This time, it is an argument. An argument is any string that the argument type can understand. In this case, we give it an argument type of `PLAYER`. This means that CommandCore will suggest us player names.
 
@@ -116,7 +112,7 @@ public final class MyPlugin extends JavaPlugin {
   }
 }
 ```
-This just registers the command so it appears when we type `/myrootcommand`
+This just registers the command, so it appears when we type `/myrootcommand`
 
 Now, lets see this baby in action!
 
