@@ -4,7 +4,7 @@ import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.arguments.Arguments;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ArgumentsImpl implements Arguments {
         }
     }
 
-    public @Unmodifiable @NotNull List<String> asList() {
+    public @UnmodifiableView @NotNull List<String> asList() {
         return Collections.unmodifiableList(allArguments);
     }
 }
