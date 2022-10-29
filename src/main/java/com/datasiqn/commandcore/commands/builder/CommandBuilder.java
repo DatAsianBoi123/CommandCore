@@ -121,7 +121,7 @@ public class CommandBuilder<S extends CommandSender> {
 
                     if (currentNodes == null) {
                         String arg = args.getString(lastSeenSize - 1);
-                        return CommandOutput.failure("Expected end of input, but instead got '" + arg + "' at position " + lastSeenSize + " instead");
+                        return CommandOutput.failure("Expected end of input, but got '" + arg + "' at position " + lastSeenSize + " instead");
                     }
 
                     ParseResult result = checkApplicable(args.getString(lastSeenSize - 1), currentNodes);
