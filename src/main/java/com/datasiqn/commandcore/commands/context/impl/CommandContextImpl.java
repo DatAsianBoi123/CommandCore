@@ -5,6 +5,7 @@ import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
 
@@ -17,15 +18,15 @@ public class CommandContextImpl<S extends CommandSender> implements CommandConte
         this.arguments = arguments;
     }
 
-    public S getSender() {
+    public @NotNull S getSender() {
         return sender;
     }
 
-    public List<String> getArguments() {
+    public @NotNull @UnmodifiableView List<String> getArguments() {
         return arguments;
     }
 
-    public <T> T parseArgument(@NotNull ArgumentType<T> type, int index) {
+    public @NotNull <T> T parseArgument(@NotNull ArgumentType<T> type, int index) {
         try {
             return type.parse(arguments.get(index));
         } catch (ArgumentParseException e) {
