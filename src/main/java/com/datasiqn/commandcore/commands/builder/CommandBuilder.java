@@ -89,7 +89,7 @@ public class CommandBuilder<S extends CommandSender> {
         }
 
         @Override
-        public List<String> getUsages() {
+        public @NotNull List<String> getUsages() {
             return usages;
         }
 
