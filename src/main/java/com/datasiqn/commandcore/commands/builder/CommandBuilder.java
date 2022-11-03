@@ -146,7 +146,7 @@ public class CommandBuilder<S extends CommandSender> {
                     // If the user adds an extra space on the end of the command
                     if (lastSeenSize > args.size()) {
                         lastSeenSize = args.size();
-                        ParseResult result = findCurrentNode(nodes, args, args.size() - 1);
+                        ParseResult result = findCurrentNode(nodes, args, 0, args.size() - 1);
                         if (result == null || !result.foundNode()) currentNodes = nodes;
                         else currentNodes = result.node.children;
                     }
@@ -191,8 +191,8 @@ public class CommandBuilder<S extends CommandSender> {
                     if (lastSeenSize != args.size()) {
                         if (args.size() != 1) {
                             if (!movedBack && currentNodes == null) return CommandExecutor.super.tabComplete(sender, args);
+                            ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, lastSeenSize - 1, args.size() - 1);
                             lastSeenSize = args.size();
-                            ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, args.size() - 1);
                             if (result == null || !result.foundNode()) {
                                 currentNodes = null;
                                 currentTabComplete.clear();
@@ -229,9 +229,9 @@ public class CommandBuilder<S extends CommandSender> {
                 return new ParseResult(options.get(0));
             }
 
-            private ParseResult findCurrentNode(@NotNull Set<CommandNode<S, ?>> nodeSet, @NotNull Arguments args, int iterations) {
+            private ParseResult findCurrentNode(@NotNull Set<CommandNode<S, ?>> nodeSet, @NotNull Arguments args, int begin, int iterations) {
                 ParseResult result = null;
-                for (int i = 0; i < iterations; i++) {
+                for (int i = begin; i < iterations; i++) {
                     ParseResult parseResult = checkApplicable(args.getString(i), nodeSet);
                     if (!parseResult.foundNode()) return parseResult;
                     nodeSet = parseResult.node.children;
