@@ -24,7 +24,7 @@ public interface Arguments {
      * @return The argument
      * @param <T> The type of the argument type
      * @throws ArgumentParseException If the argument could not be parsed
-     * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} < 0, or {@code i} > {@link Arguments#size()})
+     * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >} {@link Arguments#size()})
      */
     @NotNull
     <T> T get(int i, ArgumentType<T> type) throws ArgumentParseException;
