@@ -62,22 +62,29 @@ public final class MyPlugin extends JavaPlugin {
 Using the static method `CommandCore.init(...)` initializes CommandCore. After doing this, you can access the instance from anywhere by using `CommandCore.getInstance()`
 
 ### 2) Creating a command
+
 ```java
+import org.bukkit.entity.Player;
+
+import com.datasiqn.commandcore.arguments.ArgumentType;
+import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.builder.*;
+
 public class GreetCommand {
-  // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
-  private final Command command = new CommandBuilder<>(Player.class)
-    .description("Greets a player")
-    .executes(sender -> sender.sendMessage("You ran this command with no arguments")) // Line 5
-    .then(LiteralBuilder.<Player>literal("player")
-      .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
-        .executes(context -> context.getSender().chat("Hello " + context.parseArgument(ArgumentType.PLAYER, 1).getName()))))
-    .then(LiteralBuilder.<Player>literal("server")
-      .executes(context -> context.getSender().chat("Hello Server!")))
-    .build();
-  
-  public Command getCommand() {
-    return command;
-  }
+    // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
+    private final Command command = new CommandBuilder<>(Player.class)
+            .description("Greets a player")
+            .executes(sender -> sender.sendMessage("You ran this command with no arguments")) // Line 5
+            .then(LiteralBuilder.<Player>literal("player")
+                    .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
+                            .executes(context -> context.getArguments().get(1, ArgumentType.PLAYER).computeIfOk(player -> context.getSender().chat("Hello " + player.getName() + "!")))))
+            .then(LiteralBuilder.<Player>literal("server")
+                    .executes(context -> context.getSender().chat("Hello Server!")))
+            .build();
+
+    public Command getCommand() {
+        return command;
+    }
 }
 ```
 The `CommandBuilder` is what you use create commands.
