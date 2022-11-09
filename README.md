@@ -77,7 +77,7 @@ public class GreetCommand {
             .executes(sender -> sender.sendMessage("You ran this command with no arguments")) // Line 5
             .then(LiteralBuilder.<Player>literal("player")
                     .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
-                            .executes(context -> context.getArguments().get(1, ArgumentType.PLAYER).computeIfOk(player -> context.getSender().chat("Hello " + player.getName() + "!")))))
+                            .executes(context -> context.getArguments().get(1, ArgumentType.PLAYER).ifOk(player -> context.getSender().chat("Hello " + player.getName() + "!")))))
             .then(LiteralBuilder.<Player>literal("server")
                     .executes(context -> context.getSender().chat("Hello Server!")))
             .build();
