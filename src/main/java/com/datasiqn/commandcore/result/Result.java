@@ -28,6 +28,16 @@ public class Result<V, E extends Exception> {
         caughtError = true;
     }
 
+    public void match(Consumer<V> okConsumer, Consumer<E> errorConsumer) {
+        if (isOk()) okConsumer.accept(value);
+        errorConsumer.accept(error);
+    }
+
+    public <T> T matchResult(Function<V, T> okFunction, Function<E, T> errorFunction) {
+        if (isOk()) return okFunction.apply(value);
+        return errorFunction.apply(error);
+    }
+
     public boolean isOk() {
         return !caughtError;
     }
@@ -52,16 +62,6 @@ public class Result<V, E extends Exception> {
 
     public void ifError(Consumer<E> consumer) {
         match(value -> {}, consumer);
-    }
-
-    public void match(Consumer<V> okConsumer, Consumer<E> errorConsumer) {
-        if (isOk()) okConsumer.accept(value);
-        errorConsumer.accept(error);
-    }
-
-    public <T> T matchResult(Function<V, T> okFunction, Function<E, T> errorFunction) {
-        if (isOk()) return okFunction.apply(value);
-        return errorFunction.apply(error);
     }
 
     public <N> Result<N, E> and(Result<N, E> result) {
@@ -93,8 +93,7 @@ public class Result<V, E extends Exception> {
     }
 
     public <N extends Exception> Result<V, N> mapError(Function<E, N> mapper) {
-        if (isOk()) return ok(value);
-        return error(mapper.apply(error));
+        return matchResult(Result::ok, error -> error(mapper.apply(error)));
     }
 
     @Contract(value = "_ -> new", pure = true)
