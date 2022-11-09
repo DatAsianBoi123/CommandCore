@@ -1,8 +1,10 @@
 package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
+import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
+import com.datasiqn.commandcore.result.Result;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.*;
 
@@ -48,7 +50,7 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
      * @param args The arguments of the command
      * @return True if it was successful, false otherwise
      */
-    public final boolean executeWith(S sender, List<String> args) {
+    public final boolean executeWith(S sender, Arguments args) {
         if (executor == null) return false;
         executor.accept(new CommandContextImpl<>(sender, args));
         return true;

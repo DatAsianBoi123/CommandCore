@@ -5,6 +5,7 @@ import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.CommandOutput;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
@@ -131,14 +132,17 @@ public class CommandBuilder<S extends CommandSender> {
             private int lastSeenSize;
 
             @Override
-            public CommandOutput execute(@NotNull CommandSender sender, @NotNull Arguments args) {
+            public @NotNull CommandOutput execute(@NotNull CommandContext<CommandSender> context) {
+                CommandSender sender = context.getSender();
                 if (!senderClass.isInstance(sender)) {
                     sender.sendMessage("You cannot send this command");
                     return CommandOutput.success();
                 }
 
                 long begin = System.currentTimeMillis();
+
                 S castedSender = senderClass.cast(sender);
+                Arguments args = context.getArguments();
 
                 if (args.size() >= 1) {
                     if (nodes.isEmpty()) return CommandOutput.failure("Expected no parameters, but got " + args.size() + " parameters instead");
@@ -169,7 +173,7 @@ public class CommandBuilder<S extends CommandSender> {
                         return CommandOutput.failure(messages);
                     }
                     Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                    boolean hasExecutor = result.node.executeWith(castedSender, args.asList());
+                    boolean hasExecutor = result.node.executeWith(castedSender, args.copy());
                     return hasExecutor ? CommandOutput.success() : CommandOutput.failure();
                 }
 
@@ -180,7 +184,9 @@ public class CommandBuilder<S extends CommandSender> {
             }
 
             @Override
-            public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull Arguments args) {
+            public @NotNull List<String> tabComplete(@NotNull CommandContext<CommandSender> context) {
+                Arguments args = context.getArguments();
+
                 if (args.size() >= 1) {
                     if (args.size() == 1) {
                         currentNodes = nodes;
@@ -190,13 +196,13 @@ public class CommandBuilder<S extends CommandSender> {
                     boolean movedBack = lastSeenSize > args.size();
                     if (lastSeenSize != args.size()) {
                         if (args.size() != 1) {
-                            if (!movedBack && currentNodes == null) return CommandExecutor.super.tabComplete(sender, args);
+                            if (!movedBack && currentNodes == null) return CommandExecutor.super.tabComplete(context);
                             ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, lastSeenSize - 1, args.size() - 1);
                             lastSeenSize = args.size();
                             if (result == null || !result.foundNode()) {
                                 currentNodes = null;
                                 currentTabComplete.clear();
-                                return CommandExecutor.super.tabComplete(sender, args);
+                                return CommandExecutor.super.tabComplete(context);
                             }
                             currentNodes = result.node.children;
                         }
@@ -204,7 +210,7 @@ public class CommandBuilder<S extends CommandSender> {
                     }
                     return currentTabComplete;
                 }
-                return CommandExecutor.super.tabComplete(sender, args);
+                return CommandExecutor.super.tabComplete(context);
             }
 
             @Contract(mutates = "param1")

@@ -7,6 +7,7 @@ import com.datasiqn.commandcore.commands.CommandOutput;
 import com.datasiqn.commandcore.commands.CommandResult;
 import com.datasiqn.commandcore.commands.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.commands.builder.CommandBuilder;
+import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.commandcore.managers.CommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -114,7 +115,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            CommandOutput output = cmd.getExecutor().execute(sender, new ArgumentsImpl(listArgs));
+            CommandOutput output = cmd.getExecutor().execute(new CommandContextImpl<>(sender, new ArgumentsImpl(listArgs)));
             if (output.getResult() == CommandResult.FAILURE) {
                 for (String message : output.getMessages()) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
@@ -139,7 +140,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            tabComplete.addAll(cmd.getExecutor().tabComplete(sender, new ArgumentsImpl(listArgs)));
+            tabComplete.addAll(cmd.getExecutor().tabComplete(new CommandContextImpl<>(sender, new ArgumentsImpl(listArgs))));
         }
 
         List<String> partialMatches = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.datasiqn.commandcore.commands;
 
-import com.datasiqn.commandcore.arguments.Arguments;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,20 +10,18 @@ import java.util.List;
 public interface CommandExecutor {
     /**
      * Executes this command executor
-     * @param sender The sender that executed the command
-     * @param args The command arguments
+     * @param context The context in which this command was executed
      * @return The output of the command
      */
-    CommandOutput execute(@NotNull CommandSender sender, @NotNull Arguments args);
+    @NotNull CommandOutput execute(@NotNull CommandContext<CommandSender> context);
 
     /**
      * Gets the tabcomplete for this command executor
-     * @param sender The sender that requested the tab completions
-     * @param args The command arguments
+     * @param context The context in which this command was tab completed
      * @return The tab completions
      */
     @NotNull
-    default List<String> tabComplete(@NotNull CommandSender sender, @NotNull Arguments args) {
+    default List<String> tabComplete(@NotNull CommandContext<CommandSender> context) {
         return new ArrayList<>();
     }
 }
