@@ -27,7 +27,7 @@ public class ArgumentsImpl implements Arguments {
 
     @Override
     public @NotNull String getString(int i) {
-        return get(i, ArgumentType.STRING).orElse("");
+        return get(i, ArgumentType.STRING).unwrapOr("");
     }
 
     @Override

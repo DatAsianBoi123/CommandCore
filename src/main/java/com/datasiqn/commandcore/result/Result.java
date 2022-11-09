@@ -7,6 +7,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Represents a result of a method
+ * @param <V> The type of the {@code Ok} value
+ * @param <E> The type of the {@code Error} value
+ */
 public class Result<V, E extends Exception> {
     private final V value;
     private final E error;
@@ -31,31 +36,6 @@ public class Result<V, E extends Exception> {
         return caughtError;
     }
 
-    public Result<V, E> computeIfOk(Consumer<V> consumer) {
-        if (isOk()) consumer.accept(value);
-        return this;
-    }
-
-    public Result<V, E> computeIfError(Consumer<E> consumer) {
-        if (isError()) consumer.accept(error);
-        return this;
-    }
-
-    public Result<V, E> and(Function<V, Result<V, E>> function) {
-        if (isOk()) return function.apply(value);
-        return error(error);
-    }
-
-    public Result<V, E> or(Result<V, E> result) {
-        if (isOk()) return ok(value);
-        return result;
-    }
-
-    public V orElse(V value) {
-        if (isOk()) return this.value;
-        return value;
-    }
-
     public V unwrap() throws UnwrapException {
         if (error == null) return value;
         throw new UnwrapException("unwrap", "err");
@@ -66,14 +46,50 @@ public class Result<V, E extends Exception> {
         throw new UnwrapException("unwrapError", "ok");
     }
 
+    public void ifOk(Consumer<V> consumer) {
+        match(consumer, error -> {});
+    }
+
+    public void ifError(Consumer<E> consumer) {
+        match(value -> {}, consumer);
+    }
+
+    public void match(Consumer<V> okConsumer, Consumer<E> errorConsumer) {
+        if (isOk()) okConsumer.accept(value);
+        errorConsumer.accept(error);
+    }
+
+    public <T> T matchResult(Function<V, T> okFunction, Function<E, T> errorFunction) {
+        if (isOk()) return okFunction.apply(value);
+        return errorFunction.apply(error);
+    }
+
+    public <N> Result<N, E> and(Result<N, E> result) {
+        return matchResult(value -> result, Result::error);
+    }
+
+    public <N> Result<N, E> andThen(Function<V, Result<N, E>> function) {
+        return matchResult(function, Result::error);
+    }
+
+    public <N extends Exception> Result<V, N> or(Result<V, N> result) {
+        return matchResult(Result::ok, error -> result);
+    }
+
+    public <N extends Exception> Result<V, N> orElse(Function<E, Result<V, N>> function) {
+        return matchResult(Result::ok, function);
+    }
+
+    public V unwrapOr(V defaultValue) {
+        return matchResult(value -> this.value, error -> defaultValue);
+    }
+
     public <N> Result<N, E> map(Function<V, N> mapper) {
-        if (isOk()) return ok(mapper.apply(value));
-        return error(error);
+        return matchResult(value -> ok(mapper.apply(value)), Result::error);
     }
 
     public <N> N mapOr(Function<V, N> mapper, N defaultValue) {
-        if (isOk()) return mapper.apply(value);
-        return defaultValue;
+        return matchResult(mapper, error -> defaultValue);
     }
 
     public <N extends Exception> Result<V, N> mapError(Function<E, N> mapper) {
