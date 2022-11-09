@@ -66,7 +66,7 @@ Using the static method `CommandCore.init(...)` initializes CommandCore. After d
 public class GreetCommand {
   // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
   private final Command command = new CommandBuilder<>(Player.class)
-    .description('Greets a player')
+    .description("Greets a player")
     .executes(sender -> sender.sendMessage("You ran this command with no arguments")) // Line 5
     .then(LiteralBuilder.<Player>literal("player")
       .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
