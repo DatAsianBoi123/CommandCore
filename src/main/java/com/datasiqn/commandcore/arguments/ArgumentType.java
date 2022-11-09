@@ -8,6 +8,7 @@ import com.datasiqn.commandcore.util.ParseUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -20,14 +21,14 @@ import java.util.stream.Collectors;
 public interface ArgumentType<T> {
     ArgumentType<String> STRING = new StringArgumentType();
 
-    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str)).mapError(error -> new ArgumentParseException("Invalid integer " + str)));
+    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)));
 
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str)).mapError(error -> new ArgumentParseException("Invalid integer " + str)).and(integer -> {
+    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)).and(integer -> {
         if (integer <= 0) return Result.error(new ArgumentParseException("Integer must not be below 0"));
         return Result.ok(integer);
     }));
 
-    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str)).mapError(error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
+    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
 
     ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), () -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
 
@@ -67,11 +68,7 @@ public interface ArgumentType<T> {
 
         @Override
         public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
-            try {
-                return Result.ok(T.valueOf(enumClass, str.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                return Result.error(new ArgumentParseException("Invalid " + enumClass.getSimpleName() + " '" + str + "'"));
-            }
+            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumClass.getSimpleName() + " '" + str + "'"));
         }
 
         @Override
