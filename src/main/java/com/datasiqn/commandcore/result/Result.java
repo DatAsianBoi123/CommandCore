@@ -96,12 +96,12 @@ public class Result<V, E extends Exception> {
         return ok(value);
     }
 
-    @Contract(value = "_ -> new", pure = true)
-    public static <V, E extends Exception> Result<V, E> resolve(ValueSupplier<V, E> supplier) {
+    @Contract(value = "_, _ -> new", pure = true)
+    public static <V, F extends Exception, E extends Exception> Result<V, E> resolve(ValueSupplier<V, F> supplier, Function<Exception, E> errorMapper) {
         try {
             return ok(supplier.getValue());
         } catch (Exception e) {
-            return error((E) e);
+            return error(errorMapper.apply(e));
         }
     }
 
