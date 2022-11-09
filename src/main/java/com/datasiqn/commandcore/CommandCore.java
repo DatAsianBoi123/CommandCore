@@ -85,7 +85,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         instance.commandManager.registerCommand("help", new CommandBuilder<>(CommandSender.class)
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
-                        .executes(context -> instance.sendCommandHelp(context.getSender(), context.parseArgument(ArgumentType.STRING, 0))))
+                        .executes(context -> instance.sendCommandHelp(context.getSender(), context.getArguments().getString(0))))
                 .executes(instance::sendHelpMenu)
                 .build());
 

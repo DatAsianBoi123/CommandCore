@@ -217,12 +217,7 @@ public class CommandBuilder<S extends CommandSender> {
                 List<CommandNode<S, ?>> options = new ArrayList<>();
                 List<ArgumentParseException> exceptions = new ArrayList<>();
                 for (CommandNode<S, ?> node : nodes) {
-                    ArgumentParseException exception = node.getParsingException(argToCheck);
-                    if (exception == null) {
-                        options.add(node);
-                        continue;
-                    }
-                    exceptions.add(exception);
+                    node.parse(argToCheck).computeIfOk(o -> options.add(node)).computeIfError(exceptions::add);
                 }
                 if (options.isEmpty()) return new ParseResult(exceptions);
                 options.sort(CommandNode.getComparator());

@@ -74,12 +74,12 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
     }
 
     /**
-     * Gets any parsing exceptions that may occur with a given string
-     * @param arg The argument to test
-     * @return The parsing exception that occurred, or null if none occurred
+     * Attempts to parse a string
+     * @param arg The string to parse
+     * @return The result of the parsing
      */
-    @Nullable
-    public abstract ArgumentParseException getParsingException(String arg);
+    @NotNull
+    public abstract Result<?, ArgumentParseException> parse(String arg);
 
     protected List<String> getUsages(boolean isOptional) {
         List<String> usages = new ArrayList<>();

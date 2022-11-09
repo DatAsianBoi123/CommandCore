@@ -3,6 +3,8 @@ package com.datasiqn.commandcore.arguments;
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.result.Result;
+import com.datasiqn.commandcore.util.ParseUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -18,51 +20,26 @@ import java.util.stream.Collectors;
 public interface ArgumentType<T> {
     ArgumentType<String> STRING = new StringArgumentType();
 
-    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> {
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            throw new ArgumentParseException("Invalid integer " + str);
-        }
-    });
+    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str)).mapError(error -> new ArgumentParseException("Invalid integer " + str)));
 
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> {
-        int integer;
-        try {
-            integer = Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            throw new ArgumentParseException("Invalid integer " + str);
-        }
-        if (integer <= 0) throw new ArgumentParseException("Integer must not be below 0");
-        return integer;
-    });
+    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str)).mapError(error -> new ArgumentParseException("Invalid integer " + str)).and(integer -> {
+        if (integer <= 0) return Result.error(new ArgumentParseException("Integer must not be below 0"));
+        return Result.ok(integer);
+    }));
 
-    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> {
-        if (str.equalsIgnoreCase("true")) return true;
-        else if (str.equalsIgnoreCase("false")) return false;
-        throw new ArgumentParseException("Invalid boolean " + str + ", expected either true or false");
-    }, Arrays.asList("true", "false"));
+    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str)).mapError(error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
 
-    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> {
-        Player player = Bukkit.getPlayerExact(name);
-        if (player == null) throw new ArgumentParseException("No player exists with the name " + name);
-        return player;
-    }, () -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), () -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
 
-    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> {
-        Command executor = CommandCore.getInstance().getCommandManager().getCommand(str);
-        if (executor == null) throw new ArgumentParseException("No command exists with the name " + str);
-        return executor;
-    }, () -> new ArrayList<>(CommandCore.getInstance().getCommandManager().allCommands().keySet()));
+    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> Result.ofNullable(CommandCore.getInstance().getCommandManager().getCommand(str), new ArgumentParseException("No command exists with the name " + str)), () -> new ArrayList<>(CommandCore.getInstance().getCommandManager().allCommands().keySet()));
 
     /**
      * Parses a string
      * @param str The string to parse
-     * @return The parsed string
-     * @throws ArgumentParseException If an exception occurs when parsing
+     * @return The result of parsing
      */
     @NotNull
-    T parse(@NotNull String str) throws ArgumentParseException;
+    Result<T, ArgumentParseException> parse(@NotNull String str);
 
     /**
      * Gets the tabcomplete for this {@code ArgumentType}
@@ -89,11 +66,11 @@ public interface ArgumentType<T> {
         }
 
         @Override
-        public @NotNull T parse(@NotNull String str) throws ArgumentParseException {
+        public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
             try {
-                return T.valueOf(enumClass, str.toUpperCase());
+                return Result.ok(T.valueOf(enumClass, str.toUpperCase()));
             } catch (IllegalArgumentException e) {
-                throw new ArgumentParseException("Invalid " + enumClass.getSimpleName() + " '" + str + "'");
+                return Result.error(new ArgumentParseException("Invalid " + enumClass.getSimpleName() + " '" + str + "'"));
             }
         }
 
@@ -108,7 +85,7 @@ public interface ArgumentType<T> {
      * @param <T> The type of the argument
      */
     class CustomArgumentType<T> implements ArgumentType<T> {
-        private final ParseFunction<T> asStringFunction;
+        private final ParseFunction<T> parseFunction;
         private List<String> values;
         private Supplier<List<String>> valueSupplier;
 
@@ -122,11 +99,11 @@ public interface ArgumentType<T> {
 
         /**
          * Creates a new {@link ArgumentType}
-         * @param asStringFunction The function to use when parsing a string
+         * @param parseFunction The function to use when parsing a string
          * @param values The tabcomplete values
          */
-        public CustomArgumentType(ParseFunction<T> asStringFunction, List<String> values) {
-            this.asStringFunction = asStringFunction;
+        public CustomArgumentType(ParseFunction<T> parseFunction, List<String> values) {
+            this.parseFunction = parseFunction;
             this.values = values;
         }
 
@@ -136,13 +113,13 @@ public interface ArgumentType<T> {
          * @param valueSupplier A supplier of tabcomplete values
          */
         public CustomArgumentType(ParseFunction<T> parseFunction, Supplier<List<String>> valueSupplier) {
-            this.asStringFunction = parseFunction;
+            this.parseFunction = parseFunction;
             this.valueSupplier = valueSupplier;
         }
 
         @Override
-        public @NotNull T parse(@NotNull String str) throws ArgumentParseException {
-            return asStringFunction.apply(str);
+        public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
+            return parseFunction.parse(str);
         }
 
         @Override
@@ -159,10 +136,9 @@ public interface ArgumentType<T> {
             /**
              * Parses a string
              * @param str The string
-             * @return The parsed string
-             * @throws ArgumentParseException If there's a parsing error
+             * @return The result of the parsing
              */
-            T apply(String str) throws ArgumentParseException;
+            Result<T, ArgumentParseException> parse(String str);
         }
     }
 
@@ -171,8 +147,8 @@ public interface ArgumentType<T> {
      */
     class StringArgumentType implements ArgumentType<String> {
         @Override
-        public @NotNull String parse(@NotNull String str) {
-            return str;
+        public @NotNull Result<String, ArgumentParseException> parse(@NotNull String str) {
+            return Result.ok(str);
         }
     }
 }

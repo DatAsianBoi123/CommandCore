@@ -1,10 +1,8 @@
 package com.datasiqn.commandcore.arguments;
 
 import com.datasiqn.commandcore.ArgumentParseException;
+import com.datasiqn.commandcore.result.Result;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
-
-import java.util.List;
 
 /**
  * Represents command arguments
@@ -19,15 +17,14 @@ public interface Arguments {
 
     /**
      * Gets a specific argument
-     * @param i The index of the argument
+     * @param i    The index of the argument
      * @param type The argument type
-     * @return The argument
-     * @param <T> The type of the argument type
-     * @throws ArgumentParseException If the argument could not be parsed
+     * @param <T>  The type of the argument type
+     * @return The result of the parsing
      * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >} {@link Arguments#size()})
      */
     @NotNull
-    <T> T get(int i, ArgumentType<T> type) throws ArgumentParseException;
+    <T> Result<T, ArgumentParseException> get(int i, ArgumentType<T> type);
 
     /**
      * Gets a simple string argument
@@ -37,9 +34,6 @@ public interface Arguments {
     @NotNull
     String getString(int i);
 
-    /**
-     * Gets the arguments represented as a list of strings
-     * @return An unmodifiable view of all arguments
-     */
-    @UnmodifiableView @NotNull List<String> asList();
+    @NotNull
+    Arguments copy();
 }
