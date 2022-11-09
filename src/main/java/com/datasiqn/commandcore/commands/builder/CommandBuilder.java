@@ -197,7 +197,7 @@ public class CommandBuilder<S extends CommandSender> {
                     if (lastSeenSize != args.size()) {
                         if (args.size() != 1) {
                             if (!movedBack && currentNodes == null) return CommandExecutor.super.tabComplete(context);
-                            ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, lastSeenSize - 1, args.size() - 1);
+                            ParseResult result = findCurrentNode(movedBack ? nodes : currentNodes, args, movedBack ? 0 : lastSeenSize - 1, args.size() - 1);
                             lastSeenSize = args.size();
                             if (result == null || !result.foundNode()) {
                                 currentNodes = null;
