@@ -5,6 +5,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * Represents a command
+ */
 public interface Command {
     /**
      * Gets the executor for this command
