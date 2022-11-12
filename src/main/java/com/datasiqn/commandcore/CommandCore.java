@@ -1,46 +1,39 @@
 package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.arguments.impl.ArgumentsImpl;
 import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.CommandOutput;
-import com.datasiqn.commandcore.commands.CommandResult;
 import com.datasiqn.commandcore.commands.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.commands.builder.CommandBuilder;
-import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.commandcore.managers.CommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Main class of {@code CommandCore}
  */
-public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompleter {
+public class CommandCore {
     private static CommandCore instance;
     private final CommandManager commandManager = new CommandManager();
     private final JavaPlugin plugin;
     private final org.bukkit.command.Command bukkitCommand;
+    private final InitOptions options;
 
-    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command) {
+    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command, InitOptions options) {
         this.plugin = plugin;
         this.bukkitCommand = command;
+        this.options = options;
     }
 
     /**
@@ -53,14 +46,28 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
 
     /**
      * Initializes CommandCore so that it can be accessed using {@link CommandCore#getInstance()}
+     *
      * @param plugin Your plugin instance
      * @param rootCommand The name of your root command
-     * @throws RuntimeException If it has already been initialized
      * @return The instance
+     * @throws RuntimeException If it has already been initialized
      */
     public static @NotNull CommandCore init(JavaPlugin plugin, String rootCommand) {
+        return init(plugin, InitOptions.Builder.create(rootCommand).build());
+    }
+
+    /**
+     * Initializes CommandCore so that it can be accessed using {@link CommandCore#getInstance()}
+     *
+     * @param plugin Your plugin instance
+     * @param options The initialization options
+     * @return The instance
+     * @throws RuntimeException If it has already been initialized
+     */
+    public static @NotNull CommandCore init(JavaPlugin plugin, InitOptions options) {
         if (instance != null) throw new RuntimeException("An instance of CommandCore has already been created");
 
+        String rootCommand = options.getRootCommand();
         PluginCommand command = plugin.getCommand(rootCommand);
         if (command == null) {
             Bukkit.getLogger().info("[CommandCore] The root command " + rootCommand + " isn't registered in your plugin.yml! Attempting to reflectively insert it into Bukkit's command map...");
@@ -79,11 +86,12 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
             Bukkit.getLogger().info("[CommandCore] Successfully injected the command into Bukkit");
         }
 
-        instance = new CommandCore(plugin, command);
-        command.setExecutor(instance);
-        command.setTabCompleter(instance);
+        instance = new CommandCore(plugin, command, options);
+        MainCommand mainCommand = new MainCommand(instance);
+        command.setExecutor(mainCommand);
+        command.setTabCompleter(mainCommand);
 
-        instance.commandManager.registerCommand("help", new CommandBuilder<>(CommandSender.class)
+        if (options.createHelpCommand()) instance.commandManager.registerCommand("help", new CommandBuilder<>(CommandSender.class)
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
                         .executes(context -> instance.sendCommandHelp(context.getSender(), context.getArguments().getString(0))))
@@ -101,56 +109,7 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         return instance;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length >= 1) {
-            Command cmd = commandManager.getCommand(args[0]);
-            if (cmd == null) {
-                sendHelpMenu(sender);
-                return true;
-            }
-            if (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString())) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to use this command");
-                return true;
-            }
-            List<String> listArgs = new ArrayList<>(Arrays.asList(args));
-            listArgs.remove(0);
-            CommandOutput output = cmd.getExecutor().execute(new CommandContextImpl<>(sender, new ArgumentsImpl(listArgs)));
-            if (output.getResult() == CommandResult.FAILURE) {
-                for (String message : output.getMessages()) sender.sendMessage(ChatColor.RED + message);
-                sender.sendMessage(ChatColor.GRAY + "Usage(s):");
-                sender.sendMessage(getUsagesFor(args[0], 1).toArray(new String[0]));
-            }
-            return true;
-        }
-        sendHelpMenu(sender);
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        List<String> tabComplete = new ArrayList<>();
-        if (args.length == 1) {
-            commandManager.allCommands().forEach((s, cmd) -> {
-                if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) tabComplete.add(s);
-            });
-        } else {
-            Command cmd = commandManager.getCommand(args[0]);
-            if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
-            List<String> listArgs = new ArrayList<>(Arrays.asList(args));
-            listArgs.remove(0);
-            tabComplete.addAll(cmd.getExecutor().tabComplete(new CommandContextImpl<>(sender, new ArgumentsImpl(listArgs))));
-        }
-
-        List<String> partialMatches = new ArrayList<>();
-        StringUtil.copyPartialMatches(args[args.length - 1], tabComplete, partialMatches);
-        partialMatches.sort(Comparator.naturalOrder());
-
-        return partialMatches;
-    }
-
-    private void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
+    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
         if (!commandManager.hasCommand(commandName)) throw new RuntimeException("Command " + commandName + " does not exist");
         Command command = commandManager.getCommand(commandName);
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
@@ -159,16 +118,18 @@ public class CommandCore implements org.bukkit.command.CommandExecutor, TabCompl
         sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
     }
 
-    private void sendHelpMenu(@NotNull CommandSender sender) {
-        sender.sendMessage(ChatColor.GOLD + plugin.getName() + " Commands");
+    public void sendHelpMenu(@NotNull CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
         commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
             Command command = commandManager.getCommand(name);
             if (command.getPermissionString() == null || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
         });
     }
 
-    private @NotNull List<String> getUsagesFor(String commandName, int spaces) {
-        if (!commandManager.hasCommand(commandName)) throw new RuntimeException("Command " + commandName + " does not exist");
+    @NotNull
+    public List<String> getUsagesFor(String commandName, int spaces) {
+        if (!commandManager.hasCommand(commandName))
+            throw new RuntimeException("Command " + commandName + " does not exist");
         List<String> usages = new ArrayList<>();
         Command command = commandManager.getCommand(commandName);
         command.getUsages().forEach(usage -> {
