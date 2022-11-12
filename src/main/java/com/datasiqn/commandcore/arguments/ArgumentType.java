@@ -3,7 +3,7 @@ package com.datasiqn.commandcore.arguments;
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.result.Result;
+import com.datasiqn.resultapi.Result;
 import com.datasiqn.commandcore.util.ParseUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

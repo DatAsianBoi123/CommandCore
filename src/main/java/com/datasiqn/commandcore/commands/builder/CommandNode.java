@@ -4,7 +4,7 @@ import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
-import com.datasiqn.commandcore.result.Result;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.*;
 

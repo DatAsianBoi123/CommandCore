@@ -2,7 +2,7 @@ package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.result.Result;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;

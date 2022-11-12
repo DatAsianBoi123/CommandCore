@@ -3,7 +3,7 @@ package com.datasiqn.commandcore.arguments.impl;
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.arguments.Arguments;
-import com.datasiqn.commandcore.result.Result;
+import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
