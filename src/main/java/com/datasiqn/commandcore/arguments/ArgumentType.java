@@ -23,10 +23,7 @@ public interface ArgumentType<T> {
 
     ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)));
 
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)).andThen(integer -> {
-        if (integer <= 0) return Result.error(new ArgumentParseException("Integer must not be below 0"));
-        return Result.ok(integer);
-    }));
+    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)).andThen(integer -> integer <= 0 ? Result.error(new ArgumentParseException("Integer must not be below 0")) : Result.ok(integer)));
 
     ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
 
