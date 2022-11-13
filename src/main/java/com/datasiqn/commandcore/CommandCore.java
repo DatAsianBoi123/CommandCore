@@ -91,11 +91,11 @@ public class CommandCore {
         command.setExecutor(mainCommand);
         command.setTabCompleter(mainCommand);
 
-        if (options.createHelpCommand()) instance.commandManager.registerCommand("help", new CommandBuilder<>(CommandSender.class)
+        if (options.createHelpCommand()) instance.commandManager.registerCommand("help", new CommandBuilder()
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
-                        .executes(context -> instance.sendCommandHelp(context.getSender(), context.getArguments().getString(0))))
-                .executes(instance::sendHelpMenu));
+                        .executes(context -> instance.sendCommandHelp(context.getSource().getSender(), context.getArguments().getString(0))))
+                .executes(source -> instance.sendHelpMenu(source.getSender())));
 
         return instance;
     }

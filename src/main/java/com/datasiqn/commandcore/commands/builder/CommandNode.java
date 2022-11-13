@@ -2,11 +2,14 @@ package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
+import com.datasiqn.commandcore.commands.CommandSource;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.resultapi.Result;
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -14,22 +17,21 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a node that can be added onto a command
- * @param <S> The type of the sender
  * @param <This> The type of the extended class
  */
-public abstract class CommandNode<S extends CommandSender, This extends CommandNode<S, This>> {
-    private static final Comparator<CommandNode<?, ?>> comparator = Comparator.comparingInt(CommandNode::getPriority);
+public abstract class CommandNode<This extends CommandNode<This>> {
+    private static final Comparator<CommandNode<?>> comparator = Comparator.comparingInt(CommandNode::getPriority);
 
-    protected final Set<CommandNode<S, ?>> children = new HashSet<>();
+    protected final Set<CommandNode<?>> children = new HashSet<>();
 
-    protected Consumer<CommandContext<S>> executor;
+    protected Consumer<CommandContext> executor;
 
     /**
      * Adds a new node onto this current node
      * @param node The node
      * @return The node for chaining
      */
-    public final @NotNull This then(CommandNode<S, ?> node) {
+    public final @NotNull This then(CommandNode<?> node) {
         children.add(node);
         return getThis();
     }
@@ -39,20 +41,20 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
      * @param executor The executor
      * @return The node for chaining
      */
-    public final @NotNull This executes(Consumer<CommandContext<S>> executor) {
+    public final @NotNull This executes(Consumer<CommandContext> executor) {
         this.executor = executor;
         return getThis();
     }
 
     /**
      * Executes this node
-     * @param sender The sender that executed it
+     * @param source The source that executed it
      * @param args The arguments of the command
      * @return True if it was successful, false otherwise
      */
-    public final boolean executeWith(S sender, Arguments args) {
+    public final boolean executeWith(CommandSource source, Arguments args) {
         if (executor == null) return false;
-        executor.accept(new CommandContextImpl<>(sender, args));
+        executor.accept(new CommandContextImpl(source, args));
         return true;
     }
 
@@ -71,7 +73,7 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
      */
     @Contract(" -> new")
     @UnmodifiableView
-    public final @NotNull @Unmodifiable Set<CommandNode<S, ?>> getChildren() {
+    public final @NotNull @Unmodifiable Set<CommandNode<?>> getChildren() {
         return Collections.unmodifiableSet(children);
     }
 
@@ -88,8 +90,8 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
         if (executor != null) usages.add(getUsageArgument(isOptional));
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        List<CommandNode<S, ?>> sortedChildren = children.stream().sorted(comparator).collect(Collectors.toList());
-        for (CommandNode<S, ?> node : sortedChildren) {
+        List<CommandNode<?>> sortedChildren = children.stream().sorted(comparator).collect(Collectors.toList());
+        for (CommandNode<?> node : sortedChildren) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
             usages.addAll(node.getUsages(executor != null).stream().map(str -> getUsageArgument(isOptional) + " " + str).collect(Collectors.toList()));
@@ -115,7 +117,7 @@ public abstract class CommandNode<S extends CommandSender, This extends CommandN
      * Gets the comparator for command nodes
      * @return The comparator
      */
-    public static Comparator<CommandNode<?, ?>> getComparator() {
+    public static Comparator<CommandNode<?>> getComparator() {
         return comparator;
     }
 }

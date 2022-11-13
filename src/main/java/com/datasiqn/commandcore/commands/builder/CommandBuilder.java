@@ -5,9 +5,9 @@ import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.CommandOutput;
+import com.datasiqn.commandcore.commands.CommandSource;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,30 +17,25 @@ import java.util.function.Consumer;
 
 /**
  * Represents a builder that creates commands
- * @param <S> The type of the sender
  */
-public class CommandBuilder<S extends CommandSender> {
-    private final Set<CommandNode<S, ?>> nodes = new HashSet<>();
-    private final Class<S> senderClass;
+public class CommandBuilder {
+    private final Set<CommandNode<?>> nodes = new HashSet<>();
 
     private String permission;
-    private Consumer<S> executor;
+    private Consumer<CommandSource> executor;
     private String description = "No description provided";
 
     /**
      * Creates a new {@code CommandBuilder}
-     * @param senderClass The class of the required sender
      */
-    public CommandBuilder(Class<S> senderClass) {
-        this.senderClass = senderClass;
-    }
+    public CommandBuilder() {}
 
     /**
      * Sets the permission of the command
      * @param permission The permission
      * @return The builder for chaining
      */
-    public CommandBuilder<S> permission(String permission) {
+    public CommandBuilder permission(String permission) {
         this.permission = permission;
         return this;
     }
@@ -50,7 +45,7 @@ public class CommandBuilder<S extends CommandSender> {
      * @param description The description
      * @return The builder for chaining
      */
-    public CommandBuilder<S> description(String description) {
+    public CommandBuilder description(String description) {
         this.description = description;
         return this;
     }
@@ -60,7 +55,7 @@ public class CommandBuilder<S extends CommandSender> {
      * @param node The node
      * @return The builder for chaining
      */
-    public CommandBuilder<S> then(CommandNode<S, ?> node) {
+    public CommandBuilder then(CommandNode<?> node) {
         nodes.add(node);
         return this;
     }
@@ -70,7 +65,7 @@ public class CommandBuilder<S extends CommandSender> {
      * @param executor The executor
      * @return The builder for chaining
      */
-    public CommandBuilder<S> executes(Consumer<S> executor) {
+    public CommandBuilder executes(Consumer<CommandSource> executor) {
         this.executor = executor;
         return this;
     }
@@ -84,7 +79,7 @@ public class CommandBuilder<S extends CommandSender> {
         if (executor != null) usages.add("");
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        for (CommandNode<S, ?> node : nodes) {
+        for (CommandNode<?> node : nodes) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
             usages.addAll(node.getUsages(executor != null));
@@ -128,20 +123,14 @@ public class CommandBuilder<S extends CommandSender> {
 
         private class BuilderExecutor implements CommandExecutor {
             private final List<String> currentTabComplete = new ArrayList<>();
-            private Set<CommandNode<S, ?>> currentNodes = nodes;
+            private Set<CommandNode<?>> currentNodes = nodes;
             private int lastSeenSize;
 
             @Override
-            public @NotNull CommandOutput execute(@NotNull CommandContext<CommandSender> context) {
-                CommandSender sender = context.getSender();
-                if (!senderClass.isInstance(sender)) {
-                    sender.sendMessage("You cannot send this command");
-                    return CommandOutput.success();
-                }
-
+            public @NotNull CommandOutput execute(@NotNull CommandContext context) {
                 long begin = System.currentTimeMillis();
 
-                S castedSender = senderClass.cast(sender);
+                CommandSource source = context.getSource();
                 Arguments args = context.getArguments();
 
                 if (args.size() >= 1) {
@@ -173,18 +162,18 @@ public class CommandBuilder<S extends CommandSender> {
                         return CommandOutput.failure(messages);
                     }
                     Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                    boolean hasExecutor = result.node.executeWith(castedSender, args.copy());
+                    boolean hasExecutor = result.node.executeWith(source, args.copy());
                     return hasExecutor ? CommandOutput.success() : CommandOutput.failure();
                 }
 
                 if (executor == null) return CommandOutput.failure("Expected parameters, but got no parameters instead");
                 Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                executor.accept(castedSender);
+                executor.accept(source);
                 return CommandOutput.success();
             }
 
             @Override
-            public @NotNull List<String> tabComplete(@NotNull CommandContext<CommandSender> context) {
+            public @NotNull List<String> tabComplete(@NotNull CommandContext context) {
                 Arguments args = context.getArguments();
 
                 if (args.size() >= 1) {
@@ -214,15 +203,15 @@ public class CommandBuilder<S extends CommandSender> {
             }
 
             @Contract(mutates = "param1")
-            private void populateTabComplete(@NotNull List<String> currentTabComplete, @NotNull Set<CommandNode<S, ?>> nodes) {
+            private void populateTabComplete(@NotNull List<String> currentTabComplete, @NotNull Set<CommandNode<?>> nodes) {
                 currentTabComplete.clear();
                 nodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete()));
             }
 
-            private @NotNull ParseResult checkApplicable(@NotNull String argToCheck, @NotNull Collection<CommandNode<S, ?>> nodes) {
-                List<CommandNode<S, ?>> options = new ArrayList<>();
+            private @NotNull ParseResult checkApplicable(@NotNull String argToCheck, @NotNull Collection<CommandNode<?>> nodes) {
+                List<CommandNode<?>> options = new ArrayList<>();
                 List<ArgumentParseException> exceptions = new ArrayList<>();
-                for (CommandNode<S, ?> node : nodes) {
+                for (CommandNode<?> node : nodes) {
                     node.parse(argToCheck).match(o -> options.add(node), exceptions::add);
                 }
                 if (options.isEmpty()) return new ParseResult(exceptions);
@@ -230,7 +219,7 @@ public class CommandBuilder<S extends CommandSender> {
                 return new ParseResult(options.get(0));
             }
 
-            private ParseResult findCurrentNode(@NotNull Set<CommandNode<S, ?>> nodeSet, @NotNull Arguments args, int begin, int iterations) {
+            private ParseResult findCurrentNode(@NotNull Set<CommandNode<?>> nodeSet, @NotNull Arguments args, int begin, int iterations) {
                 ParseResult result = null;
                 for (int i = begin; i < iterations; i++) {
                     ParseResult parseResult = checkApplicable(args.getString(i), nodeSet);
@@ -243,13 +232,13 @@ public class CommandBuilder<S extends CommandSender> {
 
             private class ParseResult {
                 private final List<ArgumentParseException> exceptions = new ArrayList<>();
-                private final CommandNode<S, ?> node;
+                private final CommandNode<?> node;
 
                 private ParseResult(Collection<ArgumentParseException> exceptions) {
-                    this((CommandNode<S, ?>) null);
+                    this((CommandNode<?>) null);
                     this.exceptions.addAll(exceptions);
                 }
-                private ParseResult(CommandNode<S, ?> node) {
+                private ParseResult(CommandNode<?> node) {
                     this.node = node;
                 }
 

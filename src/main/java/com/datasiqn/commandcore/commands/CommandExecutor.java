@@ -1,7 +1,6 @@
 package com.datasiqn.commandcore.commands;
 
 import com.datasiqn.commandcore.commands.context.CommandContext;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ public interface CommandExecutor {
      * @param context The context in which this command was executed
      * @return The output of the command
      */
-    @NotNull CommandOutput execute(@NotNull CommandContext<CommandSender> context);
+    @NotNull CommandOutput execute(@NotNull CommandContext context);
 
     /**
      * Gets the tabcomplete for this command executor
@@ -21,7 +20,7 @@ public interface CommandExecutor {
      * @return The tab completions
      */
     @NotNull
-    default List<String> tabComplete(@NotNull CommandContext<CommandSender> context) {
+    default List<String> tabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
     }
 }

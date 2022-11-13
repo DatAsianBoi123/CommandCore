@@ -16,7 +16,7 @@ public class CommandManager {
      * @param name The command name
      * @param command The command
      */
-    public void registerCommand(String name, CommandBuilder<?> command) {
+    public void registerCommand(String name, CommandBuilder command) {
         commandMap.put(name, command.build());
     }
 

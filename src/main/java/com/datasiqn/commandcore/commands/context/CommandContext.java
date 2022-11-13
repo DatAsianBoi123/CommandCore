@@ -1,23 +1,19 @@
 package com.datasiqn.commandcore.commands.context;
 
-import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.arguments.Arguments;
-import org.bukkit.command.CommandSender;
+import com.datasiqn.commandcore.commands.CommandSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
-
-import java.util.List;
 
 /**
  * Represents the context in which a command is executed
- * @param <S> The type of the sender that executed the command
  */
-public interface CommandContext<S extends CommandSender> {
+public interface CommandContext {
     /**
      * Gets the sender that executed this command
+     *
      * @return The sender
      */
-    @NotNull S getSender();
+    @NotNull CommandSource getSource();
 
     /**
      * Gets all arguments represented as a list of strings
