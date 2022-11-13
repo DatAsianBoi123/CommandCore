@@ -1,6 +1,7 @@
 package com.datasiqn.commandcore.managers;
 
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.builder.CommandBuilder;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
@@ -15,8 +16,8 @@ public class CommandManager {
      * @param name The command name
      * @param command The command
      */
-    public void registerCommand(String name, Command command) {
-        commandMap.put(name, command);
+    public void registerCommand(String name, CommandBuilder<?> command) {
+        commandMap.put(name, command.build());
     }
 
     /**
