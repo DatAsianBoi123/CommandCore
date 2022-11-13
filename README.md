@@ -64,6 +64,8 @@ Using the static method `CommandCore.init(...)` initializes CommandCore. After d
 ### 2) Creating a command
 
 ```java
+import com.datasiqn.commandcore.ArgumentParseException;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.entity.Player;
 
 import com.datasiqn.commandcore.arguments.ArgumentType;
@@ -74,12 +76,17 @@ public class GreetCommand {
     // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
     private final Command command = new CommandBuilder<>(Player.class)
             .description("Greets a player")
-            .executes(sender -> sender.sendMessage("You ran this command with no arguments")) // Line 5
-            .then(LiteralBuilder.<Player>literal("player")
+            .executes(source -> source.getSender().sendMessage("You ran this command with no arguments")) // Line 5
+            .then(LiteralBuilder.literal("player")
                     .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
-                            .executes(context -> context.getArguments().get(1, ArgumentType.PLAYER).ifOk(player -> context.getSender().chat("Hello " + player.getName() + "!")))))
-            .then(LiteralBuilder.<Player>literal("server")
-                    .executes(context -> context.getSender().chat("Hello Server!")))
+                            .executes(context -> {
+                                Result<Player, ArgumentParseException> playerResult = context.getArguments().get(1, ArgumentType.PLAYER);
+                                if (playerResult.isError()) return;
+                                Player player = playerResult.unwrap();
+                                context.getSource().getPlayer().match(source -> source.chat("Hello " + player.getName()), error -> context.getSource().getSender().sendMessage("You must be a player to send this!"));
+                            })))
+            .then(LiteralBuilder.literal("server")
+                    .executes(context -> context.getSource().getPlayer().match(player -> player.chat("Hello Server!"), error -> context.getSource().getSender().sendMessage("You must be a player to send this!"))))
             .build();
 
     public Command getCommand() {
