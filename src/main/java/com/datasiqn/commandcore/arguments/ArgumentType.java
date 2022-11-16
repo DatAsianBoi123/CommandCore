@@ -56,10 +56,7 @@ public interface ArgumentType<T> {
      * Represents a custom argument type that parses to an enum value
      * @param <T> The type of the enum
      */
-    class EnumArgumentType<T extends Enum<T>> implements ArgumentType<T> {
-        private final String enumName;
-        private final Class<T> enumClass;
-
+    class EnumArgumentType<T extends Enum<T>> extends CustomArgumentType<T> {
         /**
          * Creates a new {@code ArgumentType}
          * @param enumClass The enum's class
@@ -73,18 +70,7 @@ public interface ArgumentType<T> {
          * @param enumName The name of the enum
          */
         public EnumArgumentType(@NotNull Class<T> enumClass, @NotNull String enumName) {
-            this.enumClass = enumClass;
-            this.enumName = enumName;
-        }
-
-        @Override
-        public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumName + " '" + str + "'"));
-        }
-
-        @Override
-        public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
-            return Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+            super(str -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumName + " '" + str + "'")), Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList()));
         }
     }
 
