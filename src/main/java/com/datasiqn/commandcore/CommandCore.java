@@ -94,7 +94,15 @@ public class CommandCore {
         if (options.createHelpCommand()) instance.commandManager.registerCommand("help", new CommandBuilder()
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
-                        .executes(context -> instance.sendCommandHelp(context.getSource().getSender(), context.getArguments().getString(0))))
+                        .executes(context -> {
+                            Command cmd = context.getArguments().get(0, ArgumentType.COMMAND).unwrap();
+                            String commandName = context.getArguments().getString(0);
+                            if (!context.getSource().hasPermission(cmd.getPermissionString())) {
+                                context.getSource().getSender().sendMessage(ChatColor.RED + "No help for " + commandName);
+                                return;
+                            }
+                            instance.sendCommandHelp(context.getSource().getSender(), commandName);
+                        }))
                 .executes(context -> instance.sendHelpMenu(context.getSource().getSender())));
 
         return instance;
