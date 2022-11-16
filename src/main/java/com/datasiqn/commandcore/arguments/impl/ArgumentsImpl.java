@@ -6,7 +6,6 @@ import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ArgumentsImpl implements Arguments {
@@ -28,10 +27,5 @@ public class ArgumentsImpl implements Arguments {
     @Override
     public @NotNull String getString(int i) {
         return get(i, ArgumentType.STRING).unwrapOr("");
-    }
-
-    @Override
-    public @NotNull Arguments copy() {
-        return new ArgumentsImpl(new ArrayList<>(allArguments));
     }
 }

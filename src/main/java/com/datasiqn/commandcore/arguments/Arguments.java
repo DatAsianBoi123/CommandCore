@@ -33,7 +33,4 @@ public interface Arguments {
      */
     @NotNull
     String getString(int i);
-
-    @NotNull
-    Arguments copy();
 }
