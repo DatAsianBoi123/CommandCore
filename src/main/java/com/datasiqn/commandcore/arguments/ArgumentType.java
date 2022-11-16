@@ -55,6 +55,7 @@ public interface ArgumentType<T> {
      * @param <T> The type of the enum
      */
     class EnumArgumentType<T extends Enum<T>> implements ArgumentType<T> {
+        private final String enumName;
         private final Class<T> enumClass;
 
         /**
@@ -62,12 +63,21 @@ public interface ArgumentType<T> {
          * @param enumClass The enum's class
          */
         public EnumArgumentType(Class<T> enumClass) {
+            this(enumClass, enumClass.getSimpleName());
+        }
+        /**
+         * Creates a new {@code ArgumentType}
+         * @param enumClass The enum's class
+         * @param enumName The name of the enum
+         */
+        public EnumArgumentType(Class<T> enumClass, String enumName) {
             this.enumClass = enumClass;
+            this.enumName = enumName;
         }
 
         @Override
         public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumClass.getSimpleName() + " '" + str + "'"));
+            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumName + " '" + str + "'"));
         }
 
         @Override
