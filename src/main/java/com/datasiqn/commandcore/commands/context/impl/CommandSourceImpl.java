@@ -5,7 +5,9 @@ import com.datasiqn.resultapi.Result;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CommandSourceImpl implements CommandSource {
     private final CommandSender sender;
@@ -27,5 +29,14 @@ public class CommandSourceImpl implements CommandSource {
     @Override
     public @NotNull CommandSender getSender() {
         return sender;
+    }
+
+    @Override
+    public boolean hasPermission(@NotNull Permission permission) {
+        return getSender().hasPermission(permission);
+    }
+    @Override
+    public boolean hasPermission(@Nullable String permission) {
+        return permission == null || getSender().hasPermission(permission);
     }
 }
