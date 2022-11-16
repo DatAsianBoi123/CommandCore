@@ -22,10 +22,7 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
 
     @Override
     public @NotNull Result<String, ArgumentParseException> parse(String arg) {
-        return Result.<String, ArgumentParseException>ok(arg).andThen(str -> {
-            if (literal.equals(arg)) return Result.ok(str);
-            return Result.error(new ArgumentParseException("Invalid literal '" + arg + "'"));
-        });
+        return Result.<String, ArgumentParseException>ok(arg).andThen(str -> literal.equals(arg) ? Result.ok(str) : Result.error(new ArgumentParseException("Invalid literal '" + arg + "'")));
     }
 
     @Override
