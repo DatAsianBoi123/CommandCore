@@ -1,10 +1,7 @@
 package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
-import com.datasiqn.commandcore.arguments.Arguments;
-import com.datasiqn.commandcore.commands.CommandSource;
 import com.datasiqn.commandcore.commands.context.CommandContext;
-import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -48,13 +45,12 @@ public abstract class CommandNode<This extends CommandNode<This>> {
 
     /**
      * Executes this node
-     * @param source The source that executed it
-     * @param args The arguments of the command
+     * @param context The context in which the command was executed
      * @return True if it was successful, false otherwise
      */
-    public final boolean executeWith(CommandSource source, Arguments args) {
+    public final boolean executeWith(CommandContext context) {
         if (executor == null) return false;
-        executor.accept(new CommandContextImpl(source, args));
+        executor.accept(context);
         return true;
     }
 

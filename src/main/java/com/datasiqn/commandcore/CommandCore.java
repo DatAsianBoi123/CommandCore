@@ -95,7 +95,7 @@ public class CommandCore {
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
                         .executes(context -> instance.sendCommandHelp(context.getSource().getSender(), context.getArguments().getString(0))))
-                .executes(source -> instance.sendHelpMenu(source.getSender())));
+                .executes(context -> instance.sendHelpMenu(context.getSource().getSender())));
 
         return instance;
     }

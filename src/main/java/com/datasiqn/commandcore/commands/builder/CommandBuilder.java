@@ -5,7 +5,6 @@ import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.CommandOutput;
-import com.datasiqn.commandcore.commands.CommandSource;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
@@ -22,7 +21,7 @@ public class CommandBuilder {
     private final Set<CommandNode<?>> nodes = new HashSet<>();
 
     private String permission;
-    private Consumer<CommandSource> executor;
+    private Consumer<CommandContext> executor;
     private String description = "No description provided";
 
     /**
@@ -65,7 +64,7 @@ public class CommandBuilder {
      * @param executor The executor
      * @return The builder for chaining
      */
-    public CommandBuilder executes(Consumer<CommandSource> executor) {
+    public CommandBuilder executes(Consumer<CommandContext> executor) {
         this.executor = executor;
         return this;
     }
@@ -130,7 +129,6 @@ public class CommandBuilder {
             public @NotNull CommandOutput execute(@NotNull CommandContext context) {
                 long begin = System.currentTimeMillis();
 
-                CommandSource source = context.getSource();
                 Arguments args = context.getArguments();
 
                 if (args.size() >= 1) {
@@ -162,13 +160,13 @@ public class CommandBuilder {
                         return CommandOutput.failure(messages);
                     }
                     Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                    boolean hasExecutor = result.node.executeWith(source, args.copy());
+                    boolean hasExecutor = result.node.executeWith(context);
                     return hasExecutor ? CommandOutput.success() : CommandOutput.failure();
                 }
 
                 if (executor == null) return CommandOutput.failure("Expected parameters, but got no parameters instead");
                 Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                executor.accept(source);
+                executor.accept(context);
                 return CommandOutput.success();
             }
 
