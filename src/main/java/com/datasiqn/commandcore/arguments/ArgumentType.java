@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -30,9 +30,15 @@ public interface ArgumentType<T> {
 
     ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
 
-    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), () -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
 
-    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> Result.ofNullable(CommandCore.getInstance().getCommandManager().getCommand(str), new ArgumentParseException("No command exists with the name " + str)), () -> new ArrayList<>(CommandCore.getInstance().getCommandManager().allCommands().keySet()));
+    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> Result.ofNullable(CommandCore.getInstance().getCommandManager().getCommand(str), new ArgumentParseException("No command exists with the name " + str)), context -> {
+        List<String> commandNames = new ArrayList<>();
+        CommandCore.getInstance().getCommandManager().allCommands().forEach((name, command) -> {
+            if (context.getSource().hasPermission(command.getPermissionString())) commandNames.add(name);
+        });
+        return commandNames;
+    });
 
     /**
      * Parses a string
@@ -81,7 +87,7 @@ public interface ArgumentType<T> {
     class CustomArgumentType<T> implements ArgumentType<T> {
         private final ParseFunction<T> parseFunction;
         private List<String> values;
-        private Supplier<List<String>> valueSupplier;
+        private @NotNull Function<CommandContext, List<String>> valueFunction;
 
         /**
          * Creates a new {@link ArgumentType}
@@ -102,11 +108,11 @@ public interface ArgumentType<T> {
         /**
          * Creates a new {@link ArgumentType}
          * @param parseFunction The function to use when parsing a string
-         * @param valueSupplier A supplier of tabcomplete values
+         * @param valueFunction A function of tabcomplete values
          */
-        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull Supplier<List<String>> valueSupplier) {
+        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull Function<CommandContext, List<String>> valueFunction) {
             this.parseFunction = parseFunction;
-            this.valueSupplier = valueSupplier;
+            this.valueFunction = valueFunction;
         }
 
         @Override
@@ -116,7 +122,7 @@ public interface ArgumentType<T> {
 
         @Override
         public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
-            return values == null ? valueSupplier.get() : values;
+            return values == null ? valueFunction.apply(context) : values;
         }
 
         /**
