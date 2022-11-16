@@ -1,6 +1,7 @@
 package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
@@ -26,7 +27,7 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
     }
 
     @Override
-    public @NotNull List<String> getTabComplete() {
+    public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>(Collections.singletonList(literal));
     }
 

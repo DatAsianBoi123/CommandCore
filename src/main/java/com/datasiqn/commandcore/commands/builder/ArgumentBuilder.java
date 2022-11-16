@@ -2,6 +2,7 @@ package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
@@ -23,8 +24,8 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
-    public @NotNull List<String> getTabComplete() {
-        return type.getTabComplete();
+    public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
+        return type.getTabComplete(context);
     }
 
     @Override

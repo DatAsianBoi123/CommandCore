@@ -59,7 +59,7 @@ public abstract class CommandNode<This extends CommandNode<This>> {
      * @return The tabcomplete
      */
     @NotNull
-    public List<String> getTabComplete() {
+    public List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
     }
 

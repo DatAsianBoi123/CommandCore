@@ -3,6 +3,7 @@ package com.datasiqn.commandcore.arguments;
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.Result;
 import com.datasiqn.commandcore.util.ParseUtil;
 import org.bukkit.Bukkit;
@@ -43,10 +44,11 @@ public interface ArgumentType<T> {
 
     /**
      * Gets the tabcomplete for this {@code ArgumentType}
+     * @param context The command context
      * @return The tabcomplete
      */
     @NotNull
-    default List<String> getTabComplete() {
+    default List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
     }
 
@@ -62,7 +64,7 @@ public interface ArgumentType<T> {
          * Creates a new {@code ArgumentType}
          * @param enumClass The enum's class
          */
-        public EnumArgumentType(Class<T> enumClass) {
+        public EnumArgumentType(@NotNull Class<T> enumClass) {
             this(enumClass, enumClass.getSimpleName());
         }
         /**
@@ -70,7 +72,7 @@ public interface ArgumentType<T> {
          * @param enumClass The enum's class
          * @param enumName The name of the enum
          */
-        public EnumArgumentType(Class<T> enumClass, String enumName) {
+        public EnumArgumentType(@NotNull Class<T> enumClass, @NotNull String enumName) {
             this.enumClass = enumClass;
             this.enumName = enumName;
         }
@@ -81,7 +83,7 @@ public interface ArgumentType<T> {
         }
 
         @Override
-        public @NotNull List<String> getTabComplete() {
+        public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
             return Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
         }
     }
@@ -99,26 +101,24 @@ public interface ArgumentType<T> {
          * Creates a new {@link ArgumentType}
          * @param parseFunction The function to use when parsing a string
          */
-        public CustomArgumentType(ParseFunction<T> parseFunction) {
+        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction) {
             this(parseFunction, Collections.emptyList());
         }
-
         /**
          * Creates a new {@link ArgumentType}
          * @param parseFunction The function to use when parsing a string
          * @param values The tabcomplete values
          */
-        public CustomArgumentType(ParseFunction<T> parseFunction, List<String> values) {
+        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull List<String> values) {
             this.parseFunction = parseFunction;
             this.values = values;
         }
-
         /**
          * Creates a new {@link ArgumentType}
          * @param parseFunction The function to use when parsing a string
          * @param valueSupplier A supplier of tabcomplete values
          */
-        public CustomArgumentType(ParseFunction<T> parseFunction, Supplier<List<String>> valueSupplier) {
+        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull Supplier<List<String>> valueSupplier) {
             this.parseFunction = parseFunction;
             this.valueSupplier = valueSupplier;
         }
@@ -129,7 +129,7 @@ public interface ArgumentType<T> {
         }
 
         @Override
-        public @NotNull List<String> getTabComplete() {
+        public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
             return values == null ? valueSupplier.get() : values;
         }
 

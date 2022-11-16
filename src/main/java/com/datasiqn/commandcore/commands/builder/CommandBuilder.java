@@ -178,7 +178,7 @@ public class CommandBuilder {
                     if (args.size() == 1) {
                         currentNodes = nodes;
                         lastSeenSize = 1;
-                        populateTabComplete(currentTabComplete, currentNodes);
+                        populateTabComplete(currentTabComplete, currentNodes, context);
                     }
                     boolean movedBack = lastSeenSize > args.size();
                     if (lastSeenSize != args.size()) {
@@ -193,7 +193,7 @@ public class CommandBuilder {
                             }
                             currentNodes = result.node.children;
                         }
-                        populateTabComplete(currentTabComplete, currentNodes);
+                        populateTabComplete(currentTabComplete, currentNodes, context);
                     }
                     return currentTabComplete;
                 }
@@ -201,9 +201,9 @@ public class CommandBuilder {
             }
 
             @Contract(mutates = "param1")
-            private void populateTabComplete(@NotNull List<String> currentTabComplete, @NotNull Set<CommandNode<?>> nodes) {
+            private void populateTabComplete(@NotNull List<String> currentTabComplete, @NotNull Set<CommandNode<?>> nodes, CommandContext context) {
                 currentTabComplete.clear();
-                nodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete()));
+                nodes.forEach(node -> currentTabComplete.addAll(node.getTabComplete(context)));
             }
 
             private @NotNull ParseResult checkApplicable(@NotNull String argToCheck, @NotNull Collection<CommandNode<?>> nodes) {
