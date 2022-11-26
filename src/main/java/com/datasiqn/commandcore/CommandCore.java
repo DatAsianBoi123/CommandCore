@@ -50,7 +50,7 @@ public class CommandCore {
      * @param plugin Your plugin instance
      * @param rootCommand The name of your root command
      * @return The instance
-     * @throws RuntimeException If it has already been initialized
+     * @throws IllegalStateException If it has already been initialized
      */
     public static @NotNull CommandCore init(JavaPlugin plugin, String rootCommand) {
         return init(plugin, InitOptions.Builder.create(rootCommand).build());
@@ -62,10 +62,10 @@ public class CommandCore {
      * @param plugin Your plugin instance
      * @param options The initialization options
      * @return The instance
-     * @throws RuntimeException If it has already been initialized
+     * @throws IllegalStateException If it has already been initialized
      */
     public static @NotNull CommandCore init(JavaPlugin plugin, InitOptions options) {
-        if (instance != null) throw new RuntimeException("An instance of CommandCore has already been created");
+        if (instance != null) throw new IllegalStateException("An instance of CommandCore has already been created");
 
         String rootCommand = options.getRootCommand();
         PluginCommand command = plugin.getCommand(rootCommand);
@@ -117,7 +117,7 @@ public class CommandCore {
     }
 
     public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
-        if (!commandManager.hasCommand(commandName)) throw new RuntimeException("Command " + commandName + " does not exist");
+        if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         Command command = commandManager.getCommand(commandName);
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
                 ChatColor.GRAY + " Description: " + ChatColor.WHITE + command.getDescription(),
@@ -136,7 +136,7 @@ public class CommandCore {
     @NotNull
     public List<String> getUsagesFor(String commandName, int spaces) {
         if (!commandManager.hasCommand(commandName))
-            throw new RuntimeException("Command " + commandName + " does not exist");
+            throw new IllegalArgumentException("Command " + commandName + " does not exist");
         List<String> usages = new ArrayList<>();
         Command command = commandManager.getCommand(commandName);
         command.getUsages().forEach(usage -> {
