@@ -1,6 +1,8 @@
 package com.datasiqn.commandcore.commands;
 
 import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.resultapi.None;
+import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -10,9 +12,9 @@ public interface CommandExecutor {
     /**
      * Executes this command executor
      * @param context The context in which this command was executed
-     * @return The output of the command
+     * @return The result of the command
      */
-    @NotNull CommandOutput execute(@NotNull CommandContext context);
+    @NotNull Result<None, List<String>> execute(@NotNull CommandContext context);
 
     /**
      * Gets the tabcomplete for this command executor

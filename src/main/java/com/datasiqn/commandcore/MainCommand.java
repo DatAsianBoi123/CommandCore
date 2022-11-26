@@ -2,10 +2,10 @@ package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.arguments.impl.ArgumentsImpl;
 import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.CommandOutput;
-import com.datasiqn.commandcore.commands.CommandResult;
 import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.commandcore.commands.context.impl.CommandSourceImpl;
+import com.datasiqn.resultapi.None;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,12 +40,12 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            CommandOutput output = cmd.getExecutor().execute(new CommandContextImpl(new CommandSourceImpl(sender), new ArgumentsImpl(listArgs)));
-            if (output.getResult() == CommandResult.FAILURE) {
-                for (String message : output.getMessages()) sender.sendMessage(ChatColor.RED + message);
+            @NotNull Result<None, List<String>> output = cmd.getExecutor().execute(new CommandContextImpl(new CommandSourceImpl(sender), new ArgumentsImpl(listArgs)));
+            output.ifError(messages -> {
+                for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
                 sender.sendMessage(commandCore.getUsagesFor(args[0], 1).toArray(new String[0]));
-            }
+            });
             return true;
         }
         commandCore.sendHelpMenu(sender);

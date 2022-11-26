@@ -4,21 +4,25 @@ import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
-import com.datasiqn.commandcore.commands.CommandOutput;
 import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.resultapi.None;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Represents a builder that creates commands
  */
 public class CommandBuilder {
     private final Set<CommandNode<?>> nodes = new HashSet<>();
+    private final List<Function<CommandContext, Result<None, String>>> requires = new ArrayList<>();
 
     private String permission;
     private Consumer<CommandContext> executor;
@@ -28,6 +32,19 @@ public class CommandBuilder {
      * Creates a new {@code CommandBuilder}
      */
     public CommandBuilder() {}
+
+    public CommandBuilder requires(Function<CommandContext, Result<None, String>> requires) {
+        this.requires.add(requires);
+        return this;
+    }
+
+    public CommandBuilder requiresPlayer() {
+        return requires(context -> context.getSource().getPlayer().and(Result.ok()).or(Result.error("A player is required to run this")));
+    }
+
+    public CommandBuilder requiresEntity() {
+        return requires(context -> context.getSource().getEntity().and(Result.ok()).or(Result.error("An entity is required to run this")));
+    }
 
     /**
      * Sets the permission of the command
@@ -126,13 +143,13 @@ public class CommandBuilder {
             private int lastSeenSize;
 
             @Override
-            public @NotNull CommandOutput execute(@NotNull CommandContext context) {
+            public @NotNull Result<None, List<String>> execute(@NotNull CommandContext context) {
                 long begin = System.currentTimeMillis();
 
                 Arguments args = context.getArguments();
 
                 if (args.size() >= 1) {
-                    if (nodes.isEmpty()) return CommandOutput.failure("Expected no parameters, but got " + args.size() + " parameters instead");
+                    if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got " + args.size() + " parameters instead"));
 
                     // If the user adds an extra space on the end of the command
                     if (lastSeenSize > args.size()) {
@@ -144,30 +161,39 @@ public class CommandBuilder {
 
                     if (currentNodes == null) {
                         String arg = args.getString(lastSeenSize - 1);
-                        return CommandOutput.failure("Expected end of input, but got '" + arg + "' at position " + lastSeenSize + " instead");
+                        return Result.error(Collections.singletonList("Expected end of input, but got '" + arg + "' at position " + lastSeenSize + " instead"));
                     }
 
                     ParseResult result = checkApplicable(args.getString(lastSeenSize - 1), currentNodes);
                     if (!result.foundNode()) {
                         String arg = args.getString(lastSeenSize - 1);
-                        String[] messages = new String[result.exceptions.size() + 1];
-                        messages[0] = "Invalid parameter '" + arg + "' at position " + lastSeenSize + ": ";
-                        int i = 1;
-                        for (ArgumentParseException exception : result.exceptions) {
-                            messages[i] = exception.getMessage();
-                            i++;
-                        }
-                        return CommandOutput.failure(messages);
+                        List<String> messages = new ArrayList<>();
+                        messages.add("Invalid parameter '" + arg + "' at position " + lastSeenSize + ": ");
+                        result.exceptions.forEach(exception -> messages.add(exception.getMessage()));
+                        return Result.error(messages);
                     }
                     Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-                    boolean hasExecutor = result.node.executeWith(context);
-                    return hasExecutor ? CommandOutput.success() : CommandOutput.failure();
+                    if (result.node.executor == null) return Result.error(Collections.emptyList());
+                    Result<None, String> executeResult = result.node.executeWith(context);
+                    if (executeResult.isError()) {
+                        context.getSource().getSender().sendMessage(ChatColor.RED + executeResult.unwrapError());
+                        return Result.ok();
+                    }
+                    return Result.error(Collections.emptyList());
                 }
 
-                if (executor == null) return CommandOutput.failure("Expected parameters, but got no parameters instead");
+                if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
                 Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
+                Result<None, String> requireResult = Result.ok();
+                for (Function<CommandContext, Result<None, String>> require : requires) {
+                    requireResult = requireResult.and(require.apply(context));
+                }
+                if (requireResult.isError()) {
+                    context.getSource().getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
+                    return Result.ok();
+                }
                 executor.accept(context);
-                return CommandOutput.success();
+                return Result.ok();
             }
 
             @Override
