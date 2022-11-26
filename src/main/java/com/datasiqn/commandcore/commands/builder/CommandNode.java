@@ -2,6 +2,7 @@ package com.datasiqn.commandcore.commands.builder;
 
 import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -20,8 +22,22 @@ public abstract class CommandNode<This extends CommandNode<This>> {
     private static final Comparator<CommandNode<?>> comparator = Comparator.comparingInt(CommandNode::getPriority);
 
     protected final Set<CommandNode<?>> children = new HashSet<>();
+    protected final List<Function<CommandContext, Result<None, String>>> requires = new ArrayList<>();
 
     protected Consumer<CommandContext> executor;
+
+    public final @NotNull This requires(Function<CommandContext, Result<None, String>> requires) {
+        this.requires.add(requires);
+        return getThis();
+    }
+
+    public @NotNull This requiresPlayer() {
+        return requires(context -> context.getSource().getPlayer().and(Result.ok()).or(Result.error("A player is required to run this")));
+    }
+
+    public @NotNull This requiresEntity() {
+        return requires(context -> context.getSource().getEntity().and(Result.ok()).or(Result.error("An entity is required to run this")));
+    }
 
     /**
      * Adds a new node onto this current node
@@ -46,12 +62,17 @@ public abstract class CommandNode<This extends CommandNode<This>> {
     /**
      * Executes this node
      * @param context The context in which the command was executed
-     * @return True if it was successful, false otherwise
+     * @return The result of the execution
+     * @throws IllegalStateException If there's no executor for this {@code CommandNode}
      */
-    public final boolean executeWith(CommandContext context) {
-        if (executor == null) return false;
+    public final @NotNull Result<None, String> executeWith(CommandContext context) {
+        if (executor == null) throw new IllegalStateException("This CommandNode has no executor");
+        for (Function<CommandContext, Result<None, String>> require : requires){
+            Result<None, String> result = require.apply(context);
+            if (result.isError()) return result;
+        }
         executor.accept(context);
-        return true;
+        return Result.ok();
     }
 
     /**
