@@ -45,8 +45,7 @@ public class CommandCore {
     }
 
     /**
-     * Initializes CommandCore so that it can be accessed using {@link CommandCore#getInstance()}
-     *
+     * Initializes CommandCore so that it can be accessed using {@link #getInstance()}
      * @param plugin Your plugin instance
      * @param rootCommand The name of your root command
      * @return The instance
@@ -57,8 +56,7 @@ public class CommandCore {
     }
 
     /**
-     * Initializes CommandCore so that it can be accessed using {@link CommandCore#getInstance()}
-     *
+     * Initializes CommandCore so that it can be accessed using {@link #getInstance()}
      * @param plugin Your plugin instance
      * @param options The initialization options
      * @return The instance
