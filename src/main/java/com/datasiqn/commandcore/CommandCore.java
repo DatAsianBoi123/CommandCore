@@ -153,4 +153,8 @@ public class CommandCore {
         });
         return usages;
     }
+
+    public InitOptions getOptions() {
+        return options;
+    }
 }

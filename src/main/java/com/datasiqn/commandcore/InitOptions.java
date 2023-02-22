@@ -7,12 +7,14 @@ public class InitOptions {
     private final String rootCommand;
     private final String pluginName;
     private final boolean helpCommand;
+    private final boolean legacyExecutor;
 
     @Contract(pure = true)
     public InitOptions(@NotNull Builder builder) {
         this.rootCommand = builder.rootCommand;
         this.pluginName = builder.pluginName;
         this.helpCommand = builder.helpCommand;
+        this.legacyExecutor = builder.legacyExecutor;
     }
 
     public String getRootCommand() {
@@ -31,10 +33,15 @@ public class InitOptions {
         return helpCommand;
     }
 
+    public boolean useLegacyExecutor() {
+        return legacyExecutor;
+    }
+
     public static class Builder {
         private final String rootCommand;
         private String pluginName;
         private boolean helpCommand = true;
+        private boolean legacyExecutor = false;
 
         public Builder(String rootCommand) {
             this.rootCommand = rootCommand;
@@ -52,6 +59,12 @@ public class InitOptions {
 
         public Builder pluginName(String name) {
             this.pluginName = name;
+            return this;
+        }
+
+        @Deprecated
+        public Builder useLegacyExecutor() {
+            this.legacyExecutor = true;
             return this;
         }
 

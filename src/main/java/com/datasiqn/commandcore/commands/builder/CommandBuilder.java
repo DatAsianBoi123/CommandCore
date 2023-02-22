@@ -4,6 +4,8 @@ import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
+import com.datasiqn.commandcore.commands.builder.executor.BuilderExecutor;
+import com.datasiqn.commandcore.commands.builder.executor.LegacyExecutor;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
@@ -109,12 +111,14 @@ public class CommandBuilder {
         private final String description;
         private final String permission;
         private final List<String> usages;
-        private final CommandExecutor commandExecutor = new BuilderExecutor();
+        private final CommandExecutor commandExecutor;
 
         public BuilderCommand(List<String> usages) {
             this.description = CommandBuilder.this.description;
             this.permission = CommandBuilder.this.permission;
             this.usages = usages;
+
+            this.commandExecutor = CommandCore.getInstance().getOptions().useLegacyExecutor() ? new LegacyExecutor(executor, nodes, requires) : new BuilderExecutor(executor, nodes, requires);
         }
 
         @Override
