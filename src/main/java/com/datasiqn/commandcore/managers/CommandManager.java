@@ -2,6 +2,7 @@ package com.datasiqn.commandcore.managers;
 
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.builder.CommandBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandManager {
+    private final Map<String, Command> executableCommands = new HashMap<>();
     private final Map<String, Command> commandMap = new HashMap<>();
 
     /**
@@ -16,8 +18,13 @@ public class CommandManager {
      * @param name The command name
      * @param command The command
      */
-    public void registerCommand(String name, CommandBuilder command) {
-        commandMap.put(name, command.build());
+    public void registerCommand(String name, @NotNull CommandBuilder command) {
+        Command builtCommand = command.build();
+        commandMap.put(name, builtCommand);
+        executableCommands.put(name, builtCommand);
+        for (String alias : builtCommand.getAliases()) {
+            executableCommands.put(alias, builtCommand);
+        }
     }
 
     /**
@@ -26,7 +33,7 @@ public class CommandManager {
      * @return The command, or null if it doesn't exist
      */
     public Command getCommand(String name) {
-        return commandMap.get(name);
+        return executableCommands.get(name);
     }
 
     /**
@@ -35,7 +42,7 @@ public class CommandManager {
      * @return True if the command exists, otherwise false
      */
     public boolean hasCommand(String name) {
-        return commandMap.containsKey(name);
+        return executableCommands.containsKey(name);
     }
 
     /**
