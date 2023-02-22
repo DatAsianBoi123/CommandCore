@@ -94,6 +94,10 @@ public abstract class CommandNode<This extends CommandNode<This>> {
         return Collections.unmodifiableSet(children);
     }
 
+    public final Consumer<CommandContext> getExecutor() {
+        return executor;
+    }
+
     /**
      * Attempts to parse a string
      * @param arg The string to parse
