@@ -47,11 +47,6 @@ public class InitOptions {
             this.rootCommand = rootCommand;
         }
 
-        @Contract(value = "_ -> new", pure = true)
-        public static @NotNull Builder create(@NotNull String rootCommand) {
-            return new Builder(rootCommand);
-        }
-
         public Builder createHelpCommand(boolean flag) {
             this.helpCommand = flag;
             return this;
@@ -70,6 +65,11 @@ public class InitOptions {
 
         public InitOptions build() {
             return new InitOptions(this);
+        }
+
+        @Contract(value = "_ -> new", pure = true)
+        public static @NotNull Builder create(@NotNull String rootCommand) {
+            return new Builder(rootCommand);
         }
     }
 }
