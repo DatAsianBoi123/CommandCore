@@ -64,10 +64,6 @@ Using the static method `CommandCore.init(...)` initializes CommandCore. After d
 ### 2) Creating a command
 
 ```java
-import com.datasiqn.commandcore.ArgumentParseException;
-import com.datasiqn.resultapi.Result;
-import org.bukkit.entity.Player;
-
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.builder.*;
