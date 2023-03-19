@@ -1,6 +1,6 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.arguments.impl.ArgumentsImpl;
+import com.datasiqn.commandcore.arguments.ListArguments;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.commandcore.commands.context.impl.CommandSourceImpl;
@@ -40,7 +40,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            @NotNull Result<None, List<String>> output = cmd.getExecutor().execute(new CommandContextImpl(new CommandSourceImpl(sender), new ArgumentsImpl(listArgs)));
+            @NotNull Result<None, List<String>> output = cmd.getExecutor().execute(new CommandContextImpl(new CommandSourceImpl(sender), new ListArguments(listArgs)));
             output.ifError(messages -> {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
@@ -65,7 +65,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            tabComplete.addAll(cmd.getExecutor().tabComplete(new CommandContextImpl(new CommandSourceImpl(sender), new ArgumentsImpl(listArgs))));
+            tabComplete.addAll(cmd.getExecutor().tabComplete(new CommandContextImpl(new CommandSourceImpl(sender), new ListArguments(listArgs))));
         }
 
         List<String> partialMatches = new ArrayList<>();
