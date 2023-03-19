@@ -12,10 +12,12 @@ public class ListArguments implements Arguments {
         allArguments = args;
     }
 
+    @Override
     public int size() {
         return allArguments.size();
     }
 
+    @Override
     public @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type) {
         if (i >= allArguments.size()) throw new IllegalArgumentException("i is greater than total length of arguments");
         return type.parse(allArguments.get(i));

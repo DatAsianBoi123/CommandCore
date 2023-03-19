@@ -14,10 +14,12 @@ public class CommandContextImpl implements CommandContext {
         this.arguments = arguments;
     }
 
+    @Override
     public @NotNull CommandSource getSource() {
         return source;
     }
 
+    @Override
     public @NotNull Arguments getArguments() {
         return arguments;
     }
