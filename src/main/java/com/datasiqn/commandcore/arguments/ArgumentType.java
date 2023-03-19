@@ -3,8 +3,10 @@ package com.datasiqn.commandcore.arguments;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.util.ParseUtil;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.util.EnumUtils;
@@ -28,9 +30,9 @@ public interface ArgumentType<T> {
 
     ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> "Invalid boolean " + str + ", expected either true or false"), Arrays.asList("true", "false"));
 
-    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
+    ArgumentType<java.util.UUID> UUID = new CustomArgumentType<>(str -> Result.resolve(() -> java.util.UUID.fromString(str), error -> "Invalid UUID " + str));
 
-    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+    ArgumentType<Material> MATERIAL = new EnumArgumentType<>(Material.class, "material");
 
     ArgumentType<Material> BLOCK = new CustomArgumentType<>(str -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(Material.class, str), error -> "Invalid block " + str).andThen(material -> material.isBlock() ? Result.ok(material) : Result.error("Invalid block " + str)));
 
