@@ -1,16 +1,14 @@
-package com.datasiqn.commandcore.arguments.impl;
+package com.datasiqn.commandcore.arguments;
 
-import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ArgumentsImpl implements Arguments {
+public class ListArguments implements Arguments {
     protected final List<String> allArguments;
 
-    public ArgumentsImpl(List<String> args) {
+    public ListArguments(List<String> args) {
         allArguments = args;
     }
 
