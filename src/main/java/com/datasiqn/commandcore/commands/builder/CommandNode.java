@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,46 +16,8 @@ import java.util.stream.Collectors;
  * Represents a node that can be added onto a command
  * @param <This> The type of the extended class
  */
-public abstract class CommandNode<This extends CommandNode<This>> {
-    private static final Comparator<CommandNode<?>> comparator = Comparator.comparingInt(CommandNode::getPriority);
-
-    protected final Set<CommandNode<?>> children = new HashSet<>();
-    protected final List<Function<CommandContext, Result<None, String>>> requires = new ArrayList<>();
-
-    protected Consumer<CommandContext> executor;
-
-    public final @NotNull This requires(Function<CommandContext, Result<None, String>> requires) {
-        this.requires.add(requires);
-        return getThis();
-    }
-
-    public @NotNull This requiresPlayer() {
-        return requires(context -> context.getSource().getPlayer().and(Result.ok()).or(Result.error("A player is required to run this")));
-    }
-
-    public @NotNull This requiresEntity() {
-        return requires(context -> context.getSource().getEntity().and(Result.ok()).or(Result.error("An entity is required to run this")));
-    }
-
-    /**
-     * Adds a new node onto this current node
-     * @param node The node
-     * @return The node for chaining
-     */
-    public final @NotNull This then(CommandNode<?> node) {
-        children.add(node);
-        return getThis();
-    }
-
-    /**
-     * Sets the executor for this node
-     * @param executor The executor
-     * @return The node for chaining
-     */
-    public final @NotNull This executes(Consumer<CommandContext> executor) {
-        this.executor = executor;
-        return getThis();
-    }
+public abstract class CommandNode<This extends CommandNode<This>> extends CommandLink<CommandNode<This>> {
+    private static final Comparator<CommandNode<?>> COMPARATOR = Comparator.comparingInt(CommandNode::getPriority);
 
     /**
      * Executes this node
@@ -93,10 +54,6 @@ public abstract class CommandNode<This extends CommandNode<This>> {
         return Collections.unmodifiableSet(children);
     }
 
-    public final Consumer<CommandContext> getExecutor() {
-        return executor;
-    }
-
     /**
      * Attempts to parse a string
      * @param arg The string to parse
@@ -110,7 +67,7 @@ public abstract class CommandNode<This extends CommandNode<This>> {
         if (executor != null) usages.add(getUsageArgument(isOptional));
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        List<CommandNode<?>> sortedChildren = children.stream().sorted(comparator).collect(Collectors.toList());
+        List<CommandNode<?>> sortedChildren = children.stream().sorted(COMPARATOR).collect(Collectors.toList());
         for (CommandNode<?> node : sortedChildren) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
@@ -130,14 +87,11 @@ public abstract class CommandNode<This extends CommandNode<This>> {
         return false;
     }
 
-    @NotNull
-    protected abstract This getThis();
-
     /**
      * Gets the comparator for command nodes
      * @return The comparator
      */
     public static Comparator<CommandNode<?>> getComparator() {
-        return comparator;
+        return COMPARATOR;
     }
 }
