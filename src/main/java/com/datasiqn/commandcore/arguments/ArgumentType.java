@@ -22,17 +22,23 @@ import java.util.stream.Collectors;
 public interface ArgumentType<T> {
     ArgumentType<String> STRING = new StringArgumentType();
 
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)).andThen(integer -> integer <= 0 ? Result.error(new ArgumentParseException("Integer must not be below 0")) : Result.ok(integer)));
+    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> "Invalid integer " + str).andThen(integer -> integer <= 0 ? Result.error("Integer must not be below 0") : Result.ok(integer)));
 
-    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> new ArgumentParseException("Invalid integer " + str)));
+    ArgumentType<Integer> INTEGER = new CustomArgumentType<>(str -> Result.resolve(() -> Integer.parseInt(str), error -> "Invalid integer " + str));
 
-    ArgumentType<Double> DOUBLE = new CustomArgumentType<>(str -> Result.resolve(() -> Double.parseDouble(str), error -> new ArgumentParseException("Invalid double " + str)));
+    ArgumentType<Double> DOUBLE = new CustomArgumentType<>(str -> Result.resolve(() -> Double.parseDouble(str), error -> "Invalid double " + str));
+
+    ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> "Invalid boolean " + str + ", expected either true or false"), Arrays.asList("true", "false"));
 
     ArgumentType<Boolean> BOOLEAN = new CustomArgumentType<>(str -> Result.resolve(() -> ParseUtil.strictParseBoolean(str), error -> new ArgumentParseException("Invalid boolean " + str + ", expected either true or false")), Arrays.asList("true", "false"));
 
     ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), new ArgumentParseException("No player exists with the name " + name)), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
 
-    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> Result.ofNullable(CommandCore.getInstance().getCommandManager().getCommand(str), new ArgumentParseException("No command exists with the name " + str)), context -> {
+    ArgumentType<Material> BLOCK = new CustomArgumentType<>(str -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(Material.class, str), error -> "Invalid block " + str).andThen(material -> material.isBlock() ? Result.ok(material) : Result.error("Invalid block " + str)));
+
+    ArgumentType<Player> PLAYER = new CustomArgumentType<>(name -> Result.ofNullable(Bukkit.getPlayerExact(name), "No player exists with the name " + name), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+
+    ArgumentType<Command> COMMAND = new CustomArgumentType<>(str -> Result.ofNullable(CommandCore.getInstance().getCommandManager().getCommand(str), "No command exists with the name " + str), context -> {
         List<String> commandNames = new ArrayList<>();
         CommandCore.getInstance().getCommandManager().allCommands().forEach((name, command) -> {
             if (context.getSource().hasPermission(command.getPermissionString())) commandNames.add(name);
@@ -46,7 +52,7 @@ public interface ArgumentType<T> {
      * @return The result of parsing
      */
     @NotNull
-    Result<T, ArgumentParseException> parse(@NotNull String str);
+    Result<T, String> parse(@NotNull String str);
 
     /**
      * Gets the tabcomplete for this {@code ArgumentType}
@@ -76,7 +82,7 @@ public interface ArgumentType<T> {
          * @param enumName The name of the enum
          */
         public EnumArgumentType(@NotNull Class<T> enumClass, @NotNull String enumName) {
-            super(str -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> new ArgumentParseException("Invalid " + enumName + " '" + str + "'")), Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList()));
+            super(str -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, str), error -> "Invalid " + enumName + " '" + str + "'"), Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList()));
         }
     }
 
@@ -85,7 +91,7 @@ public interface ArgumentType<T> {
      * @param <T> The type of the argument
      */
     class CustomArgumentType<T> implements ArgumentType<T> {
-        private final ParseFunction<T> parseFunction;
+        private final @NotNull Function<String, Result<T, String>> parseFunction;
         private List<String> values;
         private Function<CommandContext, List<String>> valueFunction;
 
@@ -93,7 +99,7 @@ public interface ArgumentType<T> {
          * Creates a new {@link ArgumentType}
          * @param parseFunction The function to use when parsing a string
          */
-        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction) {
+        public CustomArgumentType(@NotNull Function<String, Result<T, String>> parseFunction) {
             this(parseFunction, Collections.emptyList());
         }
         /**
@@ -101,7 +107,7 @@ public interface ArgumentType<T> {
          * @param parseFunction The function to use when parsing a string
          * @param values The tabcomplete values
          */
-        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull List<String> values) {
+        public CustomArgumentType(@NotNull Function<String, Result<T, String>> parseFunction, @NotNull List<String> values) {
             this.parseFunction = parseFunction;
             this.values = values;
         }
@@ -110,33 +116,19 @@ public interface ArgumentType<T> {
          * @param parseFunction The function to use when parsing a string
          * @param valueFunction A function of tabcomplete values
          */
-        public CustomArgumentType(@NotNull ParseFunction<T> parseFunction, @NotNull Function<CommandContext, List<String>> valueFunction) {
+        public CustomArgumentType(@NotNull Function<String, Result<T, String>> parseFunction, @NotNull Function<CommandContext, List<String>> valueFunction) {
             this.parseFunction = parseFunction;
             this.valueFunction = valueFunction;
         }
 
         @Override
-        public @NotNull Result<T, ArgumentParseException> parse(@NotNull String str) {
-            return parseFunction.parse(str);
+        public @NotNull Result<T, String> parse(@NotNull String str) {
+            return parseFunction.apply(str);
         }
 
         @Override
         public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
             return values == null ? valueFunction.apply(context) : values;
-        }
-
-        /**
-         * Represents the function used when parsing a string
-         * @param <T> The type of the argument
-         */
-        @FunctionalInterface
-        public interface ParseFunction<T> {
-            /**
-             * Parses a string
-             * @param str The string
-             * @return The result of the parsing
-             */
-            Result<T, ArgumentParseException> parse(String str);
         }
     }
 
@@ -145,7 +137,7 @@ public interface ArgumentType<T> {
      */
     class StringArgumentType implements ArgumentType<String> {
         @Override
-        public @NotNull Result<String, ArgumentParseException> parse(@NotNull String str) {
+        public @NotNull Result<String, String> parse(@NotNull String str) {
             return Result.ok(str);
         }
     }

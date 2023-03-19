@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.arguments.impl;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.resultapi.Result;
@@ -19,7 +18,7 @@ public class ArgumentsImpl implements Arguments {
         return allArguments.size();
     }
 
-    public @NotNull <T> Result<T, ArgumentParseException> get(int i, ArgumentType<T> type) {
+    public @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type) {
         if (i >= allArguments.size()) throw new IllegalArgumentException("i is greater than total length of arguments");
         return type.parse(allArguments.get(i));
     }

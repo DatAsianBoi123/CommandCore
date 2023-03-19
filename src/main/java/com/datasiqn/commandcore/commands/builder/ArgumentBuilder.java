@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.commands.builder;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.ArgumentType;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.Result;
@@ -29,7 +28,7 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
-    public @NotNull Result<?, ArgumentParseException> parse(String arg) {
+    public @NotNull Result<?, String> parse(String arg) {
         return type.parse(arg);
     }
 

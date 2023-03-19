@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.commands.builder.executor;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.builder.CommandNode;
@@ -59,7 +58,7 @@ public class LegacyExecutor implements CommandExecutor {
                 String arg = args.getString(lastSeenSize - 1);
                 List<String> messages = new ArrayList<>();
                 messages.add("Invalid parameter '" + arg + "' at position " + lastSeenSize + ": ");
-                result.exceptions.forEach(exception -> messages.add(exception.getMessage()));
+                messages.addAll(result.exceptions);
                 return Result.error(messages);
             }
             Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
@@ -124,7 +123,7 @@ public class LegacyExecutor implements CommandExecutor {
 
     private @NotNull ParseResult checkApplicable(@NotNull String argToCheck, @NotNull Collection<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
-        List<ArgumentParseException> exceptions = new ArrayList<>();
+        List<String> exceptions = new ArrayList<>();
         for (CommandNode<?> node : nodes) {
             node.parse(argToCheck).match(o -> options.add(node), exceptions::add);
         }
@@ -145,10 +144,10 @@ public class LegacyExecutor implements CommandExecutor {
     }
 
     private static class ParseResult {
-        private final List<ArgumentParseException> exceptions = new ArrayList<>();
+        private final List<String> exceptions = new ArrayList<>();
         private final CommandNode<?> node;
 
-        private ParseResult(Collection<ArgumentParseException> exceptions) {
+        private ParseResult(Collection<String> exceptions) {
             this((CommandNode<?>) null);
             this.exceptions.addAll(exceptions);
         }

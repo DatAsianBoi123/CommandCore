@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.commands.builder.executor;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.builder.CommandNode;
@@ -11,7 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -36,16 +38,16 @@ public class BuilderExecutor implements CommandExecutor {
         if (size >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got " + size + " parameters instead"));
 
-            Result<CommandNode<?>, List<ArgumentParseException>> result = findCurrentNode(args, size);
+            Result<CommandNode<?>, List<String>> result = findCurrentNode(args, size);
             if (result.isError()) {
-                List<ArgumentParseException> exceptions = result.unwrapError();
+                List<String> exceptions = result.unwrapError();
                 String arg = args.getString(args.size() - 1);
                 if (exceptions.isEmpty()) {
                     return Result.error(Collections.singletonList("Expected end of input, but got '" + arg + "' at position " + size + " instead"));
                 }
                 List<String> messages = new ArrayList<>();
                 messages.add("Invalid parameter '" + arg + "' at position " + size + ": ");
-                exceptions.forEach(exception -> messages.add(exception.getMessage()));
+                messages.addAll(exceptions);
                 return Result.error(messages);
             }
             Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
@@ -80,7 +82,7 @@ public class BuilderExecutor implements CommandExecutor {
 
         if (args.size() >= 1) {
             if (args.size() != 1) {
-                Result<CommandNode<?>, List<ArgumentParseException>> result = findCurrentNode(args, args.size() - 1);
+                Result<CommandNode<?>, List<String>> result = findCurrentNode(args, args.size() - 1);
                 if (result == null || result.isError()) {
                     return CommandExecutor.super.tabComplete(context);
                 }
@@ -93,9 +95,9 @@ public class BuilderExecutor implements CommandExecutor {
         return CommandExecutor.super.tabComplete(context);
     }
 
-    private @NotNull Result<CommandNode<?>, List<ArgumentParseException>> checkApplicable(@NotNull String argToCheck, @NotNull Set<CommandNode<?>> nodes) {
+    private @NotNull Result<CommandNode<?>, List<String>> checkApplicable(@NotNull String argToCheck, @NotNull Set<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
-        List<ArgumentParseException> exceptions = new ArrayList<>();
+        List<String> exceptions = new ArrayList<>();
         for (CommandNode<?> node : nodes) {
             node.parse(argToCheck).match(o -> options.add(node), exceptions::add);
         }
@@ -104,11 +106,11 @@ public class BuilderExecutor implements CommandExecutor {
         return Result.ok(options.get(0));
     }
 
-    private Result<CommandNode<?>, List<ArgumentParseException>> findCurrentNode(@NotNull Arguments args, int size) {
+    private Result<CommandNode<?>, List<String>> findCurrentNode(@NotNull Arguments args, int size) {
         Set<CommandNode<?>> nodeSet = nodes;
-        Result<CommandNode<?>, List<ArgumentParseException>> result = null;
+        Result<CommandNode<?>, List<String>> result = null;
         for (int i = 0; i < size; i++) {
-            Result<CommandNode<?>, List<ArgumentParseException>> parseResult = checkApplicable(args.getString(i), nodeSet);
+            Result<CommandNode<?>, List<String>> parseResult = checkApplicable(args.getString(i), nodeSet);
             if (parseResult.isError()) return parseResult;
             nodeSet = parseResult.unwrap().getChildren();
             result = parseResult;

@@ -104,7 +104,7 @@ public abstract class CommandNode<This extends CommandNode<This>> {
      * @return The result of the parsing
      */
     @NotNull
-    public abstract Result<?, ArgumentParseException> parse(String arg);
+    public abstract Result<?, String> parse(String arg);
 
     protected List<String> getUsages(boolean isOptional) {
         List<String> usages = new ArrayList<>();

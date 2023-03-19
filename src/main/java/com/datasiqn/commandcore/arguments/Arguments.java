@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.arguments;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +23,7 @@ public interface Arguments {
      * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >} {@link Arguments#size()})
      */
     @NotNull
-    <T> Result<T, ArgumentParseException> get(int i, ArgumentType<T> type);
+    <T> Result<T, String> get(int i, ArgumentType<T> type);
 
     /**
      * Gets a simple string argument
