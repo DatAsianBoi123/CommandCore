@@ -8,9 +8,19 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
 public interface CommandSource {
-    @NotNull Result<Player, IllegalStateException> getPlayer();
+    /**
+     * Gets the player executing command
+     * @return A result describing the player. This can be safely unwrapped if the command link {@link CommandLink#requiresPlayer() requiresPlayer}.
+     */
+    @NotNull
+    Result<Player, String> getPlayer();
 
-    @NotNull Result<Entity, IllegalStateException> getEntity();
+    /**
+     * Gets the entity executing command
+     * @return A result describing the entity. This can be safely unwrapped if the command link {@link CommandLink#requiresEntity() requiresEntity}.
+     */
+    @NotNull
+    Result<Entity, String> getEntity();
 
     @NotNull CommandSender getSender();
 

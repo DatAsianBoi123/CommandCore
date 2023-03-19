@@ -17,13 +17,13 @@ public class CommandSourceImpl implements CommandSource {
     }
 
     @Override
-    public @NotNull Result<Player, IllegalStateException> getPlayer() {
-        return Result.resolve(() -> (Player) sender, error -> new IllegalStateException("Sender is not a player"));
+    public @NotNull Result<Player, String> getPlayer() {
+        return Result.resolve(() -> (Player) sender, error -> "Sender is not a player");
     }
 
     @Override
-    public @NotNull Result<Entity, IllegalStateException> getEntity() {
-        return Result.resolve(() -> (Entity) sender, error -> new IllegalStateException("Sender is not an entity"));
+    public @NotNull Result<Entity, String> getEntity() {
+        return Result.resolve(() -> (Entity) sender, error -> "Sender is not an entity");
     }
 
     @Override
