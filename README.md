@@ -74,19 +74,16 @@ import com.datasiqn.commandcore.commands.builder.*;
 
 public class GreetCommand {
     // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
-    private final Command command = new CommandBuilder<>(Player.class)
+    private final Command command = new CommandBuilder<>()
             .description("Greets a player")
-            .executes(source -> source.getSender().sendMessage("You ran this command with no arguments")) // Line 5
+            .executes(context -> context.getSource().getSender().sendMessage("You ran this command with no arguments")) // Line 5
             .then(LiteralBuilder.literal("player")
-                    .then(ArgumentBuilder.<Player, Player>argument(ArgumentType.PLAYER, "player")
-                            .executes(context -> {
-                                Result<Player, ArgumentParseException> playerResult = context.getArguments().get(1, ArgumentType.PLAYER);
-                                if (playerResult.isError()) return;
-                                Player player = playerResult.unwrap();
-                                context.getSource().getPlayer().match(source -> source.chat("Hello " + player.getName()), error -> context.getSource().getSender().sendMessage("You must be a player to send this!"));
-                            })))
+                    .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
+                            .requiresPlayer()
+                            .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).unwrap().getName()))))
             .then(LiteralBuilder.literal("server")
-                    .executes(context -> context.getSource().getPlayer().match(player -> player.chat("Hello Server!"), error -> context.getSource().getSender().sendMessage("You must be a player to send this!"))))
+                    .requiresPlayer()
+                    .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello Server!")))
             .build();
 
     public Command getCommand() {
