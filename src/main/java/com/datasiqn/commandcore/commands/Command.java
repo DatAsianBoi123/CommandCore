@@ -29,7 +29,6 @@ public interface Command {
 
     /**
      * Gets the usages for this command
-     *
      * @return The usages
      */
     @NotNull List<String> getUsages();
