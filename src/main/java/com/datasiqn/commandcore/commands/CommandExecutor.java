@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an executor for a command
+ */
 public interface CommandExecutor {
     /**
      * Executes this command executor

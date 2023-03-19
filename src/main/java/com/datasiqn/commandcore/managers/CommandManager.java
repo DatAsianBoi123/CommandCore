@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class that manages all commands
+ */
 public class CommandManager {
     private final Map<String, Command> executableCommands = new HashMap<>();
     private final Map<String, Command> commandMap = new HashMap<>();

@@ -115,6 +115,12 @@ public class CommandCore {
         return instance;
     }
 
+    /**
+     * Sends command usage to {@code sender}
+     * @param sender The sender
+     * @param commandName The name of the command
+     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
+     */
     public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
         if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         Command command = commandManager.getCommand(commandName);
@@ -124,6 +130,10 @@ public class CommandCore {
         sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
     }
 
+    /**
+     * Sends the help menu to {@code sender}
+     * @param sender The sender
+     */
     public void sendHelpMenu(@NotNull CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
         commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
@@ -132,6 +142,13 @@ public class CommandCore {
         });
     }
 
+    /**
+     * Generates a formatted string for each usage of a command
+     * @param commandName The name of the command
+     * @param spaces The # of spaces to add before each usage string
+     * @return A list of formatted strings representing all usages for the command
+     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
+     */
     @NotNull
     public List<String> getUsagesFor(String commandName, int spaces) {
         if (!commandManager.hasCommand(commandName))
@@ -153,6 +170,10 @@ public class CommandCore {
         return usages;
     }
 
+    /**
+     * Gets the options used to initialize {@code CommandCore}
+     * @return The options used to initialize {@code CommandCore}
+     */
     public InitOptions getOptions() {
         return options;
     }

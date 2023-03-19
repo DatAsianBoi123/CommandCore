@@ -33,5 +33,9 @@ public interface Command {
      */
     @NotNull List<String> getUsages();
 
+    /**
+     * Gets the aliases of this command
+     * @return The aliases
+     */
     @NotNull String[] getAliases();
 }

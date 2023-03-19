@@ -8,6 +8,10 @@ import java.util.List;
 public class ListArguments implements Arguments {
     protected final List<String> allArguments;
 
+    /**
+     * Creates a new {@code ListArguments}
+     * @param args The arguments in a string list
+     */
     public ListArguments(List<String> args) {
         allArguments = args;
     }

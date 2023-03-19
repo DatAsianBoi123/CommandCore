@@ -44,6 +44,11 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
         return this;
     }
 
+    /**
+     * Sets the command's aliases
+     * @param aliases The aliases
+     * @return The builder, for chaining
+     */
     public CommandBuilder alias(String... aliases) {
         this.aliases = aliases;
         return this;
