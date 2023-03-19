@@ -1,6 +1,5 @@
 package com.datasiqn.commandcore.commands.builder;
 
-import com.datasiqn.commandcore.ArgumentParseException;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
