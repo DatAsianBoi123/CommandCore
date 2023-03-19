@@ -27,7 +27,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
     /**
      * Sets the permission of the command
      * @param permission The permission
-     * @return The builder for chaining
+     * @return The builder, for chaining
      */
     public CommandBuilder permission(String permission) {
         this.permission = permission;
@@ -37,7 +37,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
     /**
      * Sets the description of the command
      * @param description The description
-     * @return The builder for chaining
+     * @return The builder, for chaining
      */
     public CommandBuilder description(String description) {
         this.description = description;
