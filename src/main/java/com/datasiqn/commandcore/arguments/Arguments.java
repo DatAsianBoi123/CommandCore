@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents command arguments
- * This is more or less a wrapper for a {@code List<String>}
  */
 public interface Arguments {
     /**
