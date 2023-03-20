@@ -1,11 +1,21 @@
 # CommandCore
 CommandCore is a simple, yet powerful command framework for the Spigot API.
 
+### Table of Contents
+* #### [Installation](#Installation)
+  1. [Install to Local .m2 Repo](#1-install-to-your-local-m2-repo)
+  2. [Add the Dependency](#2-add-the-dependency)
+* #### [Usage](#Usage)
+  1. [Initialize CommandCore](#1-initialize-commandcore-in-your-plugin)
+  2. [Create a Command](#2-create-a-command)
+  3. [Register a Command](#3-register-the-command)
+* #### [Contributing](#contributing)
+---
 ## Installation
 **Java 8 or higher is required**
 
-### 1) Installing to your local .m2 repo
-**If you are using JitPack, you can skip this step.**
+### 1) Install to your local .m2 repo
+> If you are using JitPack, you can skip this step.
 
 Clone this repository onto your local computer and run the command `mvn clean install` in that directory.
 This will install CommandCore onto your local .m2 folder, so you can use the dependency.
@@ -61,7 +71,7 @@ public final class MyPlugin extends JavaPlugin {
 ```
 Using the static method `CommandCore.init(...)` initializes CommandCore. After doing this, you can access the instance from anywhere by using `CommandCore.getInstance()`
 
-### 2) Creating a command
+### 2) Create a command
 
 ```java
 import com.datasiqn.commandcore.arguments.ArgumentType;
@@ -105,7 +115,7 @@ After that, we have a `.executes` call. This gets executed when we have typed th
 
 The next line is adding another literal onto the main trunk (notice the indentation). This literal is less complicated than the last, and just makes the sender chat "Hello Server!".
 
-### 3) Registering the command
+### 3) Register the command
 ```java
 public final class MyPlugin extends JavaPlugin {
   @Override
@@ -124,3 +134,11 @@ This just registers the command, so it appears when we type `/myrootcommand`
 Now, lets see this baby in action!
 
 <img src=https://user-images.githubusercontent.com/55264711/197649001-c165521c-7153-44bc-9827-7d7da41a9360.gif width=500px />
+
+## Contributing
+You can contribute to this project by
+* Creating an [issue](https://github.com/DatAsianBoi123/CommandCore/issues/new)
+* [Forking](https://github.com/DatAsianBoi123/CommandCore/fork) this repo
+* Creating a [pull request](https://github.com/DatAsianBoi123/CommandCore/compare)
+---
+Have any questions? Ask me on [discord](https://discord.com)! My tag is `DatAsianBoi1234#7767`
