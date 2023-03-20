@@ -2,14 +2,14 @@
 CommandCore is a simple, yet powerful command framework for the Spigot API.
 
 ### Table of Contents
-* #### [Installation](#Installation)
+* #### [Installation](#installation-1)
   1. [Install to Local .m2 Repo](#1-install-to-your-local-m2-repo)
   2. [Add the Dependency](#2-add-the-dependency)
-* #### [Usage](#Usage)
+* #### [Usage](#usage-1)
   1. [Initialize CommandCore](#1-initialize-commandcore-in-your-plugin)
   2. [Create a Command](#2-create-a-command)
   3. [Register a Command](#3-register-the-command)
-* #### [Contributing](#contributing)
+* #### [Contributing](#contributing-1)
 ---
 ## Installation
 **Java 8 or higher is required**
