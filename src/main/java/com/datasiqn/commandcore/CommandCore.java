@@ -45,6 +45,77 @@ public class CommandCore {
     }
 
     /**
+     * Gets this instance of {@code CommandCore}
+     * @return This instance
+     */
+    public static CommandCore getInstance() {
+        return instance;
+    }
+
+    /**
+     * Gets the options used to initialize {@code CommandCore}
+     * @return The options used to initialize {@code CommandCore}
+     */
+    public InitOptions getOptions() {
+        return options;
+    }
+
+    /**
+     * Sends command usage to {@code sender}
+     * @param sender The sender
+     * @param commandName The name of the command
+     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
+     */
+    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
+        if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
+        Command command = commandManager.getCommand(commandName);
+        sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
+                ChatColor.GRAY + " Description: " + ChatColor.WHITE + command.getDescription(),
+                ChatColor.GRAY + " Usage(s):");
+        sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
+    }
+
+    /**
+     * Sends the help menu to {@code sender}
+     * @param sender The sender
+     */
+    public void sendHelpMenu(@NotNull CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
+        commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
+            Command command = commandManager.getCommand(name);
+            if (command.getPermissionString() == null || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
+        });
+    }
+
+    /**
+     * Generates a formatted string for each usage of a command
+     * @param commandName The name of the command
+     * @param spaces The # of spaces to add before each usage string
+     * @return A list of formatted strings representing all usages for the command
+     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
+     */
+    @NotNull
+    public List<String> getUsagesFor(String commandName, int spaces) {
+        if (!commandManager.hasCommand(commandName))
+            throw new IllegalArgumentException("Command " + commandName + " does not exist");
+        List<String> usages = new ArrayList<>();
+        Command command = commandManager.getCommand(commandName);
+        command.getUsages().forEach(usage -> {
+            StringBuilder addedUsage = new StringBuilder();
+            for (int i = 0; i < spaces; i++) {
+                addedUsage.append(" ");
+            }
+            addedUsage.append(ChatColor.YELLOW)
+                    .append("/")
+                    .append(this.bukkitCommand.getName())
+                    .append(" ").append(ChatColor.WHITE).append(commandName)
+                    .append(" ").append(usage);
+            usages.add(addedUsage.toString());
+        });
+        return usages;
+    }
+
+    /**
      * Initializes CommandCore so that it can be accessed using {@link #getInstance()}
      * @param plugin Your plugin instance
      * @param rootCommand The name of your root command
@@ -105,76 +176,5 @@ public class CommandCore {
                 .executes(context -> instance.sendHelpMenu(context.getSource().getSender())));
 
         return instance;
-    }
-
-    /**
-     * Gets this instance of {@code CommandCore}
-     * @return This instance
-     */
-    public static CommandCore getInstance() {
-        return instance;
-    }
-
-    /**
-     * Sends command usage to {@code sender}
-     * @param sender The sender
-     * @param commandName The name of the command
-     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
-     */
-    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
-        if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
-        Command command = commandManager.getCommand(commandName);
-        sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
-                ChatColor.GRAY + " Description: " + ChatColor.WHITE + command.getDescription(),
-                ChatColor.GRAY + " Usage(s):");
-        sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
-    }
-
-    /**
-     * Sends the help menu to {@code sender}
-     * @param sender The sender
-     */
-    public void sendHelpMenu(@NotNull CommandSender sender) {
-        sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
-        commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
-            Command command = commandManager.getCommand(name);
-            if (command.getPermissionString() == null || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
-        });
-    }
-
-    /**
-     * Generates a formatted string for each usage of a command
-     * @param commandName The name of the command
-     * @param spaces The # of spaces to add before each usage string
-     * @return A list of formatted strings representing all usages for the command
-     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
-     */
-    @NotNull
-    public List<String> getUsagesFor(String commandName, int spaces) {
-        if (!commandManager.hasCommand(commandName))
-            throw new IllegalArgumentException("Command " + commandName + " does not exist");
-        List<String> usages = new ArrayList<>();
-        Command command = commandManager.getCommand(commandName);
-        command.getUsages().forEach(usage -> {
-            StringBuilder addedUsage = new StringBuilder();
-            for (int i = 0; i < spaces; i++) {
-                addedUsage.append(" ");
-            }
-            addedUsage.append(ChatColor.YELLOW)
-                    .append("/")
-                    .append(this.bukkitCommand.getName())
-                    .append(" ").append(ChatColor.WHITE).append(commandName)
-                    .append(" ").append(usage);
-            usages.add(addedUsage.toString());
-        });
-        return usages;
-    }
-
-    /**
-     * Gets the options used to initialize {@code CommandCore}
-     * @return The options used to initialize {@code CommandCore}
-     */
-    public InitOptions getOptions() {
-        return options;
     }
 }
