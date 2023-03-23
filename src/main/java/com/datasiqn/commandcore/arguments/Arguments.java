@@ -31,4 +31,8 @@ public interface Arguments {
      */
     @NotNull
     String getString(int i);
+
+    // TODO: Write javadocs
+    @NotNull
+    ArgumentReader asReader();
 }

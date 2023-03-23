@@ -24,11 +24,16 @@ public class ListArguments implements Arguments {
     @Override
     public @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type) {
         if (i >= allArguments.size()) throw new IllegalArgumentException("i is greater than total length of arguments");
-        return type.parse(allArguments.get(i));
+        return type.parse(new StringArgumentReader(allArguments.get(i)));
     }
 
     @Override
     public @NotNull String getString(int i) {
-        return get(i, ArgumentType.STRING).unwrapOr("");
+        return get(i, ArgumentType.NAME).unwrapOr("");
+    }
+
+    @Override
+    public @NotNull ArgumentReader asReader() {
+        return new StringArgumentReader(String.join(" ", allArguments));
     }
 }

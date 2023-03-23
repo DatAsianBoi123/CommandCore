@@ -1,5 +1,6 @@
 package com.datasiqn.commandcore.commands.builder;
 
+import com.datasiqn.commandcore.arguments.ArgumentReader;
 import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
@@ -56,11 +57,11 @@ public abstract class CommandNode<This extends CommandNode<This>> extends Comman
 
     /**
      * Attempts to parse a string
-     * @param arg The string to parse
+     * @param reader The reader to parse
      * @return The result of the parsing
      */
     @NotNull
-    public abstract Result<?, String> parse(String arg);
+    public abstract Result<?, String> parse(ArgumentReader reader);
 
     protected List<String> getUsages(boolean isOptional) {
         List<String> usages = new ArrayList<>();

@@ -1,13 +1,17 @@
 package com.datasiqn.commandcore.commands.builder.executor;
 
+import com.datasiqn.commandcore.arguments.ArgumentReader;
 import com.datasiqn.commandcore.arguments.Arguments;
+import com.datasiqn.commandcore.arguments.ListArguments;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.builder.CommandNode;
 import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -33,12 +37,13 @@ public class BuilderExecutor implements CommandExecutor {
         long begin = System.currentTimeMillis();
 
         Arguments args = context.getArguments();
+        ArgumentReader reader = args.asReader();
         int size = args.size();
 
         if (size >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got " + size + " parameters instead"));
 
-            Result<CommandNode<?>, List<String>> result = findCurrentNode(args, size);
+            Result<NodeArgumentResult, List<String>> result = findCurrentNode(reader);
             if (result.isError()) {
                 List<String> exceptions = result.unwrapError();
                 String arg = args.getString(args.size() - 1);
@@ -51,8 +56,10 @@ public class BuilderExecutor implements CommandExecutor {
                 return Result.error(messages);
             }
             Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
-            if (result.unwrap().getExecutor() == null) return Result.error(Collections.emptyList());
-            Result<None, String> executeResult = result.unwrap().executeWith(context);
+            CommandContext newContext = buildContext(context, result.unwrap());
+            CommandNode<?> node = result.unwrap().getNode();
+            if (node.getExecutor() == null) return Result.error(Collections.emptyList());
+            Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
                 context.getSource().getSender().sendMessage(ChatColor.RED + executeResult.unwrapError());
                 return Result.ok();
@@ -77,44 +84,80 @@ public class BuilderExecutor implements CommandExecutor {
     @Override
     public @NotNull List<String> tabComplete(@NotNull CommandContext context) {
         Arguments args = context.getArguments();
+        ArgumentReader reader = args.asReader();
 
         Set<CommandNode<?>> nodeSet = nodes;
 
+        CommandContext newContext = context;
         if (args.size() >= 1) {
             if (args.size() != 1) {
-                Result<CommandNode<?>, List<String>> result = findCurrentNode(args, args.size() - 1);
-                if (result == null || result.isError()) {
-                    return CommandExecutor.super.tabComplete(context);
+                Result<NodeArgumentResult, List<String>> result = findCurrentNode(reader);
+                if (result.isError()) {
+                    return CommandExecutor.super.tabComplete(newContext);
                 }
-                nodeSet = result.unwrap().getChildren();
+                newContext = buildContext(context, result.unwrap());
+                nodeSet = result.unwrap().getNode().getChildren();
             }
             List<String> tabcomplete = new ArrayList<>();
-            nodeSet.forEach(node -> tabcomplete.addAll(node.getTabComplete(context)));
+            CommandContext finalNewContext = newContext;
+            nodeSet.forEach(node -> tabcomplete.addAll(node.getTabComplete(finalNewContext)));
             return tabcomplete;
         }
-        return CommandExecutor.super.tabComplete(context);
+        return CommandExecutor.super.tabComplete(newContext);
     }
 
-    private @NotNull Result<CommandNode<?>, List<String>> checkApplicable(@NotNull String argToCheck, @NotNull Set<CommandNode<?>> nodes) {
+    @Contract("_, _ -> new")
+    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull NodeArgumentResult result) {
+        return new CommandContextImpl(context.getSource(), new ListArguments(result.getTabcomplete()));
+    }
+
+    private @NotNull Result<NodeArgumentResult, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
+        if (reader.index() != 0) reader.next();
         for (CommandNode<?> node : nodes) {
-            node.parse(argToCheck).match(o -> options.add(node), exceptions::add);
+            node.parse(reader.copy()).match(o -> options.add(node), exceptions::add);
         }
         if (options.isEmpty()) return Result.error(exceptions);
         options.sort(CommandNode.getComparator());
-        return Result.ok(options.get(0));
+        int beforeIndex = reader.index();
+        options.get(0).parse(reader);
+        int afterIndex = reader.index() + (reader.atEnd() ? 1 : 0);
+        NodeArgumentResult nodeArgumentResult = new NodeArgumentResult(options.get(0), Collections.singletonList(reader.section(beforeIndex, afterIndex)));
+        return Result.ok(nodeArgumentResult);
     }
 
-    private Result<CommandNode<?>, List<String>> findCurrentNode(@NotNull Arguments args, int size) {
+    private Result<NodeArgumentResult, List<String>> findCurrentNode(@NotNull ArgumentReader reader) {
         Set<CommandNode<?>> nodeSet = nodes;
-        Result<CommandNode<?>, List<String>> result = null;
-        for (int i = 0; i < size; i++) {
-            Result<CommandNode<?>, List<String>> parseResult = checkApplicable(args.getString(i), nodeSet);
-            if (parseResult.isError()) return parseResult;
-            nodeSet = parseResult.unwrap().getChildren();
-            result = parseResult;
+        List<String> args = new ArrayList<>();
+        CommandNode<?> result = null;
+        while (reader.index() + 1 < reader.size()) {
+            Result<NodeArgumentResult, List<String>> parseResult = checkApplicable(reader, nodeSet);
+            if (parseResult.isError()) return Result.error(parseResult.unwrapError());
+            result = parseResult.unwrap().getNode();
+            nodeSet = result.getChildren();
+            args.addAll(parseResult.unwrap().tabcomplete);
+            System.out.println("iterated, argument is " + parseResult.unwrap().tabcomplete + ". reader index at " + (reader.index() + 1) + "/" + reader.size());
         }
-        return result;
+        System.out.println(String.join(",", args));
+        return Result.ok(new NodeArgumentResult(result, args));
+    }
+
+    private static class NodeArgumentResult {
+        private final CommandNode<?> node;
+        private final List<String> tabcomplete;
+
+        public NodeArgumentResult(CommandNode<?> node, List<String> tabcomplete) {
+            this.node = node;
+            this.tabcomplete = tabcomplete;
+        }
+
+        public CommandNode<?> getNode() {
+            return node;
+        }
+
+        public List<String> getTabcomplete() {
+            return tabcomplete;
+        }
     }
 }
