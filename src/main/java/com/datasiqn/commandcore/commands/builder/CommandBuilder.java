@@ -1,10 +1,8 @@
 package com.datasiqn.commandcore.commands.builder;
 
-import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.builder.executor.BuilderExecutor;
-import com.datasiqn.commandcore.commands.builder.executor.LegacyExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +87,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
             this.permission = CommandBuilder.this.permission;
             this.usages = usages;
 
-            this.commandExecutor = CommandCore.getInstance().getOptions().useLegacyExecutor() ? new LegacyExecutor(executor, children, requires) : new BuilderExecutor(executor, children, requires);
+            this.commandExecutor = new BuilderExecutor(executor, children, requires);
         }
 
         @Override

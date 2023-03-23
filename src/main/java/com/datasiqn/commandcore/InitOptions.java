@@ -17,7 +17,6 @@ public class InitOptions {
     private final String rootCommand;
     private final String pluginName;
     private final boolean helpCommand;
-    private final boolean legacyExecutor;
     private final List<String> aliases;
 
     /**
@@ -30,7 +29,6 @@ public class InitOptions {
         this.helpCommand = builder.helpCommand;
         this.pluginName = builder.pluginName;
         this.aliases = Arrays.asList(builder.aliases);
-        this.legacyExecutor = builder.legacyExecutor;
     }
 
     /**
@@ -75,21 +73,12 @@ public class InitOptions {
     }
 
     /**
-     * Gets whether the legacy executor should be used or not
-     * @return True if the legacy executor should be used, false otherwise
-     */
-    public boolean useLegacyExecutor() {
-        return legacyExecutor;
-    }
-
-    /**
      * Builder class to create an {@code InitOptions} object
      */
     public static class Builder {
         private final String rootCommand;
         private String pluginName;
         private boolean helpCommand = true;
-        private boolean legacyExecutor = false;
         private String[] aliases = new String[0];
 
         /**
@@ -127,17 +116,6 @@ public class InitOptions {
          */
         public Builder aliases(String... aliases) {
             this.aliases = aliases;
-            return this;
-        }
-
-        /**
-         * Tells {@code CommandCore} to use the legacy executor when executing a command
-         * @deprecated You should not use this ever, since the legacy executor is very buggy and can cause lots of problems if used
-         * @return The builder, for chaining
-         */
-        @Deprecated
-        public Builder useLegacyExecutor() {
-            this.legacyExecutor = true;
             return this;
         }
 
