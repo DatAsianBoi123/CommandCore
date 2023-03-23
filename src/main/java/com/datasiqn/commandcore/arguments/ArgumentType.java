@@ -92,6 +92,20 @@ public interface ArgumentType<T> {
         return commandNames;
     });
 
+    @Contract("_ -> new")
+    static @NotNull ArgumentType<Integer> rangedInt(int min) {
+        return new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
+                .andThen(word -> Result.resolve(() -> Integer.valueOf(word), error -> "Invalid integer " + word))
+                .andThen(integer -> integer < min ? Result.error("Integer must be not be below " + min) : Result.ok(integer)));
+    }
+
+    @Contract("_, _ -> new")
+    static @NotNull ArgumentType<Integer> rangedInt(int min, int max) {
+        return new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
+                .andThen(word -> Result.resolve(() -> Integer.valueOf(word), error -> "Invalid integer " + word))
+                .andThen(integer -> integer < min || integer > max ? Result.error("Integer must be between " + min + " and " + max) : Result.ok(integer)));
+    }
+
     /**
      * Parses a string
      * @param reader The reader to parse
