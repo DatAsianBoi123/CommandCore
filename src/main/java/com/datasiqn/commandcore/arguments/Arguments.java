@@ -21,18 +21,15 @@ public interface Arguments {
      * @return The result of the parsing
      * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >} {@link Arguments#size()})
      */
-    @NotNull
-    <T> Result<T, String> get(int i, ArgumentType<T> type);
+    @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type);
 
     /**
      * Gets a simple string argument
      * @param i The index of the argument
      * @return The argument as a string
      */
-    @NotNull
-    String getString(int i);
+    @NotNull String getString(int i);
 
-    // TODO: Write javadocs
-    @NotNull
-    ArgumentReader asReader();
+    //TODO: Write javadocs
+    @NotNull ArgumentReader asReader();
 }
