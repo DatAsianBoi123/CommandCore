@@ -1,12 +1,12 @@
 package com.datasiqn.commandcore.commands.builder.executor;
 
+import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.arguments.ArgumentReader;
 import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.arguments.ListArguments;
 import com.datasiqn.commandcore.commands.CommandExecutor;
 import com.datasiqn.commandcore.commands.builder.CommandNode;
 import com.datasiqn.commandcore.commands.context.CommandContext;
-import com.datasiqn.commandcore.commands.context.impl.CommandContextImpl;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
@@ -107,8 +107,8 @@ public class BuilderExecutor implements CommandExecutor {
     }
 
     @Contract("_, _ -> new")
-    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull NodeArgumentResult result) {
-        return new CommandContextImpl(context.getSource(), new ListArguments(result.getTabcomplete()));
+    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
+        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.getTabcomplete()));
     }
 
     private @NotNull Result<NodeArgumentResult, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {

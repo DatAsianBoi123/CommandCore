@@ -7,16 +7,20 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents the context in which a command is executed
  */
+// TODO: documentation
 public interface CommandContext {
     /**
      * Gets the sender that executed this command
-     *
      * @return The sender
      */
     @NotNull CommandSource getSource();
 
+    @NotNull Command getCommand();
+
+    @NotNull String getLabel();
+
     /**
-     * Gets all arguments represented as a list of strings
+     * Gets all command arguments
      * @return All arguments
      */
     @NotNull Arguments getArguments();

@@ -1,18 +1,27 @@
 package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.arguments.ArgumentType;
+import com.datasiqn.commandcore.arguments.Arguments;
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.CommandSource;
 import com.datasiqn.commandcore.commands.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.commands.builder.CommandBuilder;
+import com.datasiqn.commandcore.commands.context.CommandContext;
 import com.datasiqn.commandcore.managers.CommandManager;
+import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -176,5 +185,60 @@ public class CommandCore {
                 .executes(context -> instance.sendHelpMenu(context.getSource().getSender())));
 
         return instance;
+    }
+
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static @NotNull CommandContext createContext(CommandSource source, Command command, String label, Arguments arguments) {
+        return new CommandContext() {
+            @Override
+            public @NotNull CommandSource getSource() {
+                return source;
+            }
+
+            @Override
+            public @NotNull Command getCommand() {
+                return command;
+            }
+
+            @Override
+            public @NotNull String getLabel() {
+                return label;
+            }
+
+            @Override
+            public @NotNull Arguments getArguments() {
+                return arguments;
+            }
+        };
+    }
+
+    @Contract(value = "_ -> new", pure = true)
+    public static @NotNull CommandSource createSource(CommandSender sender) {
+        return new CommandSource() {
+            @Override
+            public @NotNull Result<Player, String> getPlayer() {
+                return Result.resolve(() -> (Player) sender, error -> "Sender is not a player");
+            }
+
+            @Override
+            public @NotNull Result<Entity, String> getEntity() {
+                return Result.resolve(() -> (Entity) sender, error -> "Sender is not an entity");
+            }
+
+            @Override
+            public @NotNull CommandSender getSender() {
+                return sender;
+            }
+
+            @Override
+            public boolean hasPermission(@NotNull Permission permission) {
+                return sender.hasPermission(permission);
+            }
+
+            @Override
+            public boolean hasPermission(@Nullable String permission) {
+                return permission == null || sender.hasPermission(permission);
+            }
+        };
     }
 }
