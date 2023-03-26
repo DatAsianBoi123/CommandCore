@@ -1,6 +1,7 @@
 package com.datasiqn.commandcore.commands.context;
 
 import com.datasiqn.commandcore.arguments.Arguments;
+import com.datasiqn.commandcore.commands.Command;
 import com.datasiqn.commandcore.commands.CommandSource;
 import org.jetbrains.annotations.NotNull;
 
