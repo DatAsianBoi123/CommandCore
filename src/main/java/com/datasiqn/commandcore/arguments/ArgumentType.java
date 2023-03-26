@@ -78,7 +78,7 @@ public interface ArgumentType<T> {
     ArgumentType<Material> MATERIAL = new EnumArgumentType<>(Material.class, "material");
 
     ArgumentType<Material> BLOCK = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
-            .andThen(word -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(Material.class, word), error -> "Invalid block " + word).andThen(material -> material.isBlock() ? Result.ok(material) : Result.error("Invalid block " + word))));
+            .andThen(word -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(Material.class, word), error -> "Invalid block " + word).andThen(material -> material.isBlock() ? Result.ok(material) : Result.error("Invalid block " + word))), Arrays.stream(Material.values()).filter(Material::isBlock).map(material -> material.name().toLowerCase()).collect(Collectors.toList()));
 
     ArgumentType<Player> PLAYER = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
             .andThen(word -> Result.ofNullable(Bukkit.getPlayerExact(word), "No player exists with the name " + word)), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
