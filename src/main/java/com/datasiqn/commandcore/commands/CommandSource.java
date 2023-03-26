@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the source of a command
@@ -38,11 +39,11 @@ public interface CommandSource {
      * @param permission The permission
      * @return True if the source has {@code permission}, false otherwise
      */
-    boolean hasPermission(Permission permission);
+    boolean hasPermission(@NotNull Permission permission);
     /**
      * Gets whether the source of the command has a permission or not
      * @param permission The permission
      * @return True if the source has {@code permission}, false otherwise
      */
-    boolean hasPermission(String permission);
+    boolean hasPermission(@Nullable String permission);
 }
