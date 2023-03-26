@@ -63,7 +63,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            tabComplete.addAll(cmd.getExecutor().tabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs))));
+            tabComplete.addAll(cmd.getExecutor().getTabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs))));
         }
 
         List<String> partialMatches = new ArrayList<>();

@@ -82,7 +82,7 @@ public class BuilderExecutor implements CommandExecutor {
     }
 
     @Override
-    public @NotNull List<String> tabComplete(@NotNull CommandContext context) {
+    public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         Arguments args = context.getArguments();
         ArgumentReader reader = args.asReader();
 

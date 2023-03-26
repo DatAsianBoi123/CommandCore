@@ -25,7 +25,7 @@ public interface CommandExecutor {
      * @return The tab completions
      */
     @NotNull
-    default List<String> tabComplete(@NotNull CommandContext context) {
+    default List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
     }
 }
