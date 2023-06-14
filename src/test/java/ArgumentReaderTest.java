@@ -17,7 +17,7 @@ public class ArgumentReaderTest {
 
     @Test
     public void testNextWord() {
-        ArgumentReader reader = new StringArgumentReader("i love bugs ");
+        ArgumentReader reader = new StringArgumentReader("i love bugs");
         assertEquals("i", reader.nextWord());
         reader.next();
         assertEquals("love", reader.nextWord());
