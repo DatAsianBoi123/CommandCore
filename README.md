@@ -48,14 +48,17 @@ Finally, add the maven shade plugin to shade in CommandCore
 
 ## Usage
 ### 1) Initialize CommandCore in your plugin
+
 ```java
+import com.datasiqn.commandcore.CommandCore;
+
 public final class MyPlugin extends JavaPlugin {
-  @Override
-  public void onEnable() {
-    // Init CommandCore
-    CommandCore.init(this, "myrootcommand");
-    // ...
-  }
+    @Override
+    public void onEnable() {
+        // Init CommandCore
+        CommandCore.init(this, "myrootcommand");
+        // ...
+    }
 }
 ```
 Using the static method `CommandCore.init(...)` initializes CommandCore. After doing this, you can access the instance from anywhere by using `CommandCore.getInstance()`
@@ -68,21 +71,17 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.builder.*;
 
 public class GreetCommand {
-    // Make sure to use the com.datasiqn.commandcore.command.Command import!!
-    private final Command command = new CommandBuilder<>()
-            .description("Greets a player")
-            .executes(context -> context.getSource().getSender().sendMessage("You ran this command with no arguments")) // Line 5
-            .then(LiteralBuilder.literal("player")
-                    .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
-                            .requiresPlayer()
-                            .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).unwrap().getName()))))
-            .then(LiteralBuilder.literal("server")
-                    .requiresPlayer()
-                    .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello Server!")))
-            .build();
-
-    public Command getCommand() {
-        return command;
+    public CommandBuilder getCommand() {
+        return new CommandBuilder<>()
+                .description("Greets a player")
+                .executes(context -> context.getSource().sendMessage("You ran this command with no arguments")) // Line 5
+                .then(LiteralBuilder.literal("player")
+                        .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
+                                .requiresPlayer()
+                                .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).unwrap().getName()))))
+                .then(LiteralBuilder.literal("server")
+                        .requiresPlayer()
+                        .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello Server!")));
     }
 }
 ```
