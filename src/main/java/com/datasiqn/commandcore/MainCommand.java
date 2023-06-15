@@ -2,6 +2,7 @@ package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.arguments.ListArguments;
 import com.datasiqn.commandcore.commands.Command;
+import com.datasiqn.commandcore.commands.TabComplete;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
@@ -54,6 +55,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tabComplete = new ArrayList<>();
+        String matchingString = args[args.length - 1];
         if (args.length == 1) {
             commandCore.getCommandManager().allCommands().forEach((s, cmd) -> {
                 if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) tabComplete.add(s);
@@ -63,11 +65,13 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            tabComplete.addAll(cmd.getExecutor().getTabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs))));
+            TabComplete complete = cmd.getExecutor().getTabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs)));
+            matchingString = complete.getMatchingString();
+            tabComplete.addAll(complete.values());
         }
 
         List<String> partialMatches = new ArrayList<>();
-        StringUtil.copyPartialMatches(args[args.length - 1], tabComplete, partialMatches);
+        StringUtil.copyPartialMatches(matchingString, tabComplete, partialMatches);
         partialMatches.sort(Comparator.naturalOrder());
 
         return partialMatches;

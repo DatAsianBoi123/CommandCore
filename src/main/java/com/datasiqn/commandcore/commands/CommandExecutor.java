@@ -5,7 +5,7 @@ import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -24,8 +24,7 @@ public interface CommandExecutor {
      * @param context The context in which this command was tab completed
      * @return The tab completions
      */
-    @NotNull
-    default List<String> getTabComplete(@NotNull CommandContext context) {
-        return new ArrayList<>();
+    default @NotNull TabComplete getTabComplete(@NotNull CommandContext context) {
+        return new TabComplete(Collections.emptyList(), context.getArguments().getString(context.getArguments().size() - 1));
     }
 }

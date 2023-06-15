@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class StringArgumentReader implements ArgumentReader {
     private final String arg;
 
-    private int index;
+    private int index = 0;
 
     public StringArgumentReader(String arg) {
         this.arg = arg;
@@ -26,16 +26,7 @@ public class StringArgumentReader implements ArgumentReader {
 
     @Override
     public boolean atEnd() {
-        return index + 1 == arg.length();
-    }
-
-    @Override
-    public @NotNull String section(int beginning) {
-        return section(beginning, arg.length() - 1);
-    }
-    @Override
-    public @NotNull String section(int beginning, int end) {
-        return arg.substring(beginning, end);
+        return index + 1 >= arg.length();
     }
 
     @Override
@@ -49,19 +40,31 @@ public class StringArgumentReader implements ArgumentReader {
     }
 
     @Override
+    public void jumpTo(int index) {
+        if (index >= size()) throw new IndexOutOfBoundsException("index (" + index + ") is greater than length (" + size() + ")");
+        if (index < 0) throw new IndexOutOfBoundsException("index cannot be negative");
+        this.index = index;
+    }
+
+    @Override
+    public @NotNull String splice(int beginning) {
+        return splice(beginning, arg.length());
+    }
+
+    @Override
+    public @NotNull String splice(int beginning, int end) {
+        return arg.substring(beginning, end);
+    }
+
+    @Override
     public @NotNull String nextWord() {
+        if (atEnd()) return String.valueOf(get());
         StringBuilder builder = new StringBuilder();
         builder.append(get());
-        while (index + 1 < arg.length() && next() != ' ') {
+        while (!atEnd() && next() != ' ') {
             builder.append(get());
         }
         return builder.toString();
     }
 
-    @Override
-    public @NotNull ArgumentReader copy() {
-        StringArgumentReader reader = new StringArgumentReader(arg);
-        reader.index = index;
-        return reader;
-    }
 }

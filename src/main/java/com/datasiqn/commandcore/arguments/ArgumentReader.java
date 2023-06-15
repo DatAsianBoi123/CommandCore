@@ -14,10 +14,10 @@ public interface ArgumentReader {
 
     int size();
 
-    @NotNull String section(int beginning);
-    @NotNull String section(int beginning, int end);
+    void jumpTo(int index);
+
+    @NotNull String splice(int beginning);
+    @NotNull String splice(int beginning, int end);
 
     @NotNull String nextWord();
-
-    @NotNull ArgumentReader copy();
 }
