@@ -2,7 +2,6 @@ package com.datasiqn.commandcore.command.builder;
 
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandExecutor;
-import com.datasiqn.commandcore.command.builder.executor.BuilderExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

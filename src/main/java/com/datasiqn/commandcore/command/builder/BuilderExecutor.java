@@ -1,4 +1,4 @@
-package com.datasiqn.commandcore.command.builder.executor;
+package com.datasiqn.commandcore.command.builder;
 
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.argument.ArgumentReader;
@@ -6,7 +6,6 @@ import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.ListArguments;
 import com.datasiqn.commandcore.command.CommandExecutor;
 import com.datasiqn.commandcore.command.TabComplete;
-import com.datasiqn.commandcore.command.builder.CommandNode;
 import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
@@ -22,12 +21,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class BuilderExecutor implements CommandExecutor {
+class BuilderExecutor implements CommandExecutor {
     private final Set<CommandNode<?>> nodes;
     private final Consumer<CommandContext> executor;
     private final List<Function<CommandContext, Result<None, String>>> requires;
 
-    public BuilderExecutor(Consumer<CommandContext> executor, Set<CommandNode<?>> nodes, List<Function<CommandContext, Result<None, String>>> requires) {
+    BuilderExecutor(Consumer<CommandContext> executor, Set<CommandNode<?>> nodes, List<Function<CommandContext, Result<None, String>>> requires) {
         this.nodes = nodes;
         this.executor = executor;
         this.requires = requires;
