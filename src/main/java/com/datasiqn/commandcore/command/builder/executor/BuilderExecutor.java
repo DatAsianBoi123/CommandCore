@@ -44,22 +44,22 @@ public class BuilderExecutor implements CommandExecutor {
         if (size >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got parameters instead"));
 
-            CurrentNodeResult result = findCurrentNode(reader);
-            Result<CommandNode<?>, List<String>> resultNode = result.node;
+            CurrentNode current = findCurrentNode(reader);
+            Result<CommandNode<?>, List<String>> resultNode = current.node;
             if (resultNode.isError()) {
                 List<String> exceptions = resultNode.unwrapError();
                 if (exceptions.isEmpty()) {
                     return Result.error(Collections.singletonList("Expected end of input, but got extra args instead"));
                 }
                 List<String> messages = new ArrayList<>();
-                List<String> matches = result.args;
+                List<String> matches = current.args;
                 messages.add("Invalid parameter '" + matches.get(matches.size() - 1) + "' at position " + matches.size() + ": ");
                 messages.addAll(exceptions);
                 return Result.error(messages);
             }
             Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
             CommandNode<?> node = resultNode.unwrap();
-            CommandContext newContext = buildContext(context, result);
+            CommandContext newContext = buildContext(context, current);
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
             Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
@@ -92,14 +92,14 @@ public class BuilderExecutor implements CommandExecutor {
             String matchingString = args.getString(args.size() - 1);
 
             if (args.size() != 1) {
-                CurrentNodeResult result = findCurrentNode(reader);
-                List<CommandNode<?>> nodeList = result.nodes;
+                CurrentNode current = findCurrentNode(reader);
+                List<CommandNode<?>> nodeList = current.nodes;
                 if (nodeList.size() != 0) {
                     CommandNode<?> node = nodeList.get(nodeList.size() - 1);
-                    newContext = buildContext(context, result);
+                    newContext = buildContext(context, current);
                     nodeSet = node.getChildren();
                 }
-                matchingString = result.args.get(result.args.size() - 1);
+                matchingString = current.args.get(current.args.size() - 1);
             }
             List<String> tabcomplete = new ArrayList<>();
             for (CommandNode<?> node : nodeSet) {
@@ -111,7 +111,7 @@ public class BuilderExecutor implements CommandExecutor {
     }
 
     @Contract("_, _ -> new")
-    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNodeResult result) {
+    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
         return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.args));
     }
 
@@ -134,7 +134,7 @@ public class BuilderExecutor implements CommandExecutor {
     }
 
     @Contract("_ -> new")
-    private @NotNull CurrentNodeResult findCurrentNode(@NotNull ArgumentReader reader) {
+    private @NotNull BuilderExecutor.CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
         Set<CommandNode<?>> nodeSet = nodes;
         List<String> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
@@ -145,7 +145,7 @@ public class BuilderExecutor implements CommandExecutor {
                 System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
                 System.out.println("args is " + String.join(",", args));
                 args.add(reader.splice(reader.index()));
-                return new CurrentNodeResult(Result.error(parseResult.unwrapError()), nodeList, args);
+                return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args);
             }
             ApplicableNode applicableNode = parseResult.unwrap();
             node = applicableNode.node;
@@ -156,7 +156,7 @@ public class BuilderExecutor implements CommandExecutor {
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         }
         System.out.println("args is " + String.join(",", args));
-        return new CurrentNodeResult(Result.ok(node), nodeList, args);
+        return new CurrentNode(Result.ok(node), nodeList, args);
     }
 
     private static class ApplicableNode {
@@ -169,12 +169,12 @@ public class BuilderExecutor implements CommandExecutor {
         }
     }
 
-    private static class CurrentNodeResult {
+    private static class CurrentNode {
         private final Result<CommandNode<?>, List<String>> node;
         private final List<CommandNode<?>> nodes;
         private final List<String> args;
 
-        public CurrentNodeResult(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args) {
+        public CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args) {
             this.node = node;
             this.nodes = nodes;
             this.args = args;
