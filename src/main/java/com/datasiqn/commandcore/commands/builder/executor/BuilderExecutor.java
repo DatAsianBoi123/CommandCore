@@ -45,7 +45,7 @@ public class BuilderExecutor implements CommandExecutor {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got parameters instead"));
 
             CurrentNodeResult result = findCurrentNode(reader);
-            Result<CommandNode<?>, List<String>> resultNode = result.getNode();
+            Result<CommandNode<?>, List<String>> resultNode = result.node;
             if (resultNode.isError()) {
                 List<String> exceptions = resultNode.unwrapError();
                 if (exceptions.isEmpty()) {
@@ -93,12 +93,13 @@ public class BuilderExecutor implements CommandExecutor {
 
             if (args.size() != 1) {
                 CurrentNodeResult result = findCurrentNode(reader);
-                if (result.getNodes().size() != 0) {
-                    CommandNode<?> node = result.getNodes().get(result.getNodes().size() - 1);
+                List<CommandNode<?>> nodeList = result.nodes;
+                if (nodeList.size() != 0) {
+                    CommandNode<?> node = nodeList.get(nodeList.size() - 1);
                     newContext = buildContext(context, result);
                     nodeSet = node.getChildren();
                 }
-                matchingString = result.getArgs().get(result.getArgs().size() - 1);
+                matchingString = result.args.get(result.args.size() - 1);
             }
             List<String> tabcomplete = new ArrayList<>();
             for (CommandNode<?> node : nodeSet) {
@@ -111,7 +112,7 @@ public class BuilderExecutor implements CommandExecutor {
 
     @Contract("_, _ -> new")
     private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNodeResult result) {
-        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.getArgs()));
+        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.args));
     }
 
     private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
@@ -147,10 +148,10 @@ public class BuilderExecutor implements CommandExecutor {
                 return new CurrentNodeResult(Result.error(parseResult.unwrapError()), nodeList, args);
             }
             ApplicableNode applicableNode = parseResult.unwrap();
-            node = applicableNode.getNode();
+            node = applicableNode.node;
             nodeSet = node.getChildren();
             nodeList.add(node);
-            args.add(applicableNode.getArgument());
+            args.add(applicableNode.argument);
 
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         }
@@ -166,14 +167,6 @@ public class BuilderExecutor implements CommandExecutor {
             this.node = node;
             this.argument = argument;
         }
-
-        public CommandNode<?> getNode() {
-            return node;
-        }
-
-        public String getArgument() {
-            return argument;
-        }
     }
 
     private static class CurrentNodeResult {
@@ -185,18 +178,6 @@ public class BuilderExecutor implements CommandExecutor {
             this.node = node;
             this.nodes = nodes;
             this.args = args;
-        }
-
-        public Result<CommandNode<?>, List<String>> getNode() {
-            return node;
-        }
-
-        public List<CommandNode<?>> getNodes() {
-            return nodes;
-        }
-
-        public List<String> getArgs() {
-            return args;
         }
     }
 }
