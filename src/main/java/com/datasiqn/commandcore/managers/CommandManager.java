@@ -42,7 +42,7 @@ public class CommandManager {
     /**
      * Checks whether a command with that name exists or not
      * @param name The command name
-     * @return True if the command exists, otherwise false
+     * @return {@code true} if the command exists, otherwise {@code false}
      */
     public boolean hasCommand(String name) {
         return executableCommands.containsKey(name);

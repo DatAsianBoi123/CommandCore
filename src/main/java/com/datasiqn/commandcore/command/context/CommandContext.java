@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents the context in which a command is executed
  */
-// TODO: documentation
 public interface CommandContext {
     /**
      * Gets the sender that executed this command
@@ -16,8 +15,16 @@ public interface CommandContext {
      */
     @NotNull CommandSource getSource();
 
+    /**
+     * Gets the command that was executed
+     * @return The command
+     */
     @NotNull Command getCommand();
 
+    /**
+     * Gets the string used to execute the command. This could the name of the command, or an alias of the command.
+     * @return The exact string used to execute the command
+     */
     @NotNull String getLabel();
 
     /**

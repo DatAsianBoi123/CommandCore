@@ -5,6 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * An implementation of {@code Arguments} that uses an internal {@code List<String>} to store all arguments
+ */
 public class ListArguments implements Arguments {
     protected final List<String> allArguments;
 

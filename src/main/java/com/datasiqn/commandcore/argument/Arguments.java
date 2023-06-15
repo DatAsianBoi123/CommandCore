@@ -31,6 +31,9 @@ public interface Arguments {
      */
     @NotNull String getString(int i);
 
-    //TODO: Write javadocs
+    /**
+     * Converts all arguments into an {@code ArgumentReader}
+     * @return The newly created {@code ArgumentReader}
+     */
     @NotNull ArgumentReader asReader();
 }

@@ -41,7 +41,7 @@ public class InitOptions {
 
     /**
      * Gets whether the user has defined a custom plugin name or not
-     * @return True if there is a custom plugin name, false otherwise
+     * @return {@code true} if there is a custom plugin name, {@code false} otherwise
      */
     public boolean hasCustomPluginName() {
         return pluginName != null;
@@ -66,7 +66,7 @@ public class InitOptions {
 
     /**
      * Gets whether a help command should be generated or not
-     * @return True if a help command should be generated, false otherwise
+     * @return {@code true} if a help command should be generated, {@code false} otherwise
      */
     public boolean createHelpCommand() {
         return helpCommand;
@@ -91,7 +91,7 @@ public class InitOptions {
 
         /**
          * Sets whether a help command should be created or not
-         * @param flag True if a help command should be created, false if it shouldn't
+         * @param flag {@code true} if a help command should be created, {@code false} if it shouldn't
          * @return The builder, for chaining
          */
         public Builder createHelpCommand(boolean flag) {

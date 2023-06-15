@@ -2,12 +2,18 @@ package com.datasiqn.commandcore.argument;
 
 import org.jetbrains.annotations.NotNull;
 
-// TODO: Write documentation
+/**
+ * An {@code ArgumentReader} that reads a string
+ */
 public class StringArgumentReader implements ArgumentReader {
     private final String arg;
 
     private int index = 0;
 
+    /**
+     * Creates a new {@code ArgumentReader} that reads a string
+     * @param arg The string to read
+     */
     public StringArgumentReader(String arg) {
         this.arg = arg;
     }
@@ -48,11 +54,13 @@ public class StringArgumentReader implements ArgumentReader {
 
     @Override
     public @NotNull String splice(int beginning) {
-        return splice(beginning, arg.length());
+        return splice(beginning, size());
     }
-
     @Override
     public @NotNull String splice(int beginning, int end) {
+        if (end > size()) throw new IndexOutOfBoundsException("end index (" + end + ") is larger than the length (" + size() + ")");
+        if (beginning < 0) throw new IndexOutOfBoundsException("beginning index cannot be negative");
+        if (beginning > end) throw new IndexOutOfBoundsException("beginning index cannot be larger than end index");
         return arg.substring(beginning, end);
     }
 
@@ -66,5 +74,4 @@ public class StringArgumentReader implements ArgumentReader {
         }
         return builder.toString();
     }
-
 }

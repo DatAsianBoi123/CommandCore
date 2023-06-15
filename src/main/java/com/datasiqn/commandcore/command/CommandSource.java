@@ -43,13 +43,13 @@ public interface CommandSource {
     /**
      * Gets whether the source of the command has a permission or not
      * @param permission The permission
-     * @return True if the source has {@code permission}, false otherwise
+     * @return {@code true} if the source has {@code permission}, {@code false} otherwise
      */
     boolean hasPermission(@NotNull Permission permission);
     /**
      * Gets whether the source of the command has a permission or not
      * @param permission The permission
-     * @return True if the source has {@code permission}, false otherwise
+     * @return {@code true} if the source has {@code permission}, {@code false} otherwise
      */
     boolean hasPermission(@Nullable String permission);
 }
