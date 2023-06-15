@@ -1,8 +1,8 @@
-package com.datasiqn.commandcore.commands.builder;
+package com.datasiqn.commandcore.command.builder;
 
-import com.datasiqn.commandcore.arguments.ArgumentReader;
-import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;

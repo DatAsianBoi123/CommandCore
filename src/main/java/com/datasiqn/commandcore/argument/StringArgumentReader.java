@@ -1,4 +1,4 @@
-package com.datasiqn.commandcore.arguments;
+package com.datasiqn.commandcore.argument;
 
 import org.jetbrains.annotations.NotNull;
 

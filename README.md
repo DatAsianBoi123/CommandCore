@@ -63,12 +63,12 @@ Using the static method `CommandCore.init(...)` initializes CommandCore. After d
 ### 2) Create a command
 
 ```java
-import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.builder.*;
+import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.builder.*;
 
 public class GreetCommand {
-    // Make sure to use the com.datasiqn.commandcore.commands.Command import!!
+    // Make sure to use the com.datasiqn.commandcore.command.Command import!!
     private final Command command = new CommandBuilder<>()
             .description("Greets a player")
             .executes(context -> context.getSource().getSender().sendMessage("You ran this command with no arguments")) // Line 5

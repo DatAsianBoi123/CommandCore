@@ -1,8 +1,8 @@
-package com.datasiqn.commandcore.arguments;
+package com.datasiqn.commandcore.argument;
 
 import com.datasiqn.commandcore.CommandCore;
-import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.commandcore.util.ParseUtil;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;

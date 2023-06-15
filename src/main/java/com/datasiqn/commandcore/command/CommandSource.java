@@ -1,6 +1,6 @@
-package com.datasiqn.commandcore.commands;
+package com.datasiqn.commandcore.command;
 
-import com.datasiqn.commandcore.commands.builder.CommandLink;
+import com.datasiqn.commandcore.command.builder.CommandLink;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;

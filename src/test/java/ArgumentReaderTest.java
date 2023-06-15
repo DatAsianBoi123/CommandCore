@@ -1,5 +1,5 @@
-import com.datasiqn.commandcore.arguments.ArgumentReader;
-import com.datasiqn.commandcore.arguments.StringArgumentReader;
+import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.StringArgumentReader;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

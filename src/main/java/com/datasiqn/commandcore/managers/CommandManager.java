@@ -1,7 +1,7 @@
 package com.datasiqn.commandcore.managers;
 
-import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.builder.CommandBuilder;
+import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 

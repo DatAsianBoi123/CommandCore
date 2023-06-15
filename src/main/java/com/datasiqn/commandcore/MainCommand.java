@@ -1,8 +1,8 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.arguments.ListArguments;
-import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.TabComplete;
+import com.datasiqn.commandcore.argument.ListArguments;
+import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;

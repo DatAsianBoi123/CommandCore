@@ -1,12 +1,12 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.arguments.Arguments;
-import com.datasiqn.commandcore.commands.Command;
-import com.datasiqn.commandcore.commands.CommandSource;
-import com.datasiqn.commandcore.commands.builder.ArgumentBuilder;
-import com.datasiqn.commandcore.commands.builder.CommandBuilder;
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.argument.Arguments;
+import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.CommandSource;
+import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
+import com.datasiqn.commandcore.command.builder.CommandBuilder;
+import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
