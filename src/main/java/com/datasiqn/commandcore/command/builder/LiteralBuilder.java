@@ -23,7 +23,7 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
 
     @Override
     public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
-        return Result.<String, String>ok(reader.nextWord()).andThen(str -> literal.equals(str) ? Result.ok(str) : Result.error("Invalid literal '" + str + "'"));
+        return Result.<String, String>ok(reader.nextWord()).andThen(str -> literal.equals(str) ? Result.ok(str) : Result.error(""));
     }
 
     @Override

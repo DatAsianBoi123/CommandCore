@@ -47,10 +47,10 @@ public class BuilderExecutor implements CommandExecutor {
             CurrentNode current = findCurrentNode(reader);
             Result<CommandNode<?>, List<String>> resultNode = current.node;
             if (resultNode.isError()) {
-                List<String> exceptions = resultNode.unwrapError();
-                if (exceptions.isEmpty()) {
+                if (current.extraInput) {
                     return Result.error(Collections.singletonList("Expected end of input, but got extra args instead"));
                 }
+                List<String> exceptions = resultNode.unwrapError();
                 List<String> messages = new ArrayList<>();
                 List<String> matches = current.args;
                 messages.add("Invalid parameter '" + matches.get(matches.size() - 1) + "' at position " + matches.size() + ": ");
@@ -121,7 +121,9 @@ public class BuilderExecutor implements CommandExecutor {
         if (reader.index() != 0) reader.next();
         int beforeIndex = reader.index();
         for (CommandNode<?> node : nodes) {
-            node.parse(reader).match(val -> options.add(node), exceptions::add);
+            node.parse(reader).match(val -> options.add(node), e -> {
+                if (!e.isEmpty()) exceptions.add(e);
+            });
             reader.jumpTo(beforeIndex);
         }
         if (options.isEmpty()) return Result.error(exceptions);
@@ -140,12 +142,13 @@ public class BuilderExecutor implements CommandExecutor {
         List<CommandNode<?>> nodeList = new ArrayList<>();
         CommandNode<?> node = null;
         while (!reader.atEnd()) {
+            if (nodeSet.isEmpty()) return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
             Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
                 System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
                 System.out.println("args is " + String.join(",", args));
                 args.add(reader.splice(reader.index()));
-                return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args);
+                return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
             ApplicableNode applicableNode = parseResult.unwrap();
             node = applicableNode.node;
@@ -156,7 +159,7 @@ public class BuilderExecutor implements CommandExecutor {
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         }
         System.out.println("args is " + String.join(",", args));
-        return new CurrentNode(Result.ok(node), nodeList, args);
+        return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
     private static class ApplicableNode {
@@ -173,11 +176,13 @@ public class BuilderExecutor implements CommandExecutor {
         private final Result<CommandNode<?>, List<String>> node;
         private final List<CommandNode<?>> nodes;
         private final List<String> args;
+        private final boolean extraInput;
 
-        public CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args) {
+        public CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args, boolean extraInput) {
             this.node = node;
             this.nodes = nodes;
             this.args = args;
+            this.extraInput = extraInput;
         }
     }
 }
