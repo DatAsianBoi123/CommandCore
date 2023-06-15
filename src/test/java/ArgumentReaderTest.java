@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("ALL")
 public class ArgumentReaderTest {
     @Test
     public void testNextGet() {
