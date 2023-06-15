@@ -51,9 +51,9 @@ public class BuilderExecutor implements CommandExecutor {
                 if (exceptions.isEmpty()) {
                     return Result.error(Collections.singletonList("Expected end of input, but got extra args instead"));
                 }
-                String arg = args.getString(args.size() - 1);
                 List<String> messages = new ArrayList<>();
-                messages.add("Invalid parameter '" + arg + "' at position " + size + ": ");
+                List<String> matches = result.args;
+                messages.add("Invalid parameter '" + matches.get(matches.size() - 1) + "' at position " + matches.size() + ": ");
                 messages.addAll(exceptions);
                 return Result.error(messages);
             }
