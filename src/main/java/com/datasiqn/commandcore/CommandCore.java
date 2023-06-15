@@ -80,6 +80,7 @@ public class CommandCore {
         Command command = commandManager.getCommand(commandName);
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
                 ChatColor.GRAY + " Description: " + ChatColor.WHITE + command.getDescription(),
+                ChatColor.GRAY + " Aliases: [" + ChatColor.WHITE + String.join(ChatColor.GRAY + ", " + ChatColor.WHITE, command.getAliases()) + ChatColor.GRAY + "]",
                 ChatColor.GRAY + " Usage(s):");
         sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
     }
@@ -177,7 +178,7 @@ public class CommandCore {
                             Command cmd = context.getArguments().get(0, ArgumentType.COMMAND).unwrap();
                             String commandName = context.getArguments().getString(0);
                             if (!context.getSource().hasPermission(cmd.getPermissionString())) {
-                                context.getSource().getSender().sendMessage(ChatColor.RED + "No help for " + commandName);
+                                context.getSource().sendMessage(ChatColor.RED + "No help for " + commandName);
                                 return;
                             }
                             instance.sendCommandHelp(context.getSource().getSender(), commandName);
