@@ -22,18 +22,24 @@ public class ListArguments implements Arguments {
     }
 
     @Override
-    public @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type) {
-        if (i >= allArguments.size()) throw new IllegalArgumentException("i is greater than total length of arguments");
+    public @NotNull <T> Result<T, String> get(int i, @NotNull ArgumentType<T> type) {
+        checkBounds(i);
         return type.parse(new StringArgumentReader(allArguments.get(i)));
     }
 
     @Override
     public @NotNull String getString(int i) {
-        return get(i, ArgumentType.NAME).unwrapOr("");
+        checkBounds(i);
+        return allArguments.get(i);
     }
 
     @Override
     public @NotNull ArgumentReader asReader() {
         return new StringArgumentReader(String.join(" ", allArguments));
+    }
+
+    private void checkBounds(int i) {
+        if (i >= size()) throw new IndexOutOfBoundsException("index (" + i + ") is greater than total size (" + size() + ")");
+        if (i < 0) throw new IndexOutOfBoundsException("index cannot be negative");
     }
 }

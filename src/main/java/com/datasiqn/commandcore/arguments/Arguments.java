@@ -15,11 +15,11 @@ public interface Arguments {
 
     /**
      * Gets a specific argument
-     * @param i    The index of the argument
+     * @param i The index of the argument
      * @param type The argument type
-     * @param <T>  The type of the argument type
+     * @param <T> The type of the argument type
      * @return The result of the parsing
-     * @throws IllegalArgumentException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >} {@link #size()})
+     * @throws IndexOutOfBoundsException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >=} {@link #size()})
      */
     @NotNull <T> Result<T, String> get(int i, ArgumentType<T> type);
 
@@ -27,7 +27,7 @@ public interface Arguments {
      * Gets a simple string argument
      * @param i The index of the argument
      * @return The argument as a string
-     * @throws IllegalArgumentException if {@code i} is an invalid index ({@code i} {@literal  <} 0, or {@code i} {@literal  >} {@link #size()}
+     * @throws IndexOutOfBoundsException if {@code i} is an invalid index ({@code i} {@literal  <} 0, or {@code i} {@literal  >=} {@link #size()}
      */
     @NotNull String getString(int i);
 
