@@ -231,6 +231,11 @@ public class CommandCore {
             }
 
             @Override
+            public void sendMessage(@NotNull String @NotNull ... messages) {
+                sender.sendMessage(messages);
+            }
+
+            @Override
             public boolean hasPermission(@NotNull Permission permission) {
                 return sender.hasPermission(permission);
             }

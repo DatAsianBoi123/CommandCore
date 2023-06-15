@@ -35,6 +35,12 @@ public interface CommandSource {
     CommandSender getSender();
 
     /**
+     * Sends the command source a message
+     * @param messages The messages to send
+     */
+    void sendMessage(@NotNull String @NotNull ... messages);
+
+    /**
      * Gets whether the source of the command has a permission or not
      * @param permission The permission
      * @return True if the source has {@code permission}, false otherwise
