@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainCommand implements CommandExecutor, TabCompleter {
+class MainCommand implements CommandExecutor, TabCompleter {
     private final CommandCore commandCore;
 
     public MainCommand(CommandCore commandCore) {
