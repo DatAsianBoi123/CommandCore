@@ -16,6 +16,7 @@ import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -77,8 +78,9 @@ public interface ArgumentType<T> {
 
     ArgumentType<Material> MATERIAL = new EnumArgumentType<>(Material.class, "material");
 
-    ArgumentType<Material> BLOCK = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
-            .andThen(word -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(Material.class, word), error -> "Invalid block " + word).andThen(material -> material.isBlock() ? Result.ok(material) : Result.error("Invalid block " + word))), Arrays.stream(Material.values()).filter(Material::isBlock).map(material -> material.name().toLowerCase()).collect(Collectors.toList()));
+    ArgumentType<Material> BLOCK = new FilteredEnumArgumentType<>(Material.class, Material::isBlock, str -> "Invalid block '" + str + "'");
+
+    ArgumentType<Material> ITEM = new FilteredEnumArgumentType<>(Material.class, Material::isItem, str -> "Invalid item '" + str + "'");
 
     ArgumentType<Player> PLAYER = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
             .andThen(word -> Result.ofNullable(Bukkit.getPlayerExact(word), "No player exists with the name " + word)), context -> Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
@@ -144,6 +146,15 @@ public interface ArgumentType<T> {
         public EnumArgumentType(@NotNull Class<T> enumClass, @NotNull String enumName) {
             super(reader -> Result.<String, String>ok(reader.nextWord())
                     .andThen(word -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word), error -> "Invalid " + enumName + " '" + word + "'")), Arrays.stream(enumClass.getEnumConstants()).map(t -> t.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList()));
+        }
+    }
+
+    //TODO: Javadoc
+    class FilteredEnumArgumentType<T extends Enum<T>> extends CustomArgumentType<T> {
+        public FilteredEnumArgumentType(@NotNull Class<T> enumClass, Predicate<T> filterPredicate, Function<String, String> errorMessage) {
+            super(reader -> Result.<String, String>ok(reader.nextWord())
+                            .andThen(word -> Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word), error -> errorMessage.apply(word)).andThen(enumType -> filterPredicate.test(enumType) ? Result.ok(enumType) : Result.error(errorMessage.apply(word)))),
+                    Arrays.stream(enumClass.getEnumConstants()).filter(filterPredicate).map(enumType -> enumType.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList()));
         }
     }
 
