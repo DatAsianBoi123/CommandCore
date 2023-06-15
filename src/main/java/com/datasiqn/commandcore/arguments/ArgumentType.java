@@ -38,7 +38,7 @@ public interface ArgumentType<T> {
     ArgumentType<Integer> INTEGER = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
             .andThen(word -> Result.resolve(() -> Integer.parseInt(word), error -> "Invalid integer " + word)));
 
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(str -> INTEGER.parse(str)
+    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(reader -> INTEGER.parse(reader)
             .andThen(integer -> integer <= 0 ? Result.error("Integer must not be below 0") : Result.ok(integer)));
 
     ArgumentType<Double> DOUBLE = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
