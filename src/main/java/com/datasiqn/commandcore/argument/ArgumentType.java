@@ -68,6 +68,7 @@ public interface ArgumentType<T> {
     /**
      * {@code ArgumentType} that represents a uuid
      */
+    @SuppressWarnings("GrazieInspection")
     ArgumentType<java.util.UUID> UUID = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
             .andThen(word -> Result.resolve(() -> java.util.UUID.fromString(word), error -> "Invalid UUID " + word)));
 
@@ -147,7 +148,7 @@ public interface ArgumentType<T> {
      * Creates an {@code ArgumentType} that represents an integer with a minimum (inclusive) and maximum (inclusive) value
      * @param min The inclusive minimum value
      * @param max The inclusive maximum value
-     * @return
+     * @return The newly created {@code ArgumentType}
      */
     @Contract("_, _ -> new")
     static @NotNull ArgumentType<Integer> rangedInt(int min, int max) {

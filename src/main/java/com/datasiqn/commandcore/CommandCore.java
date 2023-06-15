@@ -187,6 +187,14 @@ public class CommandCore {
         return instance;
     }
 
+    /**
+     * Creates a new {@code CommandContext}
+     * @param source The sender that executed the command
+     * @param command The command being executed
+     * @param label The exact string used to execute the command. This can either be the name of the command or one of its aliases
+     * @param arguments The command arguments
+     * @return The newly created {@code CommandContext}
+     */
     @Contract(value = "_, _, _, _ -> new", pure = true)
     public static @NotNull CommandContext createContext(CommandSource source, Command command, String label, Arguments arguments) {
         return new CommandContext() {
@@ -212,6 +220,11 @@ public class CommandCore {
         };
     }
 
+    /**
+     * Creates a new {@code CommandSource}
+     * @param sender The source of the command
+     * @return The newly created {@code CommandSource}
+     */
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull CommandSource createSource(CommandSender sender) {
         return new CommandSource() {
