@@ -152,9 +152,9 @@ public interface ArgumentType<T> {
      * @param <T> The type of the argument
      */
     class CustomArgumentType<T> implements ArgumentType<T> {
-        private final @NotNull Function<ArgumentReader, Result<T, String>> parseFunction;
-        private List<String> values;
-        private Function<CommandContext, List<String>> valueFunction;
+        protected final @NotNull Function<ArgumentReader, Result<T, String>> parseFunction;
+        protected List<String> values;
+        protected Function<CommandContext, List<String>> valueFunction;
 
         /**
          * Creates a new {@link ArgumentType}
