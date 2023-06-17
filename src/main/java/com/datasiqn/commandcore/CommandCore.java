@@ -54,14 +54,6 @@ public class CommandCore {
     }
 
     /**
-     * Gets this instance of {@code CommandCore}
-     * @return This instance
-     */
-    public static CommandCore getInstance() {
-        return instance;
-    }
-
-    /**
      * Gets the options used to initialize {@code CommandCore}
      * @return The options used to initialize {@code CommandCore}
      */
@@ -123,6 +115,16 @@ public class CommandCore {
             usages.add(addedUsage.toString());
         });
         return usages;
+    }
+
+    /**
+     * Gets this instance of {@code CommandCore}
+     * @throws IllegalStateException If {@code CommandCore} hasn't been initialized yet with {@link #init(JavaPlugin, InitOptions) init}
+     * @return This instance
+     */
+    public static CommandCore getInstance() {
+        if (instance == null) throw new IllegalStateException("CommandCore has not been initialized");
+        return instance;
     }
 
     /**
