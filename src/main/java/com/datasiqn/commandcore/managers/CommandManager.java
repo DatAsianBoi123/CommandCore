@@ -20,12 +20,15 @@ public class CommandManager {
      * Registers a new command
      * @param name The command name
      * @param command The command
+     * @throws IllegalArgumentException If {@code name} contains spaces, or if one of {@code command}'s aliases contain spaces
      */
-    public void registerCommand(String name, @NotNull CommandBuilder command) {
+    public void registerCommand(@NotNull String name, @NotNull CommandBuilder command) {
+        if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
         Command builtCommand = command.build();
         commandMap.put(name, builtCommand);
         executableCommands.put(name, builtCommand);
         for (String alias : builtCommand.getAliases()) {
+            if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
             executableCommands.put(alias, builtCommand);
         }
     }
