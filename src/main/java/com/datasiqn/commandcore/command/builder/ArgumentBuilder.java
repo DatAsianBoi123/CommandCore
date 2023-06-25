@@ -34,6 +34,11 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
+    public String toString() {
+        return "Argument(" + argName + ")";
+    }
+
+    @Override
     protected String getUsageArgument(boolean isOptional) {
         return isOptional ? ChatColor.GREEN + "[" + argName + "]" : ChatColor.GOLD + "<" + argName + ">";
     }

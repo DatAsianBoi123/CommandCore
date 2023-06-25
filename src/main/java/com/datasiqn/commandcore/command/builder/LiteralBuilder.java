@@ -32,6 +32,11 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
     }
 
     @Override
+    public String toString() {
+        return "Literal(" + literal + ")";
+    }
+
+    @Override
     protected String getUsageArgument(boolean isOptional) {
         return ChatColor.WHITE + literal;
     }
