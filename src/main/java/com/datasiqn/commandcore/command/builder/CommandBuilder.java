@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class CommandBuilder extends CommandLink<CommandBuilder> {
     private String permission;
-    private String description = "No description provided";
+    private String description;
     private String[] aliases;
 
     /**
@@ -26,7 +26,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
      * @param permission The permission
      * @return The builder, for chaining
      */
-    public CommandBuilder permission(String permission) {
+    public CommandBuilder permission(@Nullable String permission) {
         this.permission = permission;
         return this;
     }
@@ -36,7 +36,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
      * @param description The description
      * @return The builder, for chaining
      */
-    public CommandBuilder description(String description) {
+    public CommandBuilder description(@Nullable String description) {
         this.description = description;
         return this;
     }
@@ -46,7 +46,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
      * @param aliases The aliases
      * @return The builder, for chaining
      */
-    public CommandBuilder alias(String... aliases) {
+    public CommandBuilder alias(@NotNull String @Nullable ... aliases) {
         this.aliases = aliases;
         return this;
     }
@@ -55,7 +55,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
      * Creates a new {@link Command} instance using the supplied values
      * @return The built {@link Command} instance
      */
-    public Command build() {
+    public @NotNull Command build() {
         List<String> usages = new ArrayList<>();
         if (executor != null) usages.add("");
         boolean hasOptional = false;
@@ -71,7 +71,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
     }
 
     @Override
-    protected CommandBuilder getThis() {
+    protected @NotNull CommandBuilder getThis() {
         return this;
     }
 
@@ -100,8 +100,18 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
         }
 
         @Override
-        public @NotNull String getDescription() {
+        public boolean hasPermission() {
+            return permission != null;
+        }
+
+        @Override
+        public @Nullable String getDescription() {
             return description;
+        }
+
+        @Override
+        public boolean hasDescription() {
+            return description != null;
         }
 
         @Override
