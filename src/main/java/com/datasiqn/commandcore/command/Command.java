@@ -22,10 +22,22 @@ public interface Command {
     @Nullable String getPermissionString();
 
     /**
+     * Gets whether this command has a permission or not
+     * @return {@code true} if this command has a permission, {@code false} otherwise
+     */
+    boolean hasPermission();
+
+    /**
      * Gets the description of this command
      * @return The description
      */
-    @NotNull String getDescription();
+    @Nullable String getDescription();
+
+    /**
+     * Gets whether this command has a description or not
+     * @return {@code true} if this command has a description, {@code false} otherwise
+     */
+    boolean hasDescription();
 
     /**
      * Gets the usages for this command
