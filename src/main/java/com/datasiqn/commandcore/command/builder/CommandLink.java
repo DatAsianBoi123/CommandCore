@@ -3,6 +3,7 @@ package com.datasiqn.commandcore.command.builder;
 import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public abstract class CommandLink<T> {
      * @param requires A function that determines if a {@code CommandContext} can run the command
      * @return Itself, for chaining
      */
-    public T requires(Function<CommandContext, Result<None, String>> requires) {
+    public T requires(@NotNull Function<CommandContext, Result<None, String>> requires) {
         this.requires.add(requires);
         return getThis();
     }
@@ -55,7 +56,7 @@ public abstract class CommandLink<T> {
      * @param node The node
      * @return The builder, for chaining
      */
-    public T then(CommandNode<?> node) {
+    public T then(@NotNull CommandNode<?> node) {
         children.add(node);
         return getThis();
     }
@@ -65,7 +66,7 @@ public abstract class CommandLink<T> {
      * @param executor The executor
      * @return The builder, for chaining
      */
-    public T executes(Consumer<CommandContext> executor) {
+    public T executes(@NotNull Consumer<CommandContext> executor) {
         this.executor = executor;
         return getThis();
     }
@@ -78,5 +79,5 @@ public abstract class CommandLink<T> {
         return executor;
     }
 
-    protected abstract T getThis();
+    protected abstract @NotNull T getThis();
 }
