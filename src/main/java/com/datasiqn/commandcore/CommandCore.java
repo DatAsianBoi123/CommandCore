@@ -71,7 +71,7 @@ public class CommandCore {
         if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         Command command = commandManager.getCommand(commandName);
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
-                ChatColor.GRAY + " Description: " + ChatColor.WHITE + command.getDescription(),
+                ChatColor.GRAY + " Description: " + ChatColor.WHITE + (command.hasDescription() ? command.getDescription() : "No description provided"),
                 ChatColor.GRAY + " Aliases: [" + ChatColor.WHITE + String.join(ChatColor.GRAY + ", " + ChatColor.WHITE, command.getAliases()) + ChatColor.GRAY + "]",
                 ChatColor.GRAY + " Usage(s):");
         sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
@@ -85,7 +85,7 @@ public class CommandCore {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
         commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
             Command command = commandManager.getCommand(name);
-            if (command.getPermissionString() == null || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
+            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
         });
     }
 
