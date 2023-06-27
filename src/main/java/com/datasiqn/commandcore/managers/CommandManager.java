@@ -1,5 +1,8 @@
 package com.datasiqn.commandcore.managers;
 
+import com.datasiqn.commandcore.CommandCore;
+import com.datasiqn.commandcore.InitOptions;
+import com.datasiqn.commandcore.InitOptions.Warning;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +28,9 @@ public class CommandManager {
     public void registerCommand(@NotNull String name, @NotNull CommandBuilder command) {
         if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
         Command builtCommand = command.build();
+        InitOptions options = CommandCore.getInstance().getOptions();
+        options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
+        options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
         commandMap.put(name, builtCommand);
         executableCommands.put(name, builtCommand);
         for (String alias : builtCommand.getAliases()) {
