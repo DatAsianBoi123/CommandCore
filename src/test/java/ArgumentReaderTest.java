@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("MissingJavadoc")
 public class ArgumentReaderTest {
     @Test
     public void testNextGet() {
