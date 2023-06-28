@@ -50,8 +50,7 @@ public interface ArgumentType<T> {
     /**
      * {@code ArgumentType} that represents an integer that is no smaller than 1
      */
-    ArgumentType<Integer> NATURAL_NUMBER = new CustomArgumentType<>(reader -> INTEGER.parse(reader)
-            .andThen(integer -> integer <= 0 ? Result.error("Integer must not be below 0") : Result.ok(integer)));
+    ArgumentType<Integer> NATURAL_NUMBER = rangedInt(1);
 
     /**
      * {@code ArgumentType} that represents a double
