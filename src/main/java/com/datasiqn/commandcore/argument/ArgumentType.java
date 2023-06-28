@@ -66,9 +66,8 @@ public interface ArgumentType<T> {
             .andThen(word -> Result.resolve(() -> ParseUtil.strictParseBoolean(word), error -> "Invalid boolean " + word + ", expected either true or false")), Arrays.asList("true", "false"));
 
     /**
-     * {@code ArgumentType} that represents a uuid
+     * {@code ArgumentType} that represents a UUID
      */
-    @SuppressWarnings("GrazieInspection")
     ArgumentType<java.util.UUID> UUID = new CustomArgumentType<>(reader -> Result.<String, String>ok(reader.nextWord())
             .andThen(word -> Result.resolve(() -> java.util.UUID.fromString(word), error -> "Invalid UUID " + word)));
 
