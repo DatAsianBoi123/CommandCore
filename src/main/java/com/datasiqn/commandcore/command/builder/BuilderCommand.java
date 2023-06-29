@@ -29,7 +29,7 @@ class BuilderCommand implements Command {
 
     private final Set<CommandNode<?>> nodes;
     private final Consumer<CommandContext> executor;
-    private final List<CommandLink.Require> requires;
+    private final List<CommandLink.Requirement> requires;
 
     public BuilderCommand(@NotNull CommandBuilder commandBuilder, List<String> usages) {
         this.name = commandBuilder.name;
@@ -86,7 +86,7 @@ class BuilderCommand implements Command {
         }
 
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
-        Result<None, String> requireResult = requires.stream().map(require -> require.apply(context)).reduce(Result.ok(), Result::and);
+        Result<None, String> requireResult = requires.stream().map(requirement -> requirement.apply(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
             context.getSource().getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();

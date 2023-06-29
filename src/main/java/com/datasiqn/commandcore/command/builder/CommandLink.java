@@ -17,23 +17,23 @@ import java.util.function.Function;
  */
 public abstract class CommandLink<T> {
     protected final Set<CommandNode<?>> children = new HashSet<>();
-    protected final List<Require> requires = new ArrayList<>();
+    protected final List<Requirement> requires = new ArrayList<>();
 
     protected Consumer<CommandContext> executor;
 
     /**
      * Requires the context in which the command is executed in to pass the {@code requires} check
-     * @param require A function that determines if a {@code CommandContext} can run the command
+     * @param requirement A function that determines if a {@code CommandContext} can run the command
      * @return Itself, for chaining
      */
-    public T requires(@NotNull Require require) {
-        this.requires.add(require);
+    public T requires(@NotNull Requirement requirement) {
+        this.requires.add(requirement);
         return getThis();
     }
 
     /**
      * Requires the sender to be a {@code Player}
-     * @see #requires(Require)
+     * @see #requires(Requirement)
      * @return Itself, for chaining
      */
     public T requiresPlayer() {
@@ -42,7 +42,7 @@ public abstract class CommandLink<T> {
 
     /**
      * Requires the sender to be an {@code Entity}
-     * @see #requires(Require)
+     * @see #requires(Requirement)
      * @return Itself, for chaining
      */
     public T requiresEntity() {
@@ -92,5 +92,5 @@ public abstract class CommandLink<T> {
      * A function that defines a command requirement.
      * This interface is basically a shorthand for {@code Function<CommandContext, Result<None, String>>}
      */
-    public interface Require extends Function<CommandContext, Result<None, String>> { }
+    public interface Requirement extends Function<CommandContext, Result<None, String>> { }
 }
