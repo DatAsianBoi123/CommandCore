@@ -5,11 +5,10 @@ import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.ListArguments;
 import com.datasiqn.commandcore.command.Command;
-import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.commandcore.command.CommandContext;
+import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -187,8 +186,6 @@ class BuilderCommand implements Command {
                 return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
             Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
-                System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
-                System.out.println("args is " + String.join(",", args));
                 args.add(reader.splice(reader.index()));
                 return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
@@ -200,7 +197,6 @@ class BuilderCommand implements Command {
 
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         } while (!reader.atEnd());
-        System.out.println("args is " + String.join(",", args));
         return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
