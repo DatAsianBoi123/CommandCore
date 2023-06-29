@@ -64,7 +64,7 @@ class BuilderCommand implements Command {
         if (size >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got parameters instead"));
 
-            BuilderCommand.CurrentNode current = findCurrentNode(reader);
+            CurrentNode current = findCurrentNode(reader);
             Result<CommandNode<?>, List<String>> resultNode = current.node;
             if (resultNode.isError()) {
                 if (current.extraInput) {
@@ -112,7 +112,7 @@ class BuilderCommand implements Command {
             String matchingString = args.getString(args.size() - 1);
 
             if (args.size() != 1) {
-                BuilderCommand.CurrentNode current = findCurrentNode(reader);
+                CurrentNode current = findCurrentNode(reader);
                 List<CommandNode<?>> nodeList = current.nodes;
                 if (nodeList.size() != 0) {
                     CommandNode<?> node = nodeList.get(nodeList.size() - 1);
@@ -156,11 +156,11 @@ class BuilderCommand implements Command {
     }
 
     @Contract("_, _ -> new")
-    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull BuilderCommand.CurrentNode result) {
+    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
         return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.args));
     }
 
-    private @NotNull Result<BuilderCommand.ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
+    private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
         if (reader.index() != 0) reader.next();
@@ -177,11 +177,11 @@ class BuilderCommand implements Command {
         String arg;
         if (reader.atEnd()) arg = reader.splice(beforeIndex);
         else arg = reader.splice(beforeIndex, reader.index());
-        return Result.ok(new BuilderCommand.ApplicableNode(options.get(0), arg));
+        return Result.ok(new ApplicableNode(options.get(0), arg));
     }
 
     @Contract("_ -> new")
-    private @NotNull BuilderCommand.CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
+    private @NotNull CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
         Set<CommandNode<?>> nodeSet = nodes;
         List<String> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
@@ -193,9 +193,9 @@ class BuilderCommand implements Command {
                 System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
                 System.out.println("args is " + String.join(",", args));
                 args.add(reader.splice(reader.index()));
-                return new BuilderCommand.CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
+                return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
-            BuilderCommand.ApplicableNode applicableNode = parseResult.unwrap();
+            ApplicableNode applicableNode = parseResult.unwrap();
             node = applicableNode.node;
             nodeSet = node.getChildren();
             nodeList.add(node);
@@ -205,7 +205,7 @@ class BuilderCommand implements Command {
         }
         if (node == null) throw new IllegalArgumentException("reader must not be at end");
         System.out.println("args is " + String.join(",", args));
-        return new BuilderCommand.CurrentNode(Result.ok(node), nodeList, args, false);
+        return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
     private static class ApplicableNode {
