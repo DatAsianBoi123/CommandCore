@@ -110,7 +110,8 @@ public interface ArgumentType<T> {
     }
 
     /**
-     * Parses a string
+     * Attempts to parse an {@code ArgumentReader}.
+     * After parsing, the reader will always be on the space of the next argument, or the end of the reader
      * @param reader The reader to parse
      * @return The result of parsing
      */
