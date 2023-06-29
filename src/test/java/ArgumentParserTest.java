@@ -10,7 +10,6 @@ import static com.datasiqn.commandcore.argument.ArgumentType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings("MissingJavadoc")
 public class ArgumentParserTest {
     @Test
     public void testWord() {
