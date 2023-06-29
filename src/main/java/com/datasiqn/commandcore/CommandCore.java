@@ -1,6 +1,6 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandSource;

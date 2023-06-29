@@ -1,7 +1,7 @@
 package com.datasiqn.commandcore.command.builder;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
-import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;

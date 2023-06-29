@@ -1,4 +1,4 @@
-import com.datasiqn.commandcore.argument.ArgumentType;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.argument.StringArgumentReader;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Material;
@@ -6,7 +6,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.datasiqn.commandcore.argument.ArgumentType.*;
+import static com.datasiqn.commandcore.argument.type.ArgumentType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

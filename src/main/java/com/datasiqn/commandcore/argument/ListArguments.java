@@ -1,5 +1,6 @@
 package com.datasiqn.commandcore.argument;
 
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
