@@ -163,7 +163,7 @@ class BuilderCommand implements Command {
     private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
-        if (reader.index() != 0) reader.next();
+        if (reader.index() != 0 && !reader.atEnd()) reader.next();
         int beforeIndex = reader.index();
         for (CommandNode<?> node : nodes) {
             node.parse(reader).match(val -> options.add(node), e -> {
@@ -185,10 +185,11 @@ class BuilderCommand implements Command {
         Set<CommandNode<?>> nodeSet = nodes;
         List<String> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
-        CommandNode<?> node = null;
-        while (!reader.atEnd()) {
-            if (nodeSet.isEmpty()) return new BuilderCommand.CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
-            Result<BuilderCommand.ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
+        CommandNode<?> node;
+        do {
+            if (nodeSet.isEmpty())
+                return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
+            Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
                 System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
                 System.out.println("args is " + String.join(",", args));
@@ -202,8 +203,7 @@ class BuilderCommand implements Command {
             args.add(applicableNode.argument);
 
             if (reader.atEnd() && reader.get() == ' ') args.add("");
-        }
-        if (node == null) throw new IllegalArgumentException("reader must not be at end");
+        } while (!reader.atEnd());
         System.out.println("args is " + String.join(",", args));
         return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
