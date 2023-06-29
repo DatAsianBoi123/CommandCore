@@ -22,7 +22,8 @@ public class CommandManager {
     /**
      * Registers a new command
      * @param command The command
-     * @throws IllegalArgumentException If {@code command}'s name or one of {@code command}'s aliases is empty or contains spaces
+     * @throws IllegalArgumentException If {@code command}'s name or one of its aliases is empty or contains spaces.
+     * If {@code command}'s name or one of its aliases are already used
      */
     public void registerCommand(@NotNull CommandBuilder command) {
         Command builtCommand = command.build();
@@ -32,11 +33,12 @@ public class CommandManager {
         InitOptions options = CommandCore.getInstance().getOptions();
         options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
         options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
-        commandMap.put(name, builtCommand);
+        if (commandMap.putIfAbsent(name, builtCommand) != null) throw new IllegalArgumentException("Command name already in use");
         for (String alias : builtCommand.getAliases()) {
             if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
             if (alias.isEmpty()) throw new IllegalArgumentException("Command aliases cannot be empty");
-            aliasesMap.put(alias, builtCommand);
+            Command prev = aliasesMap.putIfAbsent(alias, builtCommand);
+            if (prev != null) throw new IllegalArgumentException("Command alias already in use (used by " + prev.getName() + ")");
         }
     }
 
