@@ -19,7 +19,7 @@ public abstract class CommandLink<T> {
     protected final Set<CommandNode<?>> children = new HashSet<>();
     protected final List<Requirement> requires = new ArrayList<>();
 
-    protected Consumer<CommandContext> executor;
+    protected Executor executor;
 
     /**
      * Requires the context in which the command is executed in to pass the {@code requires} check
@@ -64,7 +64,7 @@ public abstract class CommandLink<T> {
      * @param executor The executor
      * @return The builder, for chaining
      */
-    public T executes(@NotNull Consumer<CommandContext> executor) {
+    public T executes(@NotNull Executor executor) {
         this.executor = executor;
         return getThis();
     }
@@ -82,11 +82,17 @@ public abstract class CommandLink<T> {
      * Gets the executor
      * @return The executor
      */
-    public Consumer<CommandContext> getExecutor() {
+    public Executor getExecutor() {
         return executor;
     }
 
     protected abstract @NotNull T getThis();
+
+    /**
+     * A function that defines a command executor
+     * This interface is basically a shorthand for {@code Consumer<CommandContext>}
+     */
+    public interface Executor extends Consumer<CommandContext> { }
 
     /**
      * A function that defines a command requirement.
