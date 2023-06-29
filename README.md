@@ -66,8 +66,7 @@ Using the static method `CommandCore.init(...)` initializes CommandCore. After d
 ### 2) Create a command
 
 ```java
-import com.datasiqn.commandcore.argument.ArgumentType;
-import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.builder.*;
 
 public class GreetCommand {
