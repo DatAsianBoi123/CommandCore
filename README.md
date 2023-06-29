@@ -128,4 +128,4 @@ You can contribute to this project by
 * [Forking](https://github.com/DatAsianBoi123/CommandCore/fork) this repo
 * Creating a [pull request](https://github.com/DatAsianBoi123/CommandCore/compare)
 ---
-Have any questions? Ask me on [discord](https://discord.com)! My tag is `DatAsianBoi1234#7767`
+Have any questions? Ask me on [discord](https://discord.com)! My tag is `datasianboi123`
