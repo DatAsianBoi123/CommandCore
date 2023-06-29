@@ -68,8 +68,8 @@ public class CommandCore {
      * @throws IllegalArgumentException If {@code commandName} is not the name of a command
      */
     public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
-        if (!commandManager.hasCommand(commandName)) throw new IllegalArgumentException("Command " + commandName + " does not exist");
-        Command command = commandManager.getCommand(commandName);
+        Command command = commandManager.getCommand(commandName, false);
+        if (command == null) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
                 ChatColor.GRAY + " Description: " + ChatColor.WHITE + (command.hasDescription() ? command.getDescription() : "No description provided"),
                 ChatColor.GRAY + " Aliases: [" + ChatColor.WHITE + String.join(ChatColor.GRAY + ", " + ChatColor.WHITE, command.getAliases()) + ChatColor.GRAY + "]",
@@ -83,8 +83,8 @@ public class CommandCore {
      */
     public void sendHelpMenu(@NotNull CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
-        commandManager.allCommands().keySet().stream().sorted().forEach(name -> {
-            Command command = commandManager.getCommand(name);
+        commandManager.getCommandNames(false).stream().sorted().forEach(name -> {
+            Command command = commandManager.getCommand(name, false);
             if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
         });
     }
@@ -98,10 +98,9 @@ public class CommandCore {
      */
     @NotNull
     public List<String> getUsagesFor(String commandName, int spaces) {
-        if (!commandManager.hasCommand(commandName))
-            throw new IllegalArgumentException("Command " + commandName + " does not exist");
+        Command command = commandManager.getCommand(commandName, false);
+        if (command == null) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         List<String> usages = new ArrayList<>();
-        Command command = commandManager.getCommand(commandName);
         command.getUsages().forEach(usage -> {
             StringBuilder addedUsage = new StringBuilder();
             for (int i = 0; i < spaces; i++) {

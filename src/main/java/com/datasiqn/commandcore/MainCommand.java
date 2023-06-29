@@ -3,6 +3,7 @@ package com.datasiqn.commandcore;
 import com.datasiqn.commandcore.argument.ListArguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.TabComplete;
+import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
@@ -28,7 +29,8 @@ class MainCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (args.length >= 1) {
-            Command cmd = commandCore.getCommandManager().getCommand(args[0]);
+            CommandManager manager = commandCore.getCommandManager();
+            Command cmd = manager.getCommand(args[0], manager.isAlias(args[0]));
             if (cmd == null) {
                 commandCore.sendHelpMenu(sender);
                 return true;
@@ -43,7 +45,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             output.ifError(messages -> {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
-                sender.sendMessage(commandCore.getUsagesFor(args[0], 1).toArray(new String[0]));
+                sender.sendMessage(commandCore.getUsagesFor(cmd.getName(), 1).toArray(new String[0]));
             });
             return true;
         }
@@ -56,12 +58,14 @@ class MainCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         List<String> tabComplete = new ArrayList<>();
         String matchingString = args[args.length - 1];
+        CommandManager manager = commandCore.getCommandManager();
         if (args.length == 1) {
-            commandCore.getCommandManager().allCommands().forEach((s, cmd) -> {
-                if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) tabComplete.add(s);
+            manager.getCommandNames(true).forEach(name -> {
+                Command cmd = manager.getCommand(name, manager.isAlias(name));
+                if (cmd.getPermissionString() == null || sender.hasPermission(cmd.getPermissionString())) tabComplete.add(name);
             });
         } else {
-            Command cmd = commandCore.getCommandManager().getCommand(args[0]);
+            Command cmd = manager.getCommand(args[0], manager.isAlias(args[0]));
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
