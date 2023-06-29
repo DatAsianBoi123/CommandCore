@@ -1,7 +1,6 @@
 package com.datasiqn.commandcore.command.builder;
 
 import com.datasiqn.commandcore.command.Command;
-import com.datasiqn.commandcore.command.CommandExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,14 +11,18 @@ import java.util.List;
  * Represents a builder that creates commands
  */
 public class CommandBuilder extends CommandLink<CommandBuilder> {
-    private String permission;
-    private String description;
-    private String[] aliases;
+    protected final String name;
+    protected String permission;
+    protected String description;
+    protected String[] aliases = new String[0];
 
     /**
      * Creates a new {@code CommandBuilder}
+     * @param name The name of the command
      */
-    public CommandBuilder() {}
+    public CommandBuilder(@NotNull String name) {
+        this.name = name;
+    }
 
     /**
      * Sets the permission of the command
@@ -46,7 +49,7 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
      * @param aliases The aliases
      * @return The builder, for chaining
      */
-    public CommandBuilder alias(@NotNull String @Nullable ... aliases) {
+    public CommandBuilder alias(@NotNull String @NotNull ... aliases) {
         this.aliases = aliases;
         return this;
     }
@@ -67,61 +70,11 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
         }
         if (executor != null && hasOptional && canBeOptional) usages.remove(0);
 
-        return new BuilderCommand(usages);
+        return new BuilderCommand(this, usages);
     }
 
     @Override
     protected @NotNull CommandBuilder getThis() {
         return this;
-    }
-
-    private class BuilderCommand implements Command {
-        private final String description;
-        private final String permission;
-        private final List<String> usages;
-        private final CommandExecutor commandExecutor;
-
-        public BuilderCommand(List<String> usages) {
-            this.description = CommandBuilder.this.description;
-            this.permission = CommandBuilder.this.permission;
-            this.usages = usages;
-
-            this.commandExecutor = new BuilderExecutor(executor, children, requires);
-        }
-
-        @Override
-        public @NotNull CommandExecutor getExecutor() {
-            return commandExecutor;
-        }
-
-        @Override
-        public @Nullable String getPermissionString() {
-            return permission;
-        }
-
-        @Override
-        public boolean hasPermission() {
-            return permission != null;
-        }
-
-        @Override
-        public @Nullable String getDescription() {
-            return description;
-        }
-
-        @Override
-        public boolean hasDescription() {
-            return description != null;
-        }
-
-        @Override
-        public @NotNull List<String> getUsages() {
-            return usages;
-        }
-
-        @Override
-        public @NotNull String[] getAliases() {
-            return aliases == null ? new String[0] : aliases;
-        }
     }
 }

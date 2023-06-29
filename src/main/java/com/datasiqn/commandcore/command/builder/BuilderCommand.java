@@ -4,32 +4,53 @@ import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.ListArguments;
-import com.datasiqn.commandcore.command.CommandExecutor;
+import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.TabComplete;
-import com.datasiqn.commandcore.command.context.CommandContext;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-class BuilderExecutor implements CommandExecutor {
+class BuilderCommand implements Command {
+    private final String name;
+    private final String[] aliases;
+    private final String description;
+    private final String permission;
+    private final List<String> usages;
+
     private final Set<CommandNode<?>> nodes;
     private final Consumer<CommandContext> executor;
-    private final List<Function<CommandContext, Result<None, String>>> requires;
+    private final List<CommandLink.Require> requires;
 
-    BuilderExecutor(Consumer<CommandContext> executor, Set<CommandNode<?>> nodes, List<Function<CommandContext, Result<None, String>>> requires) {
-        this.nodes = nodes;
-        this.executor = executor;
-        this.requires = requires;
+    public BuilderCommand(@NotNull CommandBuilder commandBuilder, List<String> usages) {
+        this.name = commandBuilder.name;
+        this.aliases = commandBuilder.aliases;
+        this.description = commandBuilder.description;
+        this.permission = commandBuilder.permission;
+        this.usages = usages;
+        this.nodes = commandBuilder.children;
+        this.executor = commandBuilder.executor;
+        this.requires = commandBuilder.requires;
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return name;
+    }
+
+    @Override
+    public @NotNull String @NotNull [] getAliases() {
+        return aliases;
     }
 
     @Override
@@ -43,7 +64,7 @@ class BuilderExecutor implements CommandExecutor {
         if (size >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got parameters instead"));
 
-            CurrentNode current = findCurrentNode(reader);
+            BuilderCommand.CurrentNode current = findCurrentNode(reader);
             Result<CommandNode<?>, List<String>> resultNode = current.node;
             if (resultNode.isError()) {
                 if (current.extraInput) {
@@ -80,7 +101,7 @@ class BuilderExecutor implements CommandExecutor {
     }
 
     @Override
-    public @NotNull TabComplete getTabComplete(@NotNull CommandContext context) {
+    public @NotNull TabComplete tabComplete(@NotNull CommandContext context) {
         Arguments args = context.getArguments();
 
         if (args.size() >= 1) {
@@ -91,7 +112,7 @@ class BuilderExecutor implements CommandExecutor {
             String matchingString = args.getString(args.size() - 1);
 
             if (args.size() != 1) {
-                CurrentNode current = findCurrentNode(reader);
+                BuilderCommand.CurrentNode current = findCurrentNode(reader);
                 List<CommandNode<?>> nodeList = current.nodes;
                 if (nodeList.size() != 0) {
                     CommandNode<?> node = nodeList.get(nodeList.size() - 1);
@@ -106,15 +127,40 @@ class BuilderExecutor implements CommandExecutor {
             }
             return new TabComplete(tabcomplete, matchingString);
         }
-        return CommandExecutor.super.getTabComplete(context);
+        return Command.super.tabComplete(context);
+    }
+
+    @Override
+    public @Nullable String getPermissionString() {
+        return permission;
+    }
+
+    @Override
+    public boolean hasPermission() {
+        return permission != null;
+    }
+
+    @Override
+    public @Nullable String getDescription() {
+        return description;
+    }
+
+    @Override
+    public boolean hasDescription() {
+        return description != null;
+    }
+
+    @Override
+    public @NotNull List<String> getUsages() {
+        return usages;
     }
 
     @Contract("_, _ -> new")
-    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
+    private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull BuilderCommand.CurrentNode result) {
         return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.args));
     }
 
-    private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
+    private @NotNull Result<BuilderCommand.ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
         if (reader.index() != 0) reader.next();
@@ -131,25 +177,25 @@ class BuilderExecutor implements CommandExecutor {
         String arg;
         if (reader.atEnd()) arg = reader.splice(beforeIndex);
         else arg = reader.splice(beforeIndex, reader.index());
-        return Result.ok(new ApplicableNode(options.get(0), arg));
+        return Result.ok(new BuilderCommand.ApplicableNode(options.get(0), arg));
     }
 
     @Contract("_ -> new")
-    private @NotNull BuilderExecutor.CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
+    private @NotNull BuilderCommand.CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
         Set<CommandNode<?>> nodeSet = nodes;
         List<String> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
         CommandNode<?> node = null;
         while (!reader.atEnd()) {
-            if (nodeSet.isEmpty()) return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
-            Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
+            if (nodeSet.isEmpty()) return new BuilderCommand.CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
+            Result<BuilderCommand.ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
                 System.out.println("errors: " + String.join(",", parseResult.unwrapError()));
                 System.out.println("args is " + String.join(",", args));
                 args.add(reader.splice(reader.index()));
-                return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
+                return new BuilderCommand.CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
-            ApplicableNode applicableNode = parseResult.unwrap();
+            BuilderCommand.ApplicableNode applicableNode = parseResult.unwrap();
             node = applicableNode.node;
             nodeSet = node.getChildren();
             nodeList.add(node);
@@ -158,7 +204,7 @@ class BuilderExecutor implements CommandExecutor {
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         }
         System.out.println("args is " + String.join(",", args));
-        return new CurrentNode(Result.ok(node), nodeList, args, false);
+        return new BuilderCommand.CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
     private static class ApplicableNode {

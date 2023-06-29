@@ -21,13 +21,14 @@ public class CommandManager {
 
     /**
      * Registers a new command
-     * @param name The command name
      * @param command The command
-     * @throws IllegalArgumentException If {@code name} contains spaces, or if one of {@code command}'s aliases contain spaces
+     * @throws IllegalArgumentException If {@code command}'s name or one of {@code command}'s aliases is empty or contains spaces
      */
-    public void registerCommand(@NotNull String name, @NotNull CommandBuilder command) {
-        if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
+    public void registerCommand(@NotNull CommandBuilder command) {
         Command builtCommand = command.build();
+        String name = builtCommand.getName();
+        if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
+        if (name.isEmpty()) throw new IllegalArgumentException("Command name cannot be empty");
         InitOptions options = CommandCore.getInstance().getOptions();
         options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
         options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
@@ -35,6 +36,7 @@ public class CommandManager {
         executableCommands.put(name, builtCommand);
         for (String alias : builtCommand.getAliases()) {
             if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
+            if (alias.isEmpty()) throw new IllegalArgumentException("Command aliases cannot be empty");
             executableCommands.put(alias, builtCommand);
         }
     }

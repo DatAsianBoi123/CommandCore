@@ -173,7 +173,7 @@ public class CommandCore {
         command.setExecutor(mainCommand);
         command.setTabCompleter(mainCommand);
 
-        if (options.createHelpCommand()) instance.commandManager.registerCommand("help", new CommandBuilder()
+        if (options.createHelpCommand()) instance.commandManager.registerCommand(new CommandBuilder("help")
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
                         .executes(context -> {

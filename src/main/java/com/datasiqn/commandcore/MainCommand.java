@@ -39,7 +39,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            Result<None, List<String>> output = cmd.getExecutor().execute(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs)));
+            Result<None, List<String>> output = cmd.execute(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs)));
             output.ifError(messages -> {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
@@ -65,7 +65,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            TabComplete complete = cmd.getExecutor().getTabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs)));
+            TabComplete complete = cmd.tabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new ListArguments(listArgs)));
             matchingString = complete.getMatchingString();
             tabComplete.addAll(complete.values());
         }
