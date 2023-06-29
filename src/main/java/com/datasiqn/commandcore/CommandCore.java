@@ -6,7 +6,7 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandSource;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
-import com.datasiqn.commandcore.command.context.CommandContext;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
