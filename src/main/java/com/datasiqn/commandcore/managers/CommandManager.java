@@ -31,8 +31,11 @@ public class CommandManager {
         if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
         if (name.isEmpty()) throw new IllegalArgumentException("Command name cannot be empty");
         InitOptions options = CommandCore.getInstance().getOptions();
-        options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
-        options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
+        // the default help command doesn't have a permission, so suppress all warnings if the command is the default help command
+        if (!options.createHelpCommand() || !builtCommand.getName().equals("help")) {
+            options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
+            options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
+        }
         if (commandMap.putIfAbsent(name, builtCommand) != null) throw new IllegalArgumentException("Command name already in use");
         for (String alias : builtCommand.getAliases()) {
             if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
