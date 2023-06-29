@@ -72,7 +72,7 @@ import com.datasiqn.commandcore.command.builder.*;
 
 public class GreetCommand {
     public CommandBuilder getCommand() {
-        return new CommandBuilder<>()
+        return new CommandBuilder()
                 .description("Greets a player")
                 .executes(context -> context.getSource().sendMessage("You ran this command with no arguments")) // Line 5
                 .then(LiteralBuilder.literal("player")
