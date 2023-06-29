@@ -4,12 +4,11 @@ import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,19 +41,7 @@ public abstract class CommandNode<This extends CommandNode<This>> extends Comman
      * @return The tabcomplete
      */
     @NotNull
-    public List<String> getTabComplete(@NotNull CommandContext context) {
-        return new ArrayList<>();
-    }
-
-    /**
-     * Gets the children of this node
-     * @return A view of this node's children
-     */
-    @Contract(" -> new")
-    @UnmodifiableView
-    public final @NotNull @Unmodifiable Set<CommandNode<?>> getChildren() {
-        return Collections.unmodifiableSet(children);
-    }
+    public abstract List<String> getTabComplete(@NotNull CommandContext context);
 
     /**
      * Attempts to parse a string

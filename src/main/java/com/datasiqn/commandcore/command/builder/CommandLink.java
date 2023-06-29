@@ -4,11 +4,9 @@ import com.datasiqn.commandcore.command.context.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -72,8 +70,17 @@ public abstract class CommandLink<T> {
     }
 
     /**
+     * Gets all children nodes
+     * @return An unmodifiable view of all children nodes
+     */
+    @UnmodifiableView
+    public @NotNull Set<CommandNode<?>> getChildren() {
+        return Collections.unmodifiableSet(children);
+    }
+
+    /**
      * Gets the executor
-     * @return the executor
+     * @return The executor
      */
     public Consumer<CommandContext> getExecutor() {
         return executor;
