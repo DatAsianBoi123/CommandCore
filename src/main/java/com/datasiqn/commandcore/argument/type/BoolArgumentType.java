@@ -1,7 +1,6 @@
 package com.datasiqn.commandcore.argument.type;
 
 import com.datasiqn.commandcore.command.CommandContext;
-import com.datasiqn.commandcore.util.ParseUtil;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,9 @@ class BoolArgumentType implements SimpleArgumentType<Boolean> {
 
     @Override
     public @NotNull Result<Boolean, None> parseWord(@NotNull String word) {
-        return Result.resolve(() -> ParseUtil.strictParseBoolean(word));
+        if (word.equalsIgnoreCase("true")) return Result.ok(true);
+        else if (word.equalsIgnoreCase("false")) return Result.ok(false);
+        return Result.error();
     }
 
     @Override
