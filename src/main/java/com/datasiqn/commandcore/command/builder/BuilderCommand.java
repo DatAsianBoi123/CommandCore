@@ -203,6 +203,7 @@ class BuilderCommand implements Command {
 
             if (reader.atEnd() && reader.get() == ' ') args.add("");
         }
+        if (node == null) throw new IllegalArgumentException("reader must not be at end");
         System.out.println("args is " + String.join(",", args));
         return new BuilderCommand.CurrentNode(Result.ok(node), nodeList, args, false);
     }
