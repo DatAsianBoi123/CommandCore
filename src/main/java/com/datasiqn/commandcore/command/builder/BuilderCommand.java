@@ -55,8 +55,6 @@ class BuilderCommand implements Command {
 
     @Override
     public @NotNull Result<None, List<String>> execute(@NotNull CommandContext context) {
-        long begin = System.currentTimeMillis();
-
         Arguments args = context.getArguments();
         ArgumentReader reader = args.asReader();
         int size = args.size();
@@ -77,7 +75,6 @@ class BuilderCommand implements Command {
                 messages.addAll(exceptions);
                 return Result.error(messages);
             }
-            Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
             CommandNode<?> node = resultNode.unwrap();
             CommandContext newContext = buildContext(context, current);
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
@@ -90,7 +87,6 @@ class BuilderCommand implements Command {
         }
 
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
-        Bukkit.getLogger().info("[CommandCore] Command took " + (System.currentTimeMillis() - begin) + "ms");
         Result<None, String> requireResult = requires.stream().map(require -> require.apply(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
             context.getSource().getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
