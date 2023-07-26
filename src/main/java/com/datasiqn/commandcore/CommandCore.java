@@ -176,7 +176,7 @@ public class CommandCore {
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
                         .executes(context -> {
-                            Command cmd = context.getArguments().get(0, ArgumentType.COMMAND).unwrap();
+                            Command cmd = context.getArguments().get(0, ArgumentType.COMMAND);
                             String commandName = context.getArguments().getString(0);
                             if (!context.getSource().hasPermission(cmd.getPermissionString())) {
                                 context.getSource().sendMessage(ChatColor.RED + "No help for " + commandName);
