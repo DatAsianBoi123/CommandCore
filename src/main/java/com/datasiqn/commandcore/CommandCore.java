@@ -229,12 +229,12 @@ public class CommandCore {
     public static @NotNull CommandSource createSource(CommandSender sender) {
         return new CommandSource() {
             @Override
-            public @NotNull Result<Player, String> getPlayer() {
+            public @NotNull Result<Player, String> getPlayerChecked() {
                 return Result.resolve(() -> (Player) sender, error -> "Sender is not a player");
             }
 
             @Override
-            public @NotNull Result<Entity, String> getEntity() {
+            public @NotNull Result<Entity, String> getEntityChecked() {
                 return Result.resolve(() -> (Entity) sender, error -> "Sender is not an entity");
             }
 

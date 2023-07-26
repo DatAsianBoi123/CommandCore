@@ -37,7 +37,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresPlayer() {
-        return requires(context -> context.getSource().getPlayer().and(Result.ok()).or(Result.error("A player is required to run this")));
+        return requires(context -> context.getSource().getPlayerChecked().and(Result.ok()).or(Result.error("A player is required to run this")));
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresEntity() {
-        return requires(context -> context.getSource().getEntity().and(Result.ok()).or(Result.error("An entity is required to run this")));
+        return requires(context -> context.getSource().getEntityChecked().and(Result.ok()).or(Result.error("An entity is required to run this")));
     }
 
     /**

@@ -14,25 +14,40 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface CommandSource {
     /**
-     * Gets the player executing command
-     * @return A result describing the player. This can be safely unwrapped if the command link {@link CommandLink#requiresPlayer() requiresPlayer}.
+     * Gets the player executing command. This can be safely called if the command link {@link CommandLink#requiresPlayer() requiresPlayer}.
+     * @return The player
+     * @throws IllegalStateException If the sender is not a player
      */
-    @NotNull
-    Result<Player, String> getPlayer();
+    default @NotNull Player getPlayer() {
+        return getPlayerChecked().<IllegalStateException>unwrapOrThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Same as {@link #getPlayer()}, except checks if the sender is a player and returns a {@code Result}
+     * @return A result describing the player. If the command link {@link CommandLink#requiresPlayer() requiresPlayer}, use {@link #getPlayer()} instead
+     */
+    @NotNull Result<Player, String> getPlayerChecked();
 
     /**
      * Gets the entity executing command
-     * @return A result describing the entity. This can be safely unwrapped if the command link {@link CommandLink#requiresEntity() requiresEntity}.
+     * @return The entity. This can be safely called if the command link {@link CommandLink#requiresEntity() requiresEntity}.
+     * @throws IllegalStateException If the sender is not an entity
      */
-    @NotNull
-    Result<Entity, String> getEntity();
+    default @NotNull Entity getEntity() {
+        return getEntityChecked().<IllegalStateException>unwrapOrThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Same as {@link #getEntity()}, except checks if the sender is an entity and returns a {@code Result}
+     * @return A result describing the entity. If the command link {@link CommandLink#requiresEntity() requiresEntity}, use {@link #getEntity()} instead
+     */
+    @NotNull Result<Entity, String> getEntityChecked();
 
     /**
      * Gets the sender of the command
      * @return The sender
      */
-    @NotNull
-    CommandSender getSender();
+    @NotNull CommandSender getSender();
 
     /**
      * Sends the command source a message
