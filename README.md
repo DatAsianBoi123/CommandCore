@@ -86,8 +86,6 @@ public class GreetCommand {
 ```
 The `CommandBuilder` is what you use create commands.
 
-The constructor argument tells CommandCore that only `Player`s may execute this command and won't let other senders execute it (command blocks, the console, etc.).
-
 On the 5th line, we use a `.executes` call. This tells CommandCore to execute whatever is in the lambda when we run the command with no arguments.
 
 On the next line, we make a `.then` call. It adds another 'branch' to the command 'tree'. You can think of the entire command as a tree, with the `CommandBuilder` as the main trunk. Any extra `.then` calls creates another branch, or path, that the user can go down.
@@ -98,7 +96,8 @@ Notice how the literal `CommandNode` doesn't have an `.executes` call. This tell
 
 On the next line, we create a new branch under the literal. This time, it is an argument. An argument is any string that the argument type can understand. In this case, we give it an argument type of `PLAYER`. This means that CommandCore will suggest us player names.
 
-After that, we have a `.executes` call. This gets executed when we have typed that entire branch out. (ex. `/... player DatAsiqn`).
+After that, we have a `.requiresPlayer` call. This tells CommandCore that the current node (the PLAYER argument) requires a player to use it. If, for example, the console sends it, CommandCore will not execute the command and instead give the user an error.
+Finally, we have a `.executes` call. This gets executed when we have typed that entire branch out. (ex. `/... player DatAsiqn`).
 
 The next line is adding another literal onto the main trunk (notice the indentation). This literal is less complicated than the last, and just makes the sender chat "Hello Server!".
 
@@ -128,4 +127,4 @@ You can contribute to this project by
 * [Forking](https://github.com/DatAsianBoi123/CommandCore/fork) this repo
 * Creating a [pull request](https://github.com/DatAsianBoi123/CommandCore/compare)
 ---
-Have any questions? Ask me on [discord](https://discord.com)! My tag is `DatAsianBoi1234#7767`
+Have any questions? Ask me on [discord](https://discord.com)! My tag is `datasianboi123`
