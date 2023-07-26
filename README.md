@@ -77,10 +77,10 @@ public class GreetCommand {
                 .then(LiteralBuilder.literal("player")
                         .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
                                 .requiresPlayer()
-                                .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).unwrap().getName()))))
+                                .executes(context -> context.getSource().getPlayer().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).getName()))))
                 .then(LiteralBuilder.literal("server")
                         .requiresPlayer()
-                        .executes(context -> context.getSource().getPlayer().unwrap().chat("Hello Server!")));
+                        .executes(context -> context.getSource().getPlayer().chat("Hello Server!")));
     }
 }
 ```
