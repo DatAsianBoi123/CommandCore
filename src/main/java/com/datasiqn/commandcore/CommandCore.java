@@ -1,12 +1,12 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.argument.Arguments;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.CommandSource;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
-import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
@@ -16,12 +16,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -243,21 +241,6 @@ public class CommandCore {
             @Override
             public @NotNull CommandSender getSender() {
                 return sender;
-            }
-
-            @Override
-            public void sendMessage(@NotNull String @NotNull ... messages) {
-                sender.sendMessage(messages);
-            }
-
-            @Override
-            public boolean hasPermission(@NotNull Permission permission) {
-                return sender.hasPermission(permission);
-            }
-
-            @Override
-            public boolean hasPermission(@Nullable String permission) {
-                return permission == null || sender.hasPermission(permission);
             }
         };
     }
