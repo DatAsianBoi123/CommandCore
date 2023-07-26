@@ -1,7 +1,8 @@
-package com.datasiqn.commandcore.commands.builder;
+package com.datasiqn.commandcore.command.builder;
 
-import com.datasiqn.commandcore.arguments.ArgumentType;
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
@@ -28,8 +29,13 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
-    public @NotNull Result<?, String> parse(String arg) {
-        return type.parse(arg);
+    public @NotNull Result<T, String> parse(ArgumentReader reader) {
+        return type.parse(reader);
+    }
+
+    @Override
+    public String toString() {
+        return "Argument(" + argName + ")";
     }
 
     @Override

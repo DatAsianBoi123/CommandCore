@@ -1,6 +1,8 @@
-package com.datasiqn.commandcore.commands.builder;
+package com.datasiqn.commandcore.command.builder;
 
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
@@ -21,13 +23,18 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
     }
 
     @Override
-    public @NotNull Result<String, String> parse(String arg) {
-        return Result.<String, String>ok(arg).andThen(str -> literal.equals(arg) ? Result.ok(str) : Result.error("Invalid literal '" + arg + "'"));
+    public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
+        return ArgumentType.WORD.parse(reader).andThen(str -> literal.equals(str) ? Result.ok(str) : Result.error(""));
     }
 
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>(Collections.singletonList(literal));
+    }
+
+    @Override
+    public String toString() {
+        return "Literal(" + literal + ")";
     }
 
     @Override
@@ -47,11 +54,14 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
 
     /**
      * Creates a new {@link LiteralBuilder}
-     * @param literal The literal string
+     * @param literal The literal string. String cannot be empty or have spaces
+     * @throws IllegalArgumentException If the string is empty or contains spaces
      * @return The created {@link LiteralBuilder} instance
      */
     @Contract("_ -> new")
-    public static @NotNull LiteralBuilder literal(String literal) {
+    public static @NotNull LiteralBuilder literal(@NotNull String literal) {
+        if (literal.isEmpty()) throw new IllegalArgumentException("literal string cannot be empty");
+        if (literal.contains(" ")) throw new IllegalArgumentException("literal string cannot have spaces");
         return new LiteralBuilder(literal);
     }
 }

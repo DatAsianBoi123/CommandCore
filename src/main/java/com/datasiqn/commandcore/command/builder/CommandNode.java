@@ -1,15 +1,14 @@
-package com.datasiqn.commandcore.commands.builder;
+package com.datasiqn.commandcore.command.builder;
 
-import com.datasiqn.commandcore.commands.context.CommandContext;
+import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
-import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -27,40 +26,29 @@ public abstract class CommandNode<This extends CommandNode<This>> extends Comman
      */
     public final @NotNull Result<None, String> executeWith(CommandContext context) {
         if (executor == null) throw new IllegalStateException("This CommandNode has no executor");
-        for (Function<CommandContext, Result<None, String>> require : requires){
-            Result<None, String> result = require.apply(context);
+        for (Requirement require : requires){
+            Result<None, String> result = require.testRequirement(context);
             if (result.isError()) return result;
         }
-        executor.accept(context);
+        executor.execute(context);
         return Result.ok();
     }
 
     /**
      * Gets the tabcomplete for this node
+     * @param context The context in which the tab complete is being requested
      * @return The tabcomplete
      */
     @NotNull
-    public List<String> getTabComplete(@NotNull CommandContext context) {
-        return new ArrayList<>();
-    }
-
-    /**
-     * Gets the children of this node
-     * @return A view of this node's children
-     */
-    @Contract(" -> new")
-    @UnmodifiableView
-    public final @NotNull @Unmodifiable Set<CommandNode<?>> getChildren() {
-        return Collections.unmodifiableSet(children);
-    }
+    public abstract List<String> getTabComplete(@NotNull CommandContext context);
 
     /**
      * Attempts to parse a string
-     * @param arg The string to parse
+     * @param reader The reader to parse
      * @return The result of the parsing
      */
     @NotNull
-    public abstract Result<?, String> parse(String arg);
+    public abstract Result<?, String> parse(ArgumentReader reader);
 
     protected List<String> getUsages(boolean isOptional) {
         List<String> usages = new ArrayList<>();

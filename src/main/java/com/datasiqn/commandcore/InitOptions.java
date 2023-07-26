@@ -1,5 +1,6 @@
 package com.datasiqn.commandcore;
 
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -8,6 +9,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Initialization options used when initializing {@code CommandCore}. Cannot be created directly, and must use a {@code Builder} to create one.
@@ -17,8 +20,8 @@ public class InitOptions {
     private final String rootCommand;
     private final String pluginName;
     private final boolean helpCommand;
-    private final boolean legacyExecutor;
     private final List<String> aliases;
+    private final Set<Warning> warnings;
 
     /**
      * Creates an {@code InitOptions} from a {@code Builder}
@@ -30,7 +33,7 @@ public class InitOptions {
         this.helpCommand = builder.helpCommand;
         this.pluginName = builder.pluginName;
         this.aliases = Arrays.asList(builder.aliases);
-        this.legacyExecutor = builder.legacyExecutor;
+        this.warnings = Arrays.stream(builder.warnings).collect(Collectors.toSet());
     }
 
     /**
@@ -43,7 +46,7 @@ public class InitOptions {
 
     /**
      * Gets whether the user has defined a custom plugin name or not
-     * @return True if there is a custom plugin name, false otherwise
+     * @return {@code true} if there is a custom plugin name, {@code false} otherwise
      */
     public boolean hasCustomPluginName() {
         return pluginName != null;
@@ -67,19 +70,31 @@ public class InitOptions {
     }
 
     /**
-     * Gets whether a help command should be generated or not
-     * @return True if a help command should be generated, false otherwise
+     * Gets whether it should warn the user on a specific warning or not
+     * @param warning The warning to check for
+     * @return {@code true} if it should warn, {@code false} otherwise
      */
-    public boolean createHelpCommand() {
-        return helpCommand;
+    @UnmodifiableView
+    public boolean shouldWarn(@NotNull Warning warning) {
+        return warnings.contains(warning);
     }
 
     /**
-     * Gets whether the legacy executor should be used or not
-     * @return True if the legacy executor should be used, false otherwise
+     * Warns a specific warning if a condition is met and {@link #shouldWarn(Warning) shouldWarn(warning)} returns {@code true}
+     * @param warning The warning to warn
+     * @param condition The condition to meet in order to warn
+     * @param args The args used to format the warning message
      */
-    public boolean useLegacyExecutor() {
-        return legacyExecutor;
+    public void warnIf(@NotNull Warning warning, boolean condition, Object... args) {
+        if (shouldWarn(warning) && condition) Bukkit.getLogger().warning(String.format("[CommandCore] " + warning, args));
+    }
+
+    /**
+     * Gets whether a help command should be generated or not
+     * @return {@code true} if a help command should be generated, {@code false} otherwise
+     */
+    public boolean createHelpCommand() {
+        return helpCommand;
     }
 
     /**
@@ -89,20 +104,20 @@ public class InitOptions {
         private final String rootCommand;
         private String pluginName;
         private boolean helpCommand = true;
-        private boolean legacyExecutor = false;
         private String[] aliases = new String[0];
+        private Warning[] warnings = new Warning[0];
 
         /**
          * Creates a new {@code Builder} class
          * @param rootCommand The name of the root command that be the root all {@code CommandCore} commands
          */
-        public Builder(String rootCommand) {
+        public Builder(@NotNull String rootCommand) {
             this.rootCommand = rootCommand;
         }
 
         /**
          * Sets whether a help command should be created or not
-         * @param flag True if a help command should be created, false if it shouldn't
+         * @param flag {@code true} if a help command should be created, {@code false} if it shouldn't
          * @return The builder, for chaining
          */
         public Builder createHelpCommand(boolean flag) {
@@ -115,7 +130,7 @@ public class InitOptions {
          * @param name The custom plugin name
          * @return The builder, for chaining
          */
-        public Builder pluginName(String name) {
+        public Builder pluginName(@NotNull String name) {
             this.pluginName = name;
             return this;
         }
@@ -125,19 +140,18 @@ public class InitOptions {
          * @param aliases The aliases
          * @return The builder, for chaining
          */
-        public Builder aliases(String... aliases) {
+        public Builder aliases(@NotNull String @NotNull ... aliases) {
             this.aliases = aliases;
             return this;
         }
 
         /**
-         * Tells {@code CommandCore} to use the legacy executor when executing a command
-         * @deprecated You should not use this ever, since the legacy executor is very buggy and can cause lots of problems if used
+         * Tells {@code CommandCore} what warnings it should give when you register a command
+         * @param warnings The warnings
          * @return The builder, for chaining
          */
-        @Deprecated
-        public Builder useLegacyExecutor() {
-            this.legacyExecutor = true;
+        public Builder warnOn(@NotNull Warning @NotNull ... warnings) {
+            this.warnings = warnings;
             return this;
         }
 
@@ -157,6 +171,33 @@ public class InitOptions {
         @Contract(value = "_ -> new", pure = true)
         public static @NotNull Builder create(@NotNull String rootCommand) {
             return new Builder(rootCommand);
+        }
+    }
+
+    /**
+     * A collection of possible errors when making command creation
+     */
+    public enum Warning {
+        /**
+         * The command is missing a description field
+         */
+        MISSING_DESCRIPTION("Command %s is missing a description"),
+
+        /**
+         * The command is missing a permission
+         */
+        MISSING_PERMISSION("Command %s is missing a permission"),
+        ;
+
+        private final String displayName;
+
+        Warning(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
         }
     }
 }
