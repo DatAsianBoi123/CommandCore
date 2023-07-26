@@ -4,8 +4,6 @@ import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
-
 /**
  * Represents command arguments
  */
@@ -26,7 +24,7 @@ public interface Arguments {
      * @throws IndexOutOfBoundsException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >=} {@link #size()})
      */
     default @NotNull <T> T get(int i, ArgumentType<T> type) {
-        return getChecked(i, type).unwrapOrThrow((Function<String, IllegalArgumentException>) err -> new IllegalArgumentException("argument could not be parsed: " + err));
+        return getChecked(i, type).<IllegalArgumentException>unwrapOrThrow(err -> new IllegalArgumentException("argument could not be parsed: " + err));
     }
 
     /**
