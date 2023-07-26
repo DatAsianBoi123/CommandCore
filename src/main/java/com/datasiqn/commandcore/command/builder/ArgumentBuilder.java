@@ -29,7 +29,7 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
-    public @NotNull Result<?, String> parse(ArgumentReader reader) {
+    public @NotNull Result<T, String> parse(ArgumentReader reader) {
         return type.parse(reader);
     }
 
