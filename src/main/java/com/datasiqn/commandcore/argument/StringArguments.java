@@ -7,16 +7,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * An implementation of {@code Arguments} that uses an internal {@code List<String>} to store all arguments
+ * Represents a list of arguments that are already parsed
  */
-public class ListArguments implements Arguments {
+public class StringArguments implements Arguments {
     protected final List<String> allArguments;
 
     /**
      * Creates a new {@code ListArguments}
      * @param args The arguments in a string list
      */
-    public ListArguments(List<String> args) {
+    public StringArguments(List<String> args) {
         allArguments = args;
     }
 
@@ -26,7 +26,7 @@ public class ListArguments implements Arguments {
     }
 
     @Override
-    public @NotNull <T> Result<T, String> get(int i, @NotNull ArgumentType<T> type) {
+    public @NotNull <T> Result<T, String> getChecked(int i, @NotNull ArgumentType<T> type) {
         checkBounds(i);
         return type.parse(new StringArgumentReader(allArguments.get(i)));
     }

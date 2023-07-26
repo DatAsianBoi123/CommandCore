@@ -3,7 +3,7 @@ package com.datasiqn.commandcore.command.builder;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
-import com.datasiqn.commandcore.argument.ListArguments;
+import com.datasiqn.commandcore.argument.StringArguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
@@ -152,7 +152,7 @@ class BuilderCommand implements Command {
 
     @Contract("_, _ -> new")
     private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
-        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new ListArguments(result.args));
+        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new StringArguments(result.args));
     }
 
     private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
