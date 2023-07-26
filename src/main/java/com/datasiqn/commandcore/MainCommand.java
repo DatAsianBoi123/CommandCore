@@ -10,7 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,7 +74,18 @@ class MainCommand implements CommandExecutor, TabCompleter {
         }
 
         List<String> partialMatches = new ArrayList<>();
-        StringUtil.copyPartialMatches(matchingString, tabComplete, partialMatches);
+        int spaces = 0;
+        for (char c : matchingString.toCharArray()) if (c == ' ') spaces++;
+        for (String match : tabComplete) {
+            if (!match.startsWith(matchingString)) continue;
+            int substringIndex;
+            char[] charArray = match.toCharArray();
+            for (substringIndex = 0; substringIndex < charArray.length; substringIndex++) {
+                if (spaces == 0) break;
+                if (charArray[substringIndex] == ' ') spaces--;
+            }
+            partialMatches.add(match.substring(substringIndex));
+        }
         partialMatches.sort(Comparator.naturalOrder());
 
         return partialMatches;
