@@ -1,6 +1,7 @@
 package com.datasiqn.commandcore.command.builder;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
@@ -23,7 +24,7 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
 
     @Override
     public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
-        return Result.<String, String>ok(reader.nextWord()).andThen(str -> literal.equals(str) ? Result.ok(str) : Result.error(""));
+        return ArgumentType.WORD.parse(reader).andThen(str -> literal.equals(str) ? Result.ok(str) : Result.error(""));
     }
 
     @Override
