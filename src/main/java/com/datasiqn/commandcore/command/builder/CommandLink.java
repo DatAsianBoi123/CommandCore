@@ -6,9 +6,9 @@ import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents a link in a command tree.
@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @param <T> The type of "This". It is returned every time a chaining method is called, allowing unique methods on the subclass to be called.
  */
 public abstract class CommandLink<T> {
-    protected final Set<CommandNode<?>> children = new HashSet<>();
+    protected final List<CommandNode<?>> children = new ArrayList<>();
     protected final List<Requirement> requires = new ArrayList<>();
 
     protected Executor executor;
@@ -74,8 +74,8 @@ public abstract class CommandLink<T> {
      * @return An unmodifiable view of all children nodes
      */
     @UnmodifiableView
-    public @NotNull Set<CommandNode<?>> getChildren() {
-        return Collections.unmodifiableSet(children);
+    public @NotNull List<CommandNode<?>> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     /**

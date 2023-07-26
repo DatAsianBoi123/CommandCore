@@ -7,6 +7,8 @@ import com.datasiqn.commandcore.argument.StringArguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
+import com.datasiqn.commandcore.command.builder.CommandLink.Executor;
+import com.datasiqn.commandcore.command.builder.CommandLink.Requirement;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
@@ -17,8 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
 
 class BuilderCommand implements Command {
     private final String name;
@@ -27,9 +27,9 @@ class BuilderCommand implements Command {
     private final String permission;
     private final List<String> usages;
 
-    private final Set<CommandNode<?>> nodes;
-    private final Consumer<CommandContext> executor;
-    private final List<CommandLink.Requirement> requires;
+    private final List<CommandNode<?>> nodes;
+    private final Executor executor;
+    private final List<Requirement> requires;
 
     public BuilderCommand(@NotNull CommandBuilder commandBuilder, List<String> usages) {
         this.name = commandBuilder.name;
@@ -102,7 +102,7 @@ class BuilderCommand implements Command {
         if (args.size() >= 1) {
             ArgumentReader reader = args.asReader();
             CommandContext newContext = context;
-            Set<CommandNode<?>> nodeSet = nodes;
+            List<CommandNode<?>> nodeSet = nodes;
 
             String matchingString = args.getString(args.size() - 1);
 
@@ -155,7 +155,7 @@ class BuilderCommand implements Command {
         return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new StringArguments(result.args));
     }
 
-    private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull Set<CommandNode<?>> nodes) {
+    private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull List<CommandNode<?>> nodes) {
         List<CommandNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
         if (reader.index() != 0 && !reader.atEnd()) reader.next();
@@ -177,7 +177,7 @@ class BuilderCommand implements Command {
 
     @Contract("_ -> new")
     private @NotNull CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
-        Set<CommandNode<?>> nodeSet = nodes;
+        List<CommandNode<?>> nodeSet = nodes;
         List<String> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
         CommandNode<?> node;
