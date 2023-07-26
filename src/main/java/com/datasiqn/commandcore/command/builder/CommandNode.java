@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,11 +26,11 @@ public abstract class CommandNode<This extends CommandNode<This>> extends Comman
      */
     public final @NotNull Result<None, String> executeWith(CommandContext context) {
         if (executor == null) throw new IllegalStateException("This CommandNode has no executor");
-        for (Function<CommandContext, Result<None, String>> require : requires){
-            Result<None, String> result = require.apply(context);
+        for (Requirement require : requires){
+            Result<None, String> result = require.testRequirement(context);
             if (result.isError()) return result;
         }
-        executor.accept(context);
+        executor.execute(context);
         return Result.ok();
     }
 

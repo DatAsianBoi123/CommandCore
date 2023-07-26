@@ -86,12 +86,12 @@ class BuilderCommand implements Command {
         }
 
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
-        Result<None, String> requireResult = requires.stream().map(requirement -> requirement.apply(context)).reduce(Result.ok(), Result::and);
+        Result<None, String> requireResult = requires.stream().map(requirement -> requirement.testRequirement(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
             context.getSource().getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
-        executor.accept(context);
+        executor.execute(context);
         return Result.ok();
     }
 

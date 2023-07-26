@@ -90,13 +90,24 @@ public abstract class CommandLink<T> {
 
     /**
      * A function that defines a command executor
-     * This interface is basically a shorthand for {@code Consumer<CommandContext>}
      */
-    public interface Executor extends Consumer<CommandContext> { }
+    public interface Executor {
+        /**
+         * Executes the command
+         * @param context The context in which the command was executed in
+         */
+        void execute(CommandContext context);
+    }
 
     /**
      * A function that defines a command requirement.
-     * This interface is basically a shorthand for {@code Function<CommandContext, Result<None, String>>}
      */
-    public interface Requirement extends Function<CommandContext, Result<None, String>> { }
+    public interface Requirement {
+        /**
+         * Tests this requirement
+         * @param context The context in which the requirement is being tested in
+         * @return A result, where the error value is an error message. An {@code Ok} value means the requirement passed, while an {@code Error} value means the requirement failed
+         */
+        Result<None, String> testRequirement(CommandContext context);
+    }
 }
