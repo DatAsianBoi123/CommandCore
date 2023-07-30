@@ -1,7 +1,8 @@
 # CommandCore
 CommandCore is a simple, yet powerful command framework for the Spigot API.
+
 ## Installation
-**Java 8 or higher is required**
+**Java 17 or higher is required**
 
 ### 1) Install to your local .m2 repo
 > If you are using JitPack, you can skip this step.
