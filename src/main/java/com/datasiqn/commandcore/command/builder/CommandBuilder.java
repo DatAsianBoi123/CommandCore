@@ -24,6 +24,10 @@ public class CommandBuilder extends CommandLink<CommandBuilder> {
         this.name = name;
     }
 
+    public String getName() {
+        return name;
+    }
+
     /**
      * Sets the permission of the command
      * @param permission The permission

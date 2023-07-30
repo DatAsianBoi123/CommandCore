@@ -8,6 +8,7 @@ import com.datasiqn.commandcore.command.CommandSource;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import com.datasiqn.commandcore.managers.CommandManager;
+import com.datasiqn.commandcore.nms.CommandRegisterer;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,14 +33,15 @@ import java.util.List;
  */
 public class CommandCore {
     private static CommandCore instance;
-    private final CommandManager commandManager = new CommandManager();
+    private final CommandManager commandManager;
     private final JavaPlugin plugin;
     private final org.bukkit.command.Command bukkitCommand;
     private final InitOptions options;
 
-    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command, InitOptions options) {
+    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command, CommandRegisterer registerer, InitOptions options) {
         this.plugin = plugin;
         this.bukkitCommand = command;
+        this.commandManager = new CommandManager(registerer);
         this.options = options;
     }
 
@@ -101,9 +103,7 @@ public class CommandCore {
         List<String> usages = new ArrayList<>();
         command.getUsages().forEach(usage -> {
             StringBuilder addedUsage = new StringBuilder();
-            for (int i = 0; i < spaces; i++) {
-                addedUsage.append(" ");
-            }
+            addedUsage.append(" ".repeat(Math.max(0, spaces)));
             addedUsage.append(ChatColor.YELLOW)
                     .append("/")
                     .append(this.bukkitCommand.getName())
@@ -146,29 +146,45 @@ public class CommandCore {
         if (instance != null) throw new IllegalStateException("An instance of CommandCore has already been created");
 
         String rootCommand = options.getRootCommand();
-        PluginCommand command = plugin.getCommand(rootCommand);
-        if (command == null) {
-            Bukkit.getLogger().info("[CommandCore] The root command " + rootCommand + " isn't registered in your plugin.yml! Attempting to reflectively insert it into Bukkit's command map...");
-            try {
-                Field mapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-                mapField.setAccessible(true);
-                CommandMap commandMap = (CommandMap) mapField.get(Bukkit.getServer());
-                Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-                constructor.setAccessible(true);
-                command = constructor.newInstance(rootCommand, plugin);
-                command.setAliases(options.getAliases());
-                commandMap.register(rootCommand, plugin.getName(), command);
-            } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
-                     InstantiationException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-            Bukkit.getLogger().info("[CommandCore] Successfully injected the command into Bukkit");
+
+        CommandRegisterer registerer;
+        String version = Bukkit.getServer().getClass().getName().split("\\.")[3].substring(1);
+        try {
+            Class<?> registererClass = Class.forName("com.datasiqn.commandcore.nms.CommandRegisterer_" + version);
+            Constructor<?> constructor = registererClass.getConstructor(String.class);
+            registerer = (CommandRegisterer) constructor.newInstance(options.getRootCommand());
+            plugin.getLogger().info("[CommandCore] Loading with NMS version " + version);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            registerer = null;
+            plugin.getLogger().warning("[CommandCore] Version " + Bukkit.getBukkitVersion() + " is not supported! Disabling NMS features");
         }
 
-        instance = new CommandCore(plugin, command, options);
-        MainCommand mainCommand = new MainCommand(instance);
-        command.setExecutor(mainCommand);
-        command.setTabCompleter(mainCommand);
+        if (registerer == null) {
+            PluginCommand command = plugin.getCommand(rootCommand);
+            if (command == null) {
+                Bukkit.getLogger().info("[CommandCore] The root command " + rootCommand + " isn't registered in your plugin.yml! Attempting to reflectively insert it into Bukkit's command map...");
+                try {
+                    Field mapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+                    mapField.setAccessible(true);
+                    CommandMap commandMap = (CommandMap) mapField.get(Bukkit.getServer());
+                    Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+                    constructor.setAccessible(true);
+                    command = constructor.newInstance(rootCommand, plugin);
+                    command.setAliases(options.getAliases());
+                    commandMap.register(rootCommand, plugin.getName(), command);
+                } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
+                         InstantiationException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+                Bukkit.getLogger().info("[CommandCore] Successfully injected the command into Bukkit");
+            }
+
+            instance = new CommandCore(plugin, command, null, options);
+            MainCommand mainCommand = new MainCommand(instance);
+            command.setExecutor(mainCommand);
+            command.setTabCompleter(mainCommand);
+        } else instance = new CommandCore(plugin, null, registerer, options);
 
         if (options.createHelpCommand()) instance.commandManager.registerCommand(new CommandBuilder("help")
                 .description("Shows the help menu")

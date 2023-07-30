@@ -35,7 +35,9 @@ public interface ArgumentReader {
      * This is the same as checking if {@link #index()} {@code ==} {@link #size()} {@code - 1}
      * @return {@code true} if the reader is at the last character, {@code false} otherwise
      */
-    boolean atEnd();
+    default boolean atEnd() {
+        return index() + 1 >= size();
+    }
 
     /**
      * Gets the current index of the reader
@@ -72,7 +74,7 @@ public interface ArgumentReader {
      * @param beginning The index to start at
      * @return The spliced string
      */
-    @NotNull String splice(int beginning);
+    @NotNull String substring(int beginning);
 
     /**
      * Performs a splice that gets a string starting at index {@code beginning} and ending at index {@code end}
@@ -91,7 +93,7 @@ public interface ArgumentReader {
      * @param end The index to end at
      * @return The spliced string
      */
-    @NotNull String splice(int beginning, int end);
+    @NotNull String substring(int beginning, int end);
 
     /**
      * Returns the next word and places the reader on the space after that word, or the last character in the reader
@@ -109,5 +111,14 @@ public interface ArgumentReader {
      *
      * @return The next word
      */
-    @NotNull String nextWord();
+    @NotNull
+    default String nextWord() {
+        if (atEnd()) return String.valueOf(get());
+        StringBuilder builder = new StringBuilder();
+        builder.append(get());
+        while (!atEnd() && next() != ' ') {
+            builder.append(get());
+        }
+        return builder.toString();
+    }
 }

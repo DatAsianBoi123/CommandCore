@@ -170,8 +170,8 @@ class BuilderCommand implements Command {
         options.sort(CommandNode.getComparator());
         options.get(0).parse(reader);
         String arg;
-        if (reader.atEnd()) arg = reader.splice(beforeIndex);
-        else arg = reader.splice(beforeIndex, reader.index());
+        if (reader.atEnd()) arg = reader.substring(beforeIndex);
+        else arg = reader.substring(beforeIndex, reader.index());
         return Result.ok(new ApplicableNode(options.get(0), arg));
     }
 
@@ -186,7 +186,7 @@ class BuilderCommand implements Command {
                 return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
             Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
-                args.add(reader.splice(reader.index()));
+                args.add(reader.substring(reader.index()));
                 return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
             ApplicableNode applicableNode = parseResult.unwrap();

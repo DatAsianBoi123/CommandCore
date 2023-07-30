@@ -1,10 +1,18 @@
 package com.datasiqn.commandcore.argument.type;
 
+import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.ReaderArgumentReader;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
+import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -16,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -23,7 +32,7 @@ import java.util.stream.Collectors;
  * Represents an argument type
  * @param <T> The type of the argument
  */
-public interface ArgumentType<T> {
+public interface ArgumentType<T> extends com.mojang.brigadier.arguments.ArgumentType<T> {
     /**
      * {@code ArgumentType} that is just a single word
      */
@@ -118,6 +127,24 @@ public interface ArgumentType<T> {
     @NotNull
     Result<T, String> parse(@NotNull ArgumentReader reader);
 
+    @Override
+    default T parse(StringReader stringReader) throws CommandSyntaxException {
+        int start = stringReader.getCursor();
+        ArgumentReader reader = new ReaderArgumentReader(stringReader);
+        Result<T, String> parseResult = parse(reader);
+        parseResult.ifOk(ok -> {
+            if (reader.atEnd()) stringReader.skip();
+        });
+        return parseResult.<CommandSyntaxException>unwrapOrThrow(err -> {
+            reader.jumpTo(start);
+            return new SimpleCommandExceptionType(new LiteralMessage(err)).createWithContext(stringReader);
+        });
+    }
+
+    default String getName() {
+        return "commandcore:" + getClass().getSimpleName().toLowerCase();
+    }
+
     /**
      * Gets the tabcomplete for this {@code ArgumentType}
      * @param context The command context
@@ -126,6 +153,16 @@ public interface ArgumentType<T> {
     @NotNull
     default List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
+    }
+
+    @Override
+    default <S> CompletableFuture<Suggestions> listSuggestions(com.mojang.brigadier.context.@NotNull CommandContext<S> context, SuggestionsBuilder builder) {
+        CommandContext coreContext = CommandCore.getInstance().getCommandManager().getRegisterer().toContext(context, null);
+        coreContext.getSource().sendMessage(context.getRootNode().getName());
+        for (String suggestion : getTabComplete(coreContext)) {
+            builder.suggest(suggestion);
+        }
+        return builder.buildFuture();
     }
 
     /**

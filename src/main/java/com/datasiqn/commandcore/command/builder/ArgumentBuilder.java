@@ -33,6 +33,14 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
         return type.parse(reader);
     }
 
+    public String getName() {
+        return argName;
+    }
+
+    public ArgumentType<T> getType() {
+        return type;
+    }
+
     @Override
     public String toString() {
         return "Argument(" + argName + ")";

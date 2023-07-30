@@ -31,11 +31,6 @@ public class StringArgumentReader implements ArgumentReader {
     }
 
     @Override
-    public boolean atEnd() {
-        return index + 1 >= arg.length();
-    }
-
-    @Override
     public int index() {
         return index;
     }
@@ -53,25 +48,14 @@ public class StringArgumentReader implements ArgumentReader {
     }
 
     @Override
-    public @NotNull String splice(int beginning) {
-        return splice(beginning, size());
+    public @NotNull String substring(int beginning) {
+        return substring(beginning, size());
     }
     @Override
-    public @NotNull String splice(int beginning, int end) {
+    public @NotNull String substring(int beginning, int end) {
         if (end > size()) throw new IndexOutOfBoundsException("end index (" + end + ") is larger than the length (" + size() + ")");
         if (beginning < 0) throw new IndexOutOfBoundsException("beginning index cannot be negative");
         if (beginning > end) throw new IndexOutOfBoundsException("beginning index cannot be larger than end index");
         return arg.substring(beginning, end);
-    }
-
-    @Override
-    public @NotNull String nextWord() {
-        if (atEnd()) return String.valueOf(get());
-        StringBuilder builder = new StringBuilder();
-        builder.append(get());
-        while (!atEnd() && next() != ' ') {
-            builder.append(get());
-        }
-        return builder.toString();
     }
 }

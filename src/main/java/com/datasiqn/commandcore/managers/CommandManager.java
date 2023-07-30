@@ -5,6 +5,7 @@ import com.datasiqn.commandcore.InitOptions;
 import com.datasiqn.commandcore.InitOptions.Warning;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
+import com.datasiqn.commandcore.nms.CommandRegisterer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -18,6 +19,15 @@ import java.util.Set;
 public class CommandManager {
     private final Map<String, Command> commandMap = new HashMap<>();
     private final Map<String, Command> aliasesMap = new HashMap<>();
+    private final CommandRegisterer registerer;
+
+    public CommandManager(CommandRegisterer registerer) {
+        this.registerer = registerer;
+    }
+
+    public CommandRegisterer getRegisterer() {
+        return registerer;
+    }
 
     /**
      * Registers a new command
@@ -43,6 +53,12 @@ public class CommandManager {
             Command prev = aliasesMap.putIfAbsent(alias, builtCommand);
             if (prev != null) throw new IllegalArgumentException("Command alias already in use (used by " + prev.getName() + ")");
         }
+        if (registerer != null) registerer.addCommand(command);
+    }
+
+    public void finish() {
+        registerer.removeOld();
+        registerer.register();
     }
 
     /**
