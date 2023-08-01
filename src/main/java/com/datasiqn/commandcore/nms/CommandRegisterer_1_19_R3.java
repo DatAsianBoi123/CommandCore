@@ -37,7 +37,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandRegisterer_1_19_R3 extends CommandRegisterer {
+class CommandRegisterer_1_19_R3 extends CommandRegisterer {
     private static final Map<String, ArgumentType<?>> CREATED_TYPES = new HashMap<>();
     private final CommandDispatcher<CommandListenerWrapper> dispatcher;
     private final LiteralArgumentBuilder<CommandListenerWrapper> root;
@@ -70,17 +70,17 @@ public class CommandRegisterer_1_19_R3 extends CommandRegisterer {
 
     private void addChildrenRecursive(ArgumentBuilder<CommandListenerWrapper, ?> argumentBuilder, @NotNull CommandLink<?> link, com.datasiqn.commandcore.command.Command command) {
         for (CommandNode<?> node : link.getChildren()) {
-            ArgumentBuilder<CommandListenerWrapper, ?> builder;
-            if (node instanceof LiteralBuilder literal) builder = LiteralArgumentBuilder.literal(literal.getLiteral());
+            ArgumentBuilder<CommandListenerWrapper, ?> child;
+            if (node instanceof LiteralBuilder literal) child = LiteralArgumentBuilder.literal(literal.getLiteral());
             else if (node instanceof com.datasiqn.commandcore.command.builder.ArgumentBuilder<?> argument) {
-                builder = RequiredArgumentBuilder.argument(argument.getName(), toArgumentType(argument.getType(), command));
+                child = RequiredArgumentBuilder.argument(argument.getName(), toArgumentType(argument.getType()));
             } else throw new RuntimeException("command node not yet implemented");
             Executor executor = node.getExecutor();
             if (executor != null) {
-                builder.executes(toCommand(executor, command));
+                child.executes(toCommand(executor, command));
             }
-            addChildrenRecursive(builder, node, command);
-            argumentBuilder.then(builder);
+            addChildrenRecursive(child, node, command);
+            argumentBuilder.then(child);
         }
     }
 
@@ -101,7 +101,7 @@ public class CommandRegisterer_1_19_R3 extends CommandRegisterer {
         return CommandCore.createContext(source, command, splitCommand.getLeft(), new StringArguments(splitCommand.getRight()));
     }
 
-    private <T> ArgumentType<T> toArgumentType(com.datasiqn.commandcore.argument.type.@NotNull ArgumentType<T> type, com.datasiqn.commandcore.command.Command command) {
+    private <T> ArgumentType<T> toArgumentType(com.datasiqn.commandcore.argument.type.@NotNull ArgumentType<T> type) {
         //noinspection unchecked
         return (ArgumentType<T>) CREATED_TYPES.computeIfAbsent(type.getName(), k -> {
 //            ArgumentType<T> argumentType = generateArgumentType(type, command);

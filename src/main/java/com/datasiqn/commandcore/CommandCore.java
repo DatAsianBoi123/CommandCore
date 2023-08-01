@@ -151,13 +151,16 @@ public class CommandCore {
         String version = Bukkit.getServer().getClass().getName().split("\\.")[3].substring(1);
         try {
             Class<?> registererClass = Class.forName("com.datasiqn.commandcore.nms.CommandRegisterer_" + version);
-            Constructor<?> constructor = registererClass.getConstructor(String.class);
+            Constructor<?> constructor = registererClass.getDeclaredConstructor(String.class);
+            constructor.setAccessible(true);
             registerer = (CommandRegisterer) constructor.newInstance(options.getRootCommand());
             plugin.getLogger().info("[CommandCore] Loading with NMS version " + version);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
+        } catch (ClassNotFoundException e) {
             registerer = null;
             plugin.getLogger().warning("[CommandCore] Version " + Bukkit.getBukkitVersion() + " is not supported! Disabling NMS features");
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            registerer = null;
+            e.printStackTrace();
         }
 
         if (registerer == null) {
