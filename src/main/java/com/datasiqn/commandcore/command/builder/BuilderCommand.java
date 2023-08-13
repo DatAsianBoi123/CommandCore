@@ -65,14 +65,17 @@ class BuilderCommand implements Command {
             Result<CommandNode<?>, List<String>> resultNode = current.node;
             if (resultNode.isError()) {
                 if (current.extraInput) {
-                    return Result.error(Collections.singletonList("Expected end of input, but got extra args instead"));
+                    return Result.error(Collections.singletonList("Expected end of input, but got extra parameters instead"));
                 }
                 List<String> exceptions = resultNode.unwrapError();
-                List<String> messages = new ArrayList<>();
-                List<String> matches = current.args;
-                messages.add("Invalid parameter '" + matches.get(matches.size() - 1) + "' at position " + matches.size() + ": ");
-                messages.addAll(exceptions);
-                return Result.error(messages);
+                if (exceptions.isEmpty()) exceptions.add("Incorrect argument '" + reader.splice(reader.index()) + "'");
+                String rootCommand = CommandCore.getInstance().getOptions().getRootCommand();
+                String label = context.getLabel();
+                String correctSection = ChatColor.GRAY + rootCommand + " " + label + " " + reader.splice(0, reader.index());
+                String incorrectParameter = ChatColor.RED.toString() + ChatColor.UNDERLINE + reader.splice(reader.index());
+                exceptions.add(correctSection + incorrectParameter + ChatColor.RESET + ChatColor.RED + ChatColor.ITALIC + " <--[HERE]");
+                exceptions.add("");
+                return Result.error(exceptions);
             }
             CommandNode<?> node = resultNode.unwrap();
             CommandContext newContext = buildContext(context, current);
