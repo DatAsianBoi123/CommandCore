@@ -5,8 +5,13 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +68,33 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents a vector
      */
     ArgumentType<Vector> VECTOR = new VectorArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents a loaded world
+     */
+    ArgumentType<World> WORLD = new WorldArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents an entity
+     */
+    ArgumentType<EntityType> ENTITY = new EnumArgumentType<>(EntityType.class, "entity");
+
+    /**
+     * {@code ArgumentType} that represents an entity that is living
+     */
+    ArgumentType<EntityType> LIVING_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, EntityType::isAlive, "living entity");
+
+    /**
+     * {@code ArgumentType} that represents an entity that can be spawned using {@link org.bukkit.World#spawnEntity(Location, EntityType)}.
+     * <br>
+     * This is the same as the {@code ENTITY} argument type, except that this omits the {@code Player} entity type
+     */
+    ArgumentType<EntityType> SPAWNABLE_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, entityType -> entityType != EntityType.PLAYER, "living entity");
+
+    /**
+     * {@code ArgumentType} that represents a loot table
+     */
+    ArgumentType<LootTable> LOOT_TABLE = new LootTableArgumentType();
 
     /**
      * {@code ArgumentType} that represents a material
