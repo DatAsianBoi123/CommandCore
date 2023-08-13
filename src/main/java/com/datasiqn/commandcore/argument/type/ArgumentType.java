@@ -168,6 +168,7 @@ public interface ArgumentType<T> {
         private final Class<T> enumClass;
         private final String enumName;
         private final List<String> tabCompletes;
+        private final boolean uppercaseValues;
 
         /**
          * Creates a new {@code ArgumentType}
@@ -185,6 +186,17 @@ public interface ArgumentType<T> {
             this.enumClass = enumClass;
             this.enumName = enumName;
             this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+
+            for (T enumConstant : enumClass.getEnumConstants()) {
+                for (char letter : enumConstant.name().toCharArray()) {
+                    if (Character.isLetter(letter) && !Character.isUpperCase(letter)) {
+                        this.uppercaseValues = false;
+                        Bukkit.getLogger().warning("[CommandCore] Enum " + enumName + " includes values that aren't in uppercase!");
+                        return;
+                    }
+                }
+            }
+            this.uppercaseValues = true;
         }
 
         @Override
@@ -194,7 +206,7 @@ public interface ArgumentType<T> {
 
         @Override
         public @NotNull Result<T, None> parseWord(String word) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word));
+            return Result.resolve(() -> uppercaseValues ? Enum.valueOf(enumClass, word.toUpperCase()) : EnumUtils.findEnumInsensitiveCase(enumClass, word));
         }
 
         @Override
@@ -207,10 +219,8 @@ public interface ArgumentType<T> {
      * Represents a custom {@code ArgumentType} that parses to a filtered enum
      * @param <T> The type of the enum
      */
-    class FilteredEnumArgumentType<T extends Enum<T>> implements SimpleArgumentType<T> {
+    class FilteredEnumArgumentType<T extends Enum<T>> extends EnumArgumentType<T> {
         private final Predicate<T> filter;
-        private final String enumName;
-        private final Class<T> enumClass;
         private final List<String> tabCompletes;
 
         /**
@@ -220,21 +230,14 @@ public interface ArgumentType<T> {
          * @param enumName The name of the enum. This is used when displaying an error message (Invalid {{@code enumName}} '{val}'
          */
         public FilteredEnumArgumentType(@NotNull Class<T> enumClass, Predicate<T> filter, String enumName) {
-            this.enumClass = enumClass;
+            super(enumClass, enumName);
             this.filter = filter;
-            this.enumName = enumName;
             this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).filter(filter).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
         }
 
         @Override
-        public @NotNull String getTypeName() {
-            return enumName;
-        }
-
-        @Override
         public @NotNull Result<T, None> parseWord(String word) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word))
-                    .andThen(val -> filter.test(val) ? Result.ok(val) : Result.error());
+            return super.parseWord(word).andThen(val -> filter.test(val) ? Result.ok(val) : Result.error());
         }
 
         @Override
