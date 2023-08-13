@@ -1,16 +1,30 @@
-import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.argument.StringArgumentReader;
+import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.resultapi.Result;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.function.Predicate;
+
 import static com.datasiqn.commandcore.argument.type.ArgumentType.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ArgumentParserTest {
+    static {
+        Bukkit.setServer(new MockServer.Builder()
+                .addPlayer("bob")
+                .addPlayer("jim")
+                .addWorld("world")
+                .addWorld("nether")
+                .build());
+    }
+
     @Test
     public void testWord() {
         testOk("hello there", WORD, "hello");
@@ -65,6 +79,40 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testWorld() {
+        this.<World>testOk("world", WORLD, world -> world.getName().equals("world"));
+        this.<World>testOk("nETHer", WORLD, world -> world.getName().equals("nether"));
+        testErr("end", WORLD);
+    }
+
+    @Test
+    public void testEntity() {
+        testOk("zombie", ENTITY, EntityType.ZOMBIE);
+        testOk("armor_stand", ENTITY, EntityType.ARMOR_STAND);
+        testErr("herobrine", ENTITY);
+    }
+
+    @Test
+    public void testLivingEntity() {
+        testOk("player", LIVING_ENTITY, EntityType.PLAYER);
+        testOk("enderman", LIVING_ENTITY, EntityType.ENDERMAN);
+        testErr("egg", LIVING_ENTITY);
+    }
+
+    @Test
+    public void testSpawnableEntity() {
+        testOk("dropped_item", SPAWNABLE_ENTITY, EntityType.DROPPED_ITEM);
+        testErr("player", SPAWNABLE_ENTITY);
+    }
+
+    @Test
+    public void testLootTable() {
+        testOk("jungle_temple", LOOT_TABLE);
+        testOk("buried_treasure", LOOT_TABLE);
+        testErr("blabla", LOOT_TABLE);
+    }
+
+    @Test
     public void testMaterial() {
         testOk("stick", MATERIAL, Material.STICK);
         testOk("DIAmOnd_SWOrd", MATERIAL, Material.DIAMOND_SWORD);
@@ -84,8 +132,28 @@ public class ArgumentParserTest {
         testErr("wall_torch", ITEM);
     }
 
-    // Skip player because that won't work in a testing environment
-    // public void testPlayer() {}
+    @Test
+    public void testEnum() {
+        ArgumentType<UppercaseEnum> uppercaseEnum = new EnumArgumentType<>(UppercaseEnum.class);
+        testOk("cOoL_ConstANT", uppercaseEnum, UppercaseEnum.COOL_CONSTANT);
+        testOk("thREE", uppercaseEnum, UppercaseEnum.THREE);
+        testOk("wow", uppercaseEnum, UppercaseEnum.WOW);
+        testErr("not an enum", uppercaseEnum);
+
+        ArgumentType<BadEnum> badEnum = new EnumArgumentType<>(BadEnum.class);
+        testOk("pascalcase", badEnum, BadEnum.PascalCase);
+        testOk("LOWERCASE", badEnum, BadEnum.lowercase);
+        testOk("CameLcAse", badEnum, BadEnum.camelCase);
+        testErr("aaaaaa", badEnum);
+    }
+
+    @Test
+    public void testPlayer() {
+        this.<Player>testOk("jim", PLAYER, player -> player.getName().equals("jim"));
+        this.<Player>testOk("bob", PLAYER, player -> player.getName().equals("bob"));
+        testErr("joe", PLAYER);
+        testErr("b", PLAYER);
+    }
 
     // Skip command because that won't work in a testing environment
     // public void testCommand() {}
@@ -109,13 +177,31 @@ public class ArgumentParserTest {
         testErr("number", ranged);
     }
 
+    private <T> void testOk(String arg, @NotNull ArgumentType<T> type) {
+        this.<T>testOk(arg, type, val -> true);
+    }
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type, T val) {
+        this.<T>testOk(arg, type, parsed -> parsed.equals(val));
+    }
+    private <T> void testOk(String arg, @NotNull ArgumentType<T> type, @NotNull Predicate<T> tester) {
         Result<T, String> result = type.parse(new StringArgumentReader(arg));
         assertTrue(result.isOk());
-        assertEquals(result.unwrap(), val);
+        assertTrue(tester.test(result.unwrap()));
     }
 
     private void testErr(String arg, @NotNull ArgumentType<?> type) {
         assertTrue(type.parse(new StringArgumentReader(arg)).isError());
+    }
+
+    private enum UppercaseEnum {
+        COOL_CONSTANT,
+        THREE,
+        WOW,
+    }
+
+    private enum BadEnum {
+        PascalCase,
+        lowercase,
+        camelCase,
     }
 }
