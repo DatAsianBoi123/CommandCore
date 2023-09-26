@@ -7,10 +7,14 @@ import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.CommandSource;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
+import com.datasiqn.commandcore.locatable.LocatableBlockSender;
+import com.datasiqn.commandcore.locatable.LocatableCommandSender;
+import com.datasiqn.commandcore.locatable.LocatableEntitySender;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -236,6 +240,22 @@ public class CommandCore {
             @Override
             public @NotNull Result<Entity, String> getEntityChecked() {
                 return Result.resolve(() -> (Entity) sender, error -> "Sender is not an entity");
+            }
+
+            @Override
+            public @NotNull Result<BlockCommandSender, String> getBlockChecked() {
+                return Result.resolve(() -> (BlockCommandSender) sender, error -> "Sender is not a block");
+            }
+
+            @Override
+            public @NotNull Result<LocatableCommandSender, String> getLocatableChecked() {
+                Result<LocatableCommandSender, String> result = Result.error("Sender is not locatable");
+                if (sender instanceof Entity) {
+                    result = result.or(Result.ok(new LocatableEntitySender((Entity) sender)));
+                } else if (sender instanceof BlockCommandSender) {
+                    result = result.or(Result.ok(new LocatableBlockSender((BlockCommandSender) sender)));
+                }
+                return result;
             }
 
             @Override

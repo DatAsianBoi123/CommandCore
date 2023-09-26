@@ -1,7 +1,9 @@
 package com.datasiqn.commandcore.command;
 
 import com.datasiqn.commandcore.command.builder.CommandLink;
+import com.datasiqn.commandcore.locatable.LocatableCommandSender;
 import com.datasiqn.resultapi.Result;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,6 +44,36 @@ public interface CommandSource {
      * @return A result describing the entity. If the command link {@link CommandLink#requiresEntity() requiresEntity}, use {@link #getEntity()} instead
      */
     @NotNull Result<Entity, String> getEntityChecked();
+
+    /**
+     * Gets the block executing command
+     * @return The block. This can be safely called if the command link {@link CommandLink#requiresBlock()} requiresBlock}.
+     * @throws IllegalStateException If the sender is not a block
+     */
+    default @NotNull BlockCommandSender getBlock() {
+        return getBlockChecked().<IllegalStateException>unwrapOrThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Same as {@link #getBlock()}, except checks if the sender is a command block and returns a {@code Result}
+     * @return A result describing the command block. If the command link {@link CommandLink#requiresBlock()} requiresCommandBlock}, use {@link #getBlock()} instead
+     */
+    @NotNull Result<BlockCommandSender, String> getBlockChecked();
+
+    /**
+     * Gets the locatable sender executing command
+     * @return The locatable sender. This can be safely called if the command link {@link CommandLink#requiresLocatable() requiresLocatable}.
+     * @throws IllegalStateException If the sender is not a locatable sender
+     */
+    default @NotNull LocatableCommandSender getLocatable() {
+        return getLocatableChecked().<IllegalStateException>unwrapOrThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Same as {@link #getLocatable()}, except checks if the sender is locatable and returns a {@code Result}
+     * @return A result describing the locatable sender. If the command link {@link CommandLink#requiresLocatable()} requiresCommandBlock}, use {@link #getLocatable()} instead
+     */
+    @NotNull Result<LocatableCommandSender, String> getLocatableChecked();
 
     /**
      * Gets the sender of the command

@@ -50,6 +50,24 @@ public abstract class CommandLink<T> {
     }
 
     /**
+     * Requires the sender to be a {@code BlockCommandSender}
+     * @see #requires(Requirement)
+     * @return Itself, for chaining
+     */
+    public T requiresBlock() {
+        return requires(context -> context.getSource().getBlockChecked().and(Result.ok()).or(Result.error("A block is required to run this")));
+    }
+
+    /**
+     * Requires the sender to be locatable
+     * @see #requires(Requirement)
+     * @return Itself, for chaining
+     */
+    public T requiresLocatable() {
+        return requires(context -> context.getSource().getLocatableChecked().and(Result.ok()).or(Result.error("A sender with a location is required to run this")));
+    }
+
+    /**
      * Adds a new node onto this command builder
      * @param node The node
      * @return The builder, for chaining
