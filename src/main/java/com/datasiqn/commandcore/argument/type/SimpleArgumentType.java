@@ -21,7 +21,7 @@ public interface SimpleArgumentType<T> extends ArgumentType<T> {
      * Parses just a single word
      *
      * @param word The word
-     * @return An {@code Optional} containing the parsed value
+     * @return A {@code Result} containing the parsed value
      */
     @NotNull Result<T, None> parseWord(String word);
 
