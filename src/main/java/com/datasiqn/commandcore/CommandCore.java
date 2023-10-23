@@ -164,6 +164,7 @@ public class CommandCore {
                 constructor.setAccessible(true);
                 command = constructor.newInstance(rootCommand, plugin);
                 command.setAliases(options.getAliases());
+                command.setDescription("Base plugin command");
                 commandMap.register(rootCommand, plugin.getName(), command);
             } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
                      InstantiationException | NoSuchMethodException e) {
