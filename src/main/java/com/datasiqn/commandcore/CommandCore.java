@@ -87,7 +87,10 @@ public class CommandCore {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
         commandManager.getCommandNames(false).stream().sorted().forEach(name -> {
             Command command = commandManager.getCommand(name, false);
-            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
+            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) {
+                String description = command.hasDescription() ? command.getDescription() : "No description provided";
+                sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + description);
+            }
         });
     }
 
