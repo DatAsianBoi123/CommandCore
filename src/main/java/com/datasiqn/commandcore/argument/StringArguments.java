@@ -10,7 +10,7 @@ import java.util.List;
  * Represents a list of arguments that are already parsed
  */
 public class StringArguments implements Arguments {
-    protected final List<String> allArguments;
+    private final List<String> allArguments;
 
     /**
      * Creates a new {@code ListArguments}
