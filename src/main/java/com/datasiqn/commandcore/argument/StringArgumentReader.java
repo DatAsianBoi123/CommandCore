@@ -74,4 +74,9 @@ public class StringArgumentReader implements ArgumentReader {
         }
         return builder.toString();
     }
+
+    @Override
+    public String toString() {
+        return arg;
+    }
 }
