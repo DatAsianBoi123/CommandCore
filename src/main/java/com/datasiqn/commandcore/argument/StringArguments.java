@@ -29,13 +29,13 @@ public class StringArguments implements Arguments {
 
     @Override
     public @NotNull <T> Result<T, String> getChecked(int i, @NotNull ArgumentType<T> type) {
-        checkBounds(i);
+        Arguments.checkBounds(i, size());
         return type.parse(new StringArgumentReader(allArguments.get(i)));
     }
 
     @Override
     public @NotNull String getString(int i) {
-        checkBounds(i);
+        Arguments.checkBounds(i, size());
         return allArguments.get(i);
     }
 
@@ -44,8 +44,4 @@ public class StringArguments implements Arguments {
         return new StringArgumentReader(stringArguments);
     }
 
-    private void checkBounds(int i) {
-        if (i >= size()) throw new IndexOutOfBoundsException("index (" + i + ") is greater than total size (" + size() + ")");
-        if (i < 0) throw new IndexOutOfBoundsException("index cannot be negative");
-    }
 }
