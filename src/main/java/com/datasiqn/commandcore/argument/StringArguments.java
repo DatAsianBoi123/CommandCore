@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class StringArguments implements Arguments {
     private final List<String> allArguments;
+    private final String stringArguments;
 
     /**
      * Creates a new {@code ListArguments}
@@ -18,6 +19,7 @@ public class StringArguments implements Arguments {
      */
     public StringArguments(List<String> args) {
         allArguments = args;
+        stringArguments = String.join(" ", allArguments);
     }
 
     @Override
@@ -39,7 +41,7 @@ public class StringArguments implements Arguments {
 
     @Override
     public @NotNull ArgumentReader asReader() {
-        return new StringArgumentReader(String.join(" ", allArguments));
+        return new StringArgumentReader(stringArguments);
     }
 
     private void checkBounds(int i) {
