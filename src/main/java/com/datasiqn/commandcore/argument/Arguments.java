@@ -55,7 +55,7 @@ public interface Arguments {
      * Checks if {@code i} is smaller than {@code size} and at least 0
      * @param i The number to check
      * @param size The total size
-     * @throws IndexOutOfBoundsException If {@code i} >= {@code size} or {@code i} < 0
+     * @throws IndexOutOfBoundsException If {@code i} {@literal >=} {@code size} or {@code i} {@literal <} 0
      */
     static void checkBounds(int i, int size) {
         if (i >= size) throw new IndexOutOfBoundsException("index (" + i + ") is greater than total size (" + size + ")");
