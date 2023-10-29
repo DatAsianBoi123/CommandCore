@@ -102,7 +102,7 @@
         <dependency>
             <groupId>com.github.DatAsianBoi123</groupId>
             <artifactId>ResultAPI</artifactId>
-            <version>f100f4765f</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
 
