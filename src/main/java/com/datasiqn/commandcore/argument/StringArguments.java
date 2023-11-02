@@ -7,10 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Represents a list of arguments that are already parsed
+ * Represents a list of arguments.
+ * <p>
+ * Internally, this uses a {@code List<String>} to store arguments and parses the string it every time the user wants an argument.
  */
 public class StringArguments implements Arguments {
-    protected final List<String> allArguments;
+    private final List<String> allArguments;
+    private final String stringArguments;
 
     /**
      * Creates a new {@code ListArguments}
@@ -18,6 +21,7 @@ public class StringArguments implements Arguments {
      */
     public StringArguments(List<String> args) {
         allArguments = args;
+        stringArguments = String.join(" ", allArguments);
     }
 
     @Override
@@ -27,23 +31,19 @@ public class StringArguments implements Arguments {
 
     @Override
     public @NotNull <T> Result<T, String> getChecked(int i, @NotNull ArgumentType<T> type) {
-        checkBounds(i);
+        Arguments.checkBounds(i, size());
         return type.parse(new StringArgumentReader(allArguments.get(i)));
     }
 
     @Override
     public @NotNull String getString(int i) {
-        checkBounds(i);
+        Arguments.checkBounds(i, size());
         return allArguments.get(i);
     }
 
     @Override
     public @NotNull ArgumentReader asReader() {
-        return new StringArgumentReader(String.join(" ", allArguments));
+        return new StringArgumentReader(stringArguments);
     }
 
-    private void checkBounds(int i) {
-        if (i >= size()) throw new IndexOutOfBoundsException("index (" + i + ") is greater than total size (" + size() + ")");
-        if (i < 0) throw new IndexOutOfBoundsException("index cannot be negative");
-    }
 }

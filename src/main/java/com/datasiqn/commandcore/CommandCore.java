@@ -4,13 +4,13 @@ import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
-import com.datasiqn.commandcore.command.CommandSource;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
+import com.datasiqn.commandcore.command.source.*;
 import com.datasiqn.commandcore.managers.CommandManager;
-import com.datasiqn.resultapi.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -83,7 +83,10 @@ public class CommandCore {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
         commandManager.getCommandNames(false).stream().sorted().forEach(name -> {
             Command command = commandManager.getCommand(name, false);
-            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + command.getDescription());
+            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) {
+                String description = command.hasDescription() ? command.getDescription() : "No description provided";
+                sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + description);
+            }
         });
     }
 
@@ -157,6 +160,7 @@ public class CommandCore {
                 constructor.setAccessible(true);
                 command = constructor.newInstance(rootCommand, plugin);
                 command.setAliases(options.getAliases());
+                command.setDescription("Base plugin command");
                 commandMap.register(rootCommand, plugin.getName(), command);
             } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
                      InstantiationException | NoSuchMethodException e) {
@@ -227,21 +231,14 @@ public class CommandCore {
      */
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull CommandSource createSource(CommandSender sender) {
-        return new CommandSource() {
-            @Override
-            public @NotNull Result<Player, String> getPlayerChecked() {
-                return Result.resolve(() -> (Player) sender, error -> "Sender is not a player");
-            }
-
-            @Override
-            public @NotNull Result<Entity, String> getEntityChecked() {
-                return Result.resolve(() -> (Entity) sender, error -> "Sender is not an entity");
-            }
-
-            @Override
-            public @NotNull CommandSender getSender() {
-                return sender;
-            }
-        };
+        if (sender instanceof Player) {
+            return new PlayerCommandSource(((Player) sender));
+        } else if (sender instanceof Entity) {
+            return new EntityCommandSource(((Entity) sender));
+        } else if (sender instanceof BlockCommandSender) {
+            return new BlockCommandSource(((BlockCommandSender) sender));
+        } else {
+            return new GenericCommandSource(sender);
+        }
     }
 }

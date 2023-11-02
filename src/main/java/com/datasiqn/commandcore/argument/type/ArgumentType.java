@@ -5,8 +5,13 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +68,33 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents a vector
      */
     ArgumentType<Vector> VECTOR = new VectorArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents a loaded world
+     */
+    ArgumentType<World> WORLD = new WorldArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents an entity
+     */
+    ArgumentType<EntityType> ENTITY = new EnumArgumentType<>(EntityType.class, "entity");
+
+    /**
+     * {@code ArgumentType} that represents an entity that is living
+     */
+    ArgumentType<EntityType> LIVING_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, EntityType::isAlive, "living entity");
+
+    /**
+     * {@code ArgumentType} that represents an entity that can be spawned using {@link org.bukkit.World#spawnEntity(Location, EntityType)}.
+     * <br>
+     * This is the same as the {@code ENTITY} argument type, except that this omits the {@code Player} entity type
+     */
+    ArgumentType<EntityType> SPAWNABLE_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, entityType -> entityType != EntityType.PLAYER, "living entity");
+
+    /**
+     * {@code ArgumentType} that represents a loot table
+     */
+    ArgumentType<LootTable> LOOT_TABLE = new LootTableArgumentType();
 
     /**
      * {@code ArgumentType} that represents a material
@@ -136,6 +168,7 @@ public interface ArgumentType<T> {
         private final Class<T> enumClass;
         private final String enumName;
         private final List<String> tabCompletes;
+        private final boolean uppercaseValues;
 
         /**
          * Creates a new {@code ArgumentType}
@@ -153,6 +186,17 @@ public interface ArgumentType<T> {
             this.enumClass = enumClass;
             this.enumName = enumName;
             this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+
+            for (T enumConstant : enumClass.getEnumConstants()) {
+                for (char letter : enumConstant.name().toCharArray()) {
+                    if (Character.isLetter(letter) && !Character.isUpperCase(letter)) {
+                        this.uppercaseValues = false;
+                        Bukkit.getLogger().warning("[CommandCore] Enum " + enumName + " includes values that aren't in uppercase!");
+                        return;
+                    }
+                }
+            }
+            this.uppercaseValues = true;
         }
 
         @Override
@@ -162,7 +206,7 @@ public interface ArgumentType<T> {
 
         @Override
         public @NotNull Result<T, None> parseWord(String word) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word));
+            return Result.resolve(() -> uppercaseValues ? Enum.valueOf(enumClass, word.toUpperCase()) : EnumUtils.findEnumInsensitiveCase(enumClass, word));
         }
 
         @Override
@@ -175,10 +219,8 @@ public interface ArgumentType<T> {
      * Represents a custom {@code ArgumentType} that parses to a filtered enum
      * @param <T> The type of the enum
      */
-    class FilteredEnumArgumentType<T extends Enum<T>> implements SimpleArgumentType<T> {
+    class FilteredEnumArgumentType<T extends Enum<T>> extends EnumArgumentType<T> {
         private final Predicate<T> filter;
-        private final String enumName;
-        private final Class<T> enumClass;
         private final List<String> tabCompletes;
 
         /**
@@ -188,21 +230,14 @@ public interface ArgumentType<T> {
          * @param enumName The name of the enum. This is used when displaying an error message (Invalid {{@code enumName}} '{val}'
          */
         public FilteredEnumArgumentType(@NotNull Class<T> enumClass, Predicate<T> filter, String enumName) {
-            this.enumClass = enumClass;
+            super(enumClass, enumName);
             this.filter = filter;
-            this.enumName = enumName;
             this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).filter(filter).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
         }
 
         @Override
-        public @NotNull String getTypeName() {
-            return enumName;
-        }
-
-        @Override
         public @NotNull Result<T, None> parseWord(String word) {
-            return Result.resolve(() -> EnumUtils.findEnumInsensitiveCase(enumClass, word))
-                    .andThen(val -> filter.test(val) ? Result.ok(val) : Result.error());
+            return super.parseWord(word).andThen(val -> filter.test(val) ? Result.ok(val) : Result.error());
         }
 
         @Override
