@@ -114,8 +114,8 @@ public class CommandCore {
 
     /**
      * Gets this instance of {@code CommandCore}
-     * @throws IllegalStateException If {@code CommandCore} hasn't been initialized yet with {@link #init(JavaPlugin, InitOptions) init}
      * @return This instance
+     * @throws IllegalStateException If {@code CommandCore} hasn't been initialized yet with {@link #init(JavaPlugin, InitOptions) init}
      */
     public static CommandCore getInstance() {
         if (instance == null) throw new IllegalStateException("CommandCore has not been initialized");

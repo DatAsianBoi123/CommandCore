@@ -25,8 +25,8 @@ public interface ArgumentReader {
      *     }
      * </pre>
      *
-     * @throws IllegalStateException If the reader has already reached the last character
      * @return The current character after advancing 1 character
+     * @throws IllegalStateException If the reader has already reached the last character
      */
     char next();
 

@@ -55,8 +55,8 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
     /**
      * Creates a new {@link LiteralBuilder}
      * @param literal The literal string. String cannot be empty or have spaces
-     * @throws IllegalArgumentException If the string is empty or contains spaces
      * @return The created {@link LiteralBuilder} instance
+     * @throws IllegalArgumentException If the string is empty or contains spaces
      */
     @Contract("_ -> new")
     public static @NotNull LiteralBuilder literal(@NotNull String literal) {
