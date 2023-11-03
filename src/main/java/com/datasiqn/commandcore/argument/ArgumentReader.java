@@ -74,8 +74,9 @@ public interface ArgumentReader {
      * @return The spliced string
      * @throws IndexOutOfBoundsException If {@code beginning} is negative, or if it is greater than {@link #size()}
      */
-    @NotNull String splice(int beginning);
-
+    default @NotNull String substring(int beginning) {
+        return substring(beginning, size());
+    }
     /**
      * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@code end}.
      * The character at index {@code beginning} is included, but the character at index {@code end} isn't
@@ -95,7 +96,7 @@ public interface ArgumentReader {
      * @return The spliced string
      * @throws IndexOutOfBoundsException If {@code end} is greater than {@link #size()}, {@code beginning} is negative, or if it is greater than {@code end}
      */
-    @NotNull String splice(int beginning, int end);
+    @NotNull String substring(int beginning, int end);
 
     /**
      * Returns the next word and places the reader on the space after that word, or the last character in the reader

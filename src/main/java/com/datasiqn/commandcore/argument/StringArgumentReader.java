@@ -53,11 +53,7 @@ public class StringArgumentReader implements ArgumentReader {
     }
 
     @Override
-    public @NotNull String splice(int beginning) {
-        return splice(beginning, size());
-    }
-    @Override
-    public @NotNull String splice(int beginning, int end) {
+    public @NotNull String substring(int beginning, int end) {
         if (end > size()) throw new IndexOutOfBoundsException("end index (" + end + ") is larger than the length (" + size() + ")");
         if (beginning < 0) throw new IndexOutOfBoundsException("beginning index cannot be negative");
         if (beginning > end) throw new IndexOutOfBoundsException("beginning index cannot be larger than end index");
