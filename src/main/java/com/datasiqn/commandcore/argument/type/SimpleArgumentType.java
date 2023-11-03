@@ -12,14 +12,12 @@ import org.jetbrains.annotations.NotNull;
 public interface SimpleArgumentType<T> extends ArgumentType<T> {
     /**
      * Gets the argument type name
-     *
      * @return The argument type name
      */
     @NotNull String getTypeName();
 
     /**
      * Parses just a single word
-     *
      * @param word The word
      * @return A {@code Result} containing the parsed value
      */
