@@ -8,7 +8,6 @@ import java.util.List;
 public record TabComplete(List<String> values, String matchingString) {
     /**
      * Creates a new {@code TabComplete}
-     *
      * @param values The tab complete values
      * @param matchingString The matching string used to filter {@code values}
      */
