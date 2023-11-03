@@ -53,7 +53,6 @@ public interface ArgumentReader {
      * Sets the index to something else, "jumping" to that location
      * @param index The index to set to
      * @throws IndexOutOfBoundsException If {@code index} is negative or greater than or equal to {@link #size()}
-     * @param index The index to set to
      */
     void jumpTo(int index);
 
