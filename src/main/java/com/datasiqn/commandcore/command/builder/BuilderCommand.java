@@ -94,7 +94,7 @@ class BuilderCommand implements Command {
             context.source().sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
-        executor.execute(context);
+        executor.execute(context, context.source(), context.arguments());
         return Result.ok();
     }
 

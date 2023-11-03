@@ -1,6 +1,8 @@
 package com.datasiqn.commandcore.command.builder;
 
+import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.command.CommandContext;
+import com.datasiqn.commandcore.command.source.CommandSource;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
@@ -113,8 +115,10 @@ public abstract class CommandLink<T> {
         /**
          * Executes the command
          * @param context The context in which the command was executed in
+         * @param source The source that executed the command. This is a shorthand for doing {@code context.source()}
+         * @param arguments The arguments of the command. This is a shorthand for doing {@code context.arguments()}
          */
-        void execute(CommandContext context);
+        void execute(CommandContext context, CommandSource source, Arguments arguments);
     }
 
     /**

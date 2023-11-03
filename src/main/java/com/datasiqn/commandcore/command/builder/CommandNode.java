@@ -29,7 +29,7 @@ public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<
             Result<None, String> result = require.testRequirement(context);
             if (result.isError()) return result;
         }
-        executor.execute(context);
+        executor.execute(context, context.source(), context.arguments());
         return Result.ok();
     }
 
