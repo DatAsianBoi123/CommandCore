@@ -16,8 +16,7 @@ public record GenericCommandSource(CommandSender sender) implements CommandSourc
      * <strong>Do not directly use constructor! Instead, use the factory method {@link CommandCore#createSource(CommandSender) createSource}</strong>
      * @param sender The command sender
      */
-    public GenericCommandSource {
-    }
+    public GenericCommandSource { }
 
     @Override
     public @NotNull CommandSender sender() {
