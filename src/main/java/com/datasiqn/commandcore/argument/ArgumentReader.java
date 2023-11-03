@@ -51,13 +51,15 @@ public interface ArgumentReader {
 
     /**
      * Sets the index to something else, "jumping" to that location
+     * @param index The index to set to
      * @throws IndexOutOfBoundsException If {@code index} is negative or greater than or equal to {@link #size()}
      * @param index The index to set to
      */
     void jumpTo(int index);
 
     /**
-     * Performs a splice that gets a string starting at index {@code beginning} and ending at index {@link #size()}
+     * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@link #size()}
+     * The character at index {@code beginning} is included.
      *
      * <pre>
      *     {@code
@@ -71,11 +73,13 @@ public interface ArgumentReader {
      *
      * @param beginning The index to start at
      * @return The spliced string
+     * @throws IndexOutOfBoundsException If {@code beginning} is negative, or if it is greater than {@link #size()}
      */
     @NotNull String splice(int beginning);
 
     /**
-     * Performs a splice that gets a string starting at index {@code beginning} and ending at index {@code end}
+     * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@code end}.
+     * The character at index {@code beginning} is included, but the character at index {@code end} isn't
      *
      * <pre>
      *     {@code
@@ -90,6 +94,7 @@ public interface ArgumentReader {
      * @param beginning The index to start at
      * @param end The index to end at
      * @return The spliced string
+     * @throws IndexOutOfBoundsException If {@code end} is greater than {@link #size()}, {@code beginning} is negative, or if it is greater than {@code end}
      */
     @NotNull String splice(int beginning, int end);
 
