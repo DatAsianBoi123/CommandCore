@@ -103,16 +103,13 @@ public class CommandCore {
         if (command == null) throw new IllegalArgumentException("Command " + commandName + " does not exist");
         List<String> usages = new ArrayList<>();
         command.getUsages().forEach(usage -> {
-            StringBuilder addedUsage = new StringBuilder();
-            for (int i = 0; i < spaces; i++) {
-                addedUsage.append(" ");
-            }
-            addedUsage.append(ChatColor.YELLOW)
-                    .append("/")
-                    .append(this.bukkitCommand.getName())
-                    .append(" ").append(ChatColor.WHITE).append(commandName)
-                    .append(" ").append(usage);
-            usages.add(addedUsage.toString());
+            String addedUsage = " ".repeat(Math.max(0, spaces)) +
+                    ChatColor.YELLOW +
+                    "/" +
+                    this.bukkitCommand.getName() +
+                    " " + ChatColor.WHITE + commandName +
+                    " " + usage;
+            usages.add(addedUsage);
         });
         return usages;
     }
@@ -184,9 +181,9 @@ public class CommandCore {
                                 context.getSource().sendMessage(ChatColor.RED + "No help for " + commandName);
                                 return;
                             }
-                            instance.sendCommandHelp(context.getSource().getSender(), commandName);
+                            instance.sendCommandHelp(context.getSource().sender(), commandName);
                         }))
-                .executes(context -> instance.sendHelpMenu(context.getSource().getSender())));
+                .executes(context -> instance.sendHelpMenu(context.getSource().sender())));
 
         return instance;
     }
@@ -231,12 +228,12 @@ public class CommandCore {
      */
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull CommandSource createSource(CommandSender sender) {
-        if (sender instanceof Player) {
-            return new PlayerCommandSource(((Player) sender));
-        } else if (sender instanceof Entity) {
-            return new EntityCommandSource(((Entity) sender));
-        } else if (sender instanceof BlockCommandSender) {
-            return new BlockCommandSource(((BlockCommandSender) sender));
+        if (sender instanceof Player player) {
+            return new PlayerCommandSource(player);
+        } else if (sender instanceof Entity entity) {
+            return new EntityCommandSource(entity);
+        } else if (sender instanceof BlockCommandSender block) {
+            return new BlockCommandSource(block);
         } else {
             return new GenericCommandSource(sender);
         }

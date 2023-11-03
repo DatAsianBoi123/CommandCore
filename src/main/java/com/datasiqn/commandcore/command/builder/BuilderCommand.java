@@ -82,7 +82,7 @@ class BuilderCommand implements Command {
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
             Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
-                context.getSource().getSender().sendMessage(ChatColor.RED + executeResult.unwrapError());
+                context.getSource().sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
                 return Result.ok();
             }
             return Result.ok();
@@ -91,7 +91,7 @@ class BuilderCommand implements Command {
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
         Result<None, String> requireResult = requires.stream().map(requirement -> requirement.testRequirement(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
-            context.getSource().getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
+            context.getSource().sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
         executor.execute(context);
@@ -203,27 +203,9 @@ class BuilderCommand implements Command {
         return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
-    private static class ApplicableNode {
-        private final CommandNode<?> node;
-        private final String argument;
-
-        private ApplicableNode(CommandNode<?> node, String argument) {
-            this.node = node;
-            this.argument = argument;
-        }
+    private record ApplicableNode(CommandNode<?> node, String argument) {
     }
 
-    private static class CurrentNode {
-        private final Result<CommandNode<?>, List<String>> node;
-        private final List<CommandNode<?>> nodes;
-        private final List<String> args;
-        private final boolean extraInput;
-
-        public CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args, boolean extraInput) {
-            this.node = node;
-            this.nodes = nodes;
-            this.args = args;
-            this.extraInput = extraInput;
-        }
+    private record CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args, boolean extraInput) {
     }
 }

@@ -69,7 +69,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
             TabComplete complete = cmd.tabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
-            matchingString = complete.getMatchingString();
+            matchingString = complete.matchingString();
             tabComplete.addAll(complete.values());
         }
 

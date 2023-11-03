@@ -5,24 +5,21 @@ import java.util.List;
 /**
  * Represents the tab completions of a command
  */
-public class TabComplete {
-    private final List<String> values;
-    private final String matchingString;
-
+public record TabComplete(List<String> values, String matchingString) {
     /**
      * Creates a new {@code TabComplete}
+     *
      * @param values The tab complete values
      * @param matchingString The matching string used to filter {@code values}
      */
-    public TabComplete(List<String> values, String matchingString) {
-        this.values = values;
-        this.matchingString = matchingString;
+    public TabComplete {
     }
 
     /**
      * Gets the tab complete values
      * @return The tab complete values
      */
+    @Override
     public List<String> values() {
         return values;
     }
@@ -31,7 +28,8 @@ public class TabComplete {
      * Gets the string used to filter tab complete values
      * @return The matching string
      */
-    public String getMatchingString() {
+    @Override
+    public String matchingString() {
         return matchingString;
     }
 }

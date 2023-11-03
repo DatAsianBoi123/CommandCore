@@ -38,7 +38,7 @@ public class BlockCommandSource implements CommandSource {
     }
 
     @Override
-    public @NotNull CommandSender getSender() {
+    public @NotNull CommandSender sender() {
         return sender;
     }
 }

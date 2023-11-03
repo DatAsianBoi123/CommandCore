@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents a node that can be added onto a command
@@ -55,11 +54,11 @@ public abstract class CommandNode<This extends CommandNode<This>> extends Comman
         if (executor != null) usages.add(getUsageArgument(isOptional));
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        List<CommandNode<?>> sortedChildren = children.stream().sorted(COMPARATOR).collect(Collectors.toList());
+        List<CommandNode<?>> sortedChildren = children.stream().sorted(COMPARATOR).toList();
         for (CommandNode<?> node : sortedChildren) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
-            usages.addAll(node.getUsages(executor != null).stream().map(str -> getUsageArgument(isOptional) + " " + str).collect(Collectors.toList()));
+            usages.addAll(node.getUsages(executor != null).stream().map(str -> getUsageArgument(isOptional) + " " + str).toList());
         }
         if (executor != null && hasOptional && canBeOptional) usages.remove(0);
         return usages;
