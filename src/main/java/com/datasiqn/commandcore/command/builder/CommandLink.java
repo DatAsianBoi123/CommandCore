@@ -35,8 +35,8 @@ public abstract class CommandLink<T> {
 
     /**
      * Requires the sender to be a {@code Player}
-     * @see #requires(Requirement)
      * @return Itself, for chaining
+     * @see #requires(Requirement)
      */
     public T requiresPlayer() {
         return requires(context -> context.source().getPlayerChecked().and(Result.ok()).or(Result.error("A player is required to run this")));
@@ -44,8 +44,8 @@ public abstract class CommandLink<T> {
 
     /**
      * Requires the sender to be an {@code Entity}
-     * @see #requires(Requirement)
      * @return Itself, for chaining
+     * @see #requires(Requirement)
      */
     public T requiresEntity() {
         return requires(context -> context.source().getEntityChecked().and(Result.ok()).or(Result.error("An entity is required to run this")));
@@ -53,8 +53,8 @@ public abstract class CommandLink<T> {
 
     /**
      * Requires the sender to be a {@code BlockCommandSender}
-     * @see #requires(Requirement)
      * @return Itself, for chaining
+     * @see #requires(Requirement)
      */
     public T requiresBlock() {
         return requires(context -> context.source().getBlockChecked().and(Result.ok()).or(Result.error("A block is required to run this")));
@@ -62,8 +62,8 @@ public abstract class CommandLink<T> {
 
     /**
      * Requires the sender to be locatable
-     * @see #requires(Requirement)
      * @return Itself, for chaining
+     * @see #requires(Requirement)
      */
     public T requiresLocatable() {
         return requires(context -> context.source().getLocatableChecked().and(Result.ok()).or(Result.error("A sender with a location is required to run this")));
