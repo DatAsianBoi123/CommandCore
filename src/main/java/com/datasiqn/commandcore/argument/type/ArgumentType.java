@@ -142,6 +142,26 @@ public interface ArgumentType<T> {
     }
 
     /**
+     * Creates an {@code ArgumentType} that represents a double with a minimum (inclusive)
+     * @param min The inclusive minimum value
+     * @return The newly created {@code ArgumentType}
+     */
+    @Contract("_ -> new")
+    static @NotNull ArgumentType<Double> rangedDouble(int min) {
+        return new RangedDoubleArgumentType(min);
+    }
+    /**
+     * Creates an {@code ArgumentType} that represents a double with a minimum (inclusive) and maximum (inclusive) value
+     * @param min The inclusive minimum value
+     * @param max The inclusive maximum value
+     * @return The newly created {@code ArgumentType}
+     */
+    @Contract("_, _ -> new")
+    static @NotNull ArgumentType<Double> rangedDouble(int min, int max) {
+        return new RangedDoubleArgumentType(min, max);
+    }
+
+    /**
      * Gets the name of this argument type
      * @return The name
      */
