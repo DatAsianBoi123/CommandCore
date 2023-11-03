@@ -14,22 +14,4 @@ public record TabComplete(List<String> values, String matchingString) {
      */
     public TabComplete {
     }
-
-    /**
-     * Gets the tab complete values
-     * @return The tab complete values
-     */
-    @Override
-    public List<String> values() {
-        return values;
-    }
-
-    /**
-     * Gets the string used to filter tab complete values
-     * @return The matching string
-     */
-    @Override
-    public String matchingString() {
-        return matchingString;
-    }
 }
