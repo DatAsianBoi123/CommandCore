@@ -35,7 +35,7 @@ public interface Arguments {
      * @return The result of the parsing
      * @throws IndexOutOfBoundsException If {@code i} is an invalid index ({@code i} {@literal <} 0, or {@code i} {@literal >=} {@link #size()})
      */
-    @NotNull <T> Result<T, String> getChecked(int i, ArgumentType<T> type);
+    @NotNull <T> Result<T, String> getChecked(int i, @NotNull ArgumentType<T> type);
 
     /**
      * Gets a simple string argument
