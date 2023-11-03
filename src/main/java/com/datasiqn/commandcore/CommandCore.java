@@ -1,9 +1,7 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.Command;
-import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import com.datasiqn.commandcore.command.source.*;
@@ -175,50 +173,17 @@ public class CommandCore {
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
                         .executes(context -> {
-                            Command cmd = context.getArguments().get(0, ArgumentType.COMMAND);
-                            String commandName = context.getArguments().getString(0);
-                            if (!context.getSource().hasPermission(cmd.getPermissionString())) {
-                                context.getSource().sendMessage(ChatColor.RED + "No help for " + commandName);
+                            Command cmd = context.arguments().get(0, ArgumentType.COMMAND);
+                            String commandName = context.arguments().getString(0);
+                            if (!context.source().hasPermission(cmd.getPermissionString())) {
+                                context.source().sendMessage(ChatColor.RED + "No help for " + commandName);
                                 return;
                             }
-                            instance.sendCommandHelp(context.getSource().sender(), commandName);
+                            instance.sendCommandHelp(context.source().sender(), commandName);
                         }))
-                .executes(context -> instance.sendHelpMenu(context.getSource().sender())));
+                .executes(context -> instance.sendHelpMenu(context.source().sender())));
 
         return instance;
-    }
-
-    /**
-     * Creates a new {@code CommandContext}
-     * @param source The sender that executed the command
-     * @param command The command being executed
-     * @param label The exact string used to execute the command. This can either be the name of the command or one of its aliases
-     * @param arguments The command arguments
-     * @return The newly created {@code CommandContext}
-     */
-    @Contract(value = "_, _, _, _ -> new", pure = true)
-    public static @NotNull CommandContext createContext(CommandSource source, Command command, String label, Arguments arguments) {
-        return new CommandContext() {
-            @Override
-            public @NotNull CommandSource getSource() {
-                return source;
-            }
-
-            @Override
-            public @NotNull Command getCommand() {
-                return command;
-            }
-
-            @Override
-            public @NotNull String getLabel() {
-                return label;
-            }
-
-            @Override
-            public @NotNull Arguments getArguments() {
-                return arguments;
-            }
-        };
     }
 
     /**

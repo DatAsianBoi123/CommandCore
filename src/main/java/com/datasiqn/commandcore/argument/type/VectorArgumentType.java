@@ -33,7 +33,7 @@ class VectorArgumentType implements ArgumentType<Vector> {
 
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
-        Result<Player, String> player = context.getSource().getPlayerChecked();
+        Result<Player, String> player = context.source().getPlayerChecked();
         if (player.isError()) return Collections.emptyList();
         Block targetBlock = player.unwrap().getTargetBlockExact(5);
         if (targetBlock == null) return Collections.emptyList();

@@ -37,7 +37,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresPlayer() {
-        return requires(context -> context.getSource().getPlayerChecked().and(Result.ok()).or(Result.error("A player is required to run this")));
+        return requires(context -> context.source().getPlayerChecked().and(Result.ok()).or(Result.error("A player is required to run this")));
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresEntity() {
-        return requires(context -> context.getSource().getEntityChecked().and(Result.ok()).or(Result.error("An entity is required to run this")));
+        return requires(context -> context.source().getEntityChecked().and(Result.ok()).or(Result.error("An entity is required to run this")));
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresBlock() {
-        return requires(context -> context.getSource().getBlockChecked().and(Result.ok()).or(Result.error("A block is required to run this")));
+        return requires(context -> context.source().getBlockChecked().and(Result.ok()).or(Result.error("A block is required to run this")));
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class CommandLink<T> {
      * @return Itself, for chaining
      */
     public T requiresLocatable() {
-        return requires(context -> context.getSource().getLocatableChecked().and(Result.ok()).or(Result.error("A sender with a location is required to run this")));
+        return requires(context -> context.source().getLocatableChecked().and(Result.ok()).or(Result.error("A sender with a location is required to run this")));
     }
 
     /**

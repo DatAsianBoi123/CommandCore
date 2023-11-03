@@ -54,7 +54,7 @@ class BuilderCommand implements Command {
 
     @Override
     public @NotNull Result<None, List<String>> execute(@NotNull CommandContext context) {
-        Arguments args = context.getArguments();
+        Arguments args = context.arguments();
         ArgumentReader reader = args.asReader();
         int size = args.size();
 
@@ -70,7 +70,7 @@ class BuilderCommand implements Command {
                 List<String> exceptions = resultNode.unwrapError();
                 if (exceptions.isEmpty()) exceptions.add("Incorrect argument '" + reader.splice(reader.index()) + "'");
                 String rootCommand = CommandCore.getInstance().getOptions().getRootCommand();
-                String label = context.getLabel();
+                String label = context.label();
                 String correctSection = ChatColor.GRAY + rootCommand + " " + label + " " + reader.splice(0, reader.index());
                 String incorrectParameter = ChatColor.RED.toString() + ChatColor.UNDERLINE + reader.splice(reader.index());
                 exceptions.add(correctSection + incorrectParameter + ChatColor.RESET + ChatColor.RED + ChatColor.ITALIC + " <--[HERE]");
@@ -82,7 +82,7 @@ class BuilderCommand implements Command {
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
             Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
-                context.getSource().sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
+                context.source().sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
                 return Result.ok();
             }
             return Result.ok();
@@ -91,7 +91,7 @@ class BuilderCommand implements Command {
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
         Result<None, String> requireResult = requires.stream().map(requirement -> requirement.testRequirement(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
-            context.getSource().sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
+            context.source().sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
         executor.execute(context);
@@ -100,7 +100,7 @@ class BuilderCommand implements Command {
 
     @Override
     public @NotNull TabComplete tabComplete(@NotNull CommandContext context) {
-        Arguments args = context.getArguments();
+        Arguments args = context.arguments();
 
         if (args.size() >= 1) {
             ArgumentReader reader = args.asReader();
@@ -155,7 +155,7 @@ class BuilderCommand implements Command {
 
     @Contract("_, _ -> new")
     private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
-        return CommandCore.createContext(context.getSource(), context.getCommand(), context.getLabel(), new StringArguments(result.args));
+        return new CommandContext(context.source(), context.command(), context.label(), new StringArguments(result.args));
     }
 
     private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull List<CommandNode<?>> nodes) {

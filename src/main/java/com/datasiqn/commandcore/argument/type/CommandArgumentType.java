@@ -28,7 +28,7 @@ class CommandArgumentType implements SimpleArgumentType<Command> {
         CommandManager manager = CommandCore.getInstance().getCommandManager();
         manager.getCommandNames(false).forEach(name -> {
             Command command = manager.getCommand(name, false);
-            if (context.getSource().hasPermission(command.getPermissionString())) commandNames.add(name);
+            if (context.source().hasPermission(command.getPermissionString())) commandNames.add(name);
         });
         return commandNames;
     }

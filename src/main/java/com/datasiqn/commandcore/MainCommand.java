@@ -2,6 +2,7 @@ package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.argument.StringArguments;
 import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.None;
@@ -40,7 +41,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             }
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            Result<None, List<String>> output = cmd.execute(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
+            Result<None, List<String>> output = cmd.execute(new CommandContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
             output.ifError(messages -> {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.sendMessage(ChatColor.GRAY + "Usage(s):");
@@ -68,7 +69,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
             if (cmd == null || (cmd.getPermissionString() != null && !sender.hasPermission(cmd.getPermissionString()))) return new ArrayList<>();
             List<String> listArgs = new ArrayList<>(Arrays.asList(args));
             listArgs.remove(0);
-            TabComplete complete = cmd.tabComplete(CommandCore.createContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
+            TabComplete complete = cmd.tabComplete(new CommandContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
             matchingString = complete.matchingString();
             tabComplete.addAll(complete.values());
         }
