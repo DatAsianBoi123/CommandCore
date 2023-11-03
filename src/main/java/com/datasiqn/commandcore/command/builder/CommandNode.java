@@ -12,9 +12,9 @@ import java.util.List;
 
 /**
  * Represents a node that can be added onto a command
- * @param <This> The type of the extended class
+ * @param <T> The type of the extended class
  */
-public abstract class CommandNode<This extends CommandNode<This>> extends CommandLink<CommandNode<This>> {
+public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<CommandNode<T>> {
     private static final Comparator<CommandNode<?>> COMPARATOR = Comparator.comparingInt(CommandNode::getPriority);
 
     /**
