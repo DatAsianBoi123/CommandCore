@@ -15,7 +15,7 @@ class LootTableArgumentType implements SimpleArgumentType<LootTable> {
     private final List<String> tabCompletes = Arrays.stream(LootTables.values()).map(LootTables::name).collect(Collectors.toList());
 
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "loot table";
     }
 
@@ -27,5 +27,10 @@ class LootTableArgumentType implements SimpleArgumentType<LootTable> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return tabCompletes;
+    }
+
+    @Override
+    public @NotNull Class<LootTable> getArgumentClass() {
+        return LootTable.class;
     }
 }

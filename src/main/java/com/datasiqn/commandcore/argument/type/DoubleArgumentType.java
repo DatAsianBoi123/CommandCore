@@ -6,12 +6,17 @@ import org.jetbrains.annotations.NotNull;
 
 class DoubleArgumentType implements SimpleArgumentType<Double> {
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "double";
     }
 
     @Override
     public @NotNull Result<Double, None> parseWord(@NotNull String word) {
         return Result.resolve(() -> Double.parseDouble(word));
+    }
+
+    @Override
+    public @NotNull Class<Double> getArgumentClass() {
+        return Double.class;
     }
 }

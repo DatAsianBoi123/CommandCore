@@ -13,6 +13,11 @@ import java.util.List;
 
 class VectorArgumentType implements ArgumentType<Vector> {
     @Override
+    public @NotNull String getName() {
+        return "vector";
+    }
+
+    @Override
     public @NotNull Result<Vector, String> parse(@NotNull ArgumentReader reader) {
         Result<Integer, String> x = INTEGER.parse(reader);
         if (x.isError()) return Result.error(x.unwrapError());
@@ -39,5 +44,10 @@ class VectorArgumentType implements ArgumentType<Vector> {
         if (targetBlock == null) return Collections.emptyList();
         Vector vector = targetBlock.getLocation().toVector();
         return Collections.singletonList(vector.getBlockX() + " " + vector.getBlockY() + " " + vector.getBlockZ());
+    }
+
+    @Override
+    public @NotNull Class<Vector> getArgumentClass() {
+        return Vector.class;
     }
 }

@@ -6,12 +6,17 @@ import org.jetbrains.annotations.NotNull;
 
 class WordArgumentType implements SimpleArgumentType<String> {
     @Override
-    public @NotNull String getTypeName() {
-        return "";
+    public @NotNull String getName() {
+        return "word";
     }
 
     @Override
     public @NotNull Result<String, None> parseWord(@NotNull String word) {
         return Result.ok(word);
+    }
+
+    @Override
+    public @NotNull Class<String> getArgumentClass() {
+        return String.class;
     }
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 class PlayerArgumentType implements SimpleArgumentType<Player> {
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "player";
     }
 
@@ -24,5 +24,10 @@ class PlayerArgumentType implements SimpleArgumentType<Player> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public @NotNull Class<Player> getArgumentClass() {
+        return Player.class;
     }
 }

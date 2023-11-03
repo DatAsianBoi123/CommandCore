@@ -142,6 +142,13 @@ public interface ArgumentType<T> {
     }
 
     /**
+     * Gets the name of this argument type
+     * @return The name
+     */
+    @NotNull
+    String getName();
+
+    /**
      * Attempts to parse an {@code ArgumentReader}.
      * After parsing, the reader will always be on the space of the next argument, or the end of the reader
      * @param reader The reader to parse
@@ -159,6 +166,13 @@ public interface ArgumentType<T> {
     default List<String> getTabComplete(@NotNull CommandContext context) {
         return new ArrayList<>();
     }
+
+    /**
+     * Gets the class that this argument parses into
+     * @return The class
+     */
+    @NotNull
+    Class<T> getArgumentClass();
 
     /**
      * Represents a custom {@code ArgumentType} that parses to an enum value
@@ -200,7 +214,7 @@ public interface ArgumentType<T> {
         }
 
         @Override
-        public @NotNull String getTypeName() {
+        public @NotNull String getName() {
             return enumName;
         }
 
@@ -212,6 +226,11 @@ public interface ArgumentType<T> {
         @Override
         public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
             return tabCompletes;
+        }
+
+        @Override
+        public @NotNull Class<T> getArgumentClass() {
+            return enumClass;
         }
     }
 

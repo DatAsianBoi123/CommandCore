@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 class WorldArgumentType implements SimpleArgumentType<World> {
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "world";
     }
 
@@ -24,5 +24,10 @@ class WorldArgumentType implements SimpleArgumentType<World> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public @NotNull Class<World> getArgumentClass() {
+        return World.class;
     }
 }

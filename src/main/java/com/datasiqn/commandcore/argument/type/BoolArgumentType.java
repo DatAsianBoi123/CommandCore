@@ -10,7 +10,7 @@ import java.util.List;
 
 class BoolArgumentType implements SimpleArgumentType<Boolean> {
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "boolean";
     }
 
@@ -24,5 +24,10 @@ class BoolArgumentType implements SimpleArgumentType<Boolean> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         return Arrays.asList("true", "false");
+    }
+
+    @Override
+    public @NotNull Class<Boolean> getArgumentClass() {
+        return Boolean.class;
     }
 }

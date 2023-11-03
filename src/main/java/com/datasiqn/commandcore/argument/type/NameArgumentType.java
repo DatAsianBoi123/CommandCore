@@ -6,6 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 class NameArgumentType implements ArgumentType<String> {
     @Override
+    public @NotNull String getName() {
+        return "name";
+    }
+
+    @Override
     public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
         StringBuilder builder = new StringBuilder();
         builder.append(reader.get());
@@ -13,5 +18,10 @@ class NameArgumentType implements ArgumentType<String> {
             builder.append(reader.next());
         }
         return Result.ok(builder.toString());
+    }
+
+    @Override
+    public @NotNull Class<String> getArgumentClass() {
+        return String.class;
     }
 }

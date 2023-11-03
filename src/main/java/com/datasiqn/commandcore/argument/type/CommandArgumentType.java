@@ -13,7 +13,7 @@ import java.util.List;
 
 class CommandArgumentType implements SimpleArgumentType<Command> {
     @Override
-    public @NotNull String getTypeName() {
+    public @NotNull String getName() {
         return "command";
     }
 
@@ -31,5 +31,10 @@ class CommandArgumentType implements SimpleArgumentType<Command> {
             if (context.source().hasPermission(command.getPermissionString())) commandNames.add(name);
         });
         return commandNames;
+    }
+
+    @Override
+    public @NotNull Class<Command> getArgumentClass() {
+        return Command.class;
     }
 }
