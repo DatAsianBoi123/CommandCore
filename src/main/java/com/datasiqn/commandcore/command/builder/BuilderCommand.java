@@ -3,12 +3,14 @@ package com.datasiqn.commandcore.command.builder;
 import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
-import com.datasiqn.commandcore.argument.StringArguments;
+import com.datasiqn.commandcore.argument.ParsedArguments;
+import com.datasiqn.commandcore.argument.ParsedArguments.ParsedArgument;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.commandcore.command.builder.CommandLink.Executor;
 import com.datasiqn.commandcore.command.builder.CommandLink.Requirement;
+import com.datasiqn.commandcore.command.source.CommandSource;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import org.bukkit.ChatColor;
@@ -54,11 +56,11 @@ class BuilderCommand implements Command {
 
     @Override
     public @NotNull Result<None, List<String>> execute(@NotNull CommandContext context) {
+        CommandSource source = context.source();
         Arguments args = context.arguments();
         ArgumentReader reader = args.asReader();
-        int size = args.size();
 
-        if (size >= 1) {
+        if (args.size() >= 1) {
             if (nodes.isEmpty()) return Result.error(Collections.singletonList("Expected no parameters, but got parameters instead"));
 
             CurrentNode current = findCurrentNode(reader);
@@ -68,11 +70,11 @@ class BuilderCommand implements Command {
                     return Result.error(Collections.singletonList("Expected end of input, but got extra parameters instead"));
                 }
                 List<String> exceptions = resultNode.unwrapError();
-                if (exceptions.isEmpty()) exceptions.add("Incorrect argument '" + reader.splice(reader.index()) + "'");
+                if (exceptions.isEmpty()) exceptions.add("Incorrect argument '" + reader.substring(reader.index()) + "'");
                 String rootCommand = CommandCore.getInstance().getOptions().getRootCommand();
                 String label = context.label();
-                String correctSection = ChatColor.GRAY + rootCommand + " " + label + " " + reader.splice(0, reader.index());
-                String incorrectParameter = ChatColor.RED.toString() + ChatColor.UNDERLINE + reader.splice(reader.index());
+                String correctSection = ChatColor.GRAY + rootCommand + " " + label + " " + reader.substring(0, reader.index());
+                String incorrectParameter = ChatColor.RED.toString() + ChatColor.UNDERLINE + reader.substring(reader.index());
                 exceptions.add(correctSection + incorrectParameter + ChatColor.RESET + ChatColor.RED + ChatColor.ITALIC + " <--[HERE]");
                 exceptions.add("");
                 return Result.error(exceptions);
@@ -82,7 +84,7 @@ class BuilderCommand implements Command {
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
             Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
-                context.source().sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
+                source.sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
                 return Result.ok();
             }
             return Result.ok();
@@ -91,10 +93,10 @@ class BuilderCommand implements Command {
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
         Result<None, String> requireResult = requires.stream().map(requirement -> requirement.testRequirement(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
-            context.source().sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
+            source.sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
-        executor.execute(context, context.source(), context.arguments());
+        executor.execute(context, source, args);
         return Result.ok();
     }
 
@@ -117,7 +119,7 @@ class BuilderCommand implements Command {
                     newContext = buildContext(context, current);
                     nodeSet = node.getChildren();
                 }
-                matchingString = current.args.get(current.args.size() - 1);
+                matchingString = current.args.get(current.args.size() - 1).stringArg();
             }
             List<String> tabcomplete = new ArrayList<>();
             for (CommandNode<?> node : nodeSet) {
@@ -155,57 +157,57 @@ class BuilderCommand implements Command {
 
     @Contract("_, _ -> new")
     private @NotNull CommandContext buildContext(@NotNull CommandContext context, @NotNull CurrentNode result) {
-        return new CommandContext(context.source(), context.command(), context.label(), new StringArguments(result.args));
+        return new CommandContext(context.source(), context.command(), context.label(), new ParsedArguments(result.args));
     }
 
-    private @NotNull Result<ApplicableNode, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull List<CommandNode<?>> nodes) {
-        List<CommandNode<?>> options = new ArrayList<>();
+    private @NotNull Result<ApplicableNode<?>, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull List<CommandNode<?>> nodes) {
+        List<ApplicableNode<?>> options = new ArrayList<>();
         List<String> exceptions = new ArrayList<>();
         if (reader.index() != 0 && !reader.atEnd()) reader.next();
         int beforeIndex = reader.index();
         for (CommandNode<?> node : nodes) {
-            node.parse(reader).match(val -> options.add(node), e -> {
+            node.parse(reader).match(val -> {
+                String stringArg = reader.substring(beforeIndex, reader.index());
+                options.add(new ApplicableNode<>(node, new ParsedArgument<>(val, stringArg), reader.index()));
+            }, e -> {
                 if (!e.isEmpty()) exceptions.add(e);
             });
             reader.jumpTo(beforeIndex);
         }
         if (options.isEmpty()) return Result.error(exceptions);
-        options.sort(CommandNode.getComparator());
-        options.get(0).parse(reader);
-        String arg;
-        if (reader.atEnd()) arg = reader.splice(beforeIndex);
-        else arg = reader.splice(beforeIndex, reader.index());
-        return Result.ok(new ApplicableNode(options.get(0), arg));
+        options.sort((option1, option2) -> CommandNode.getComparator().compare(option1.node(), option2.node()));
+        ApplicableNode<?> option = options.get(0);
+        reader.jumpTo(option.afterIndex);
+        return Result.ok(option);
     }
 
     @Contract("_ -> new")
     private @NotNull CurrentNode findCurrentNode(@NotNull ArgumentReader reader) {
         List<CommandNode<?>> nodeSet = nodes;
-        List<String> args = new ArrayList<>();
+        List<ParsedArgument<?>> args = new ArrayList<>();
         List<CommandNode<?>> nodeList = new ArrayList<>();
         CommandNode<?> node;
         do {
             if (nodeSet.isEmpty())
                 return new CurrentNode(Result.error(Collections.emptyList()), nodeList, args, true);
-            Result<ApplicableNode, List<String>> parseResult = checkApplicable(reader, nodeSet);
+            Result<ApplicableNode<?>, List<String>> parseResult = checkApplicable(reader, nodeSet);
             if (parseResult.isError()) {
-                args.add(reader.splice(reader.index()));
+                String rest = reader.substring(reader.index());
+                args.add(new ParsedArgument<>(rest, rest));
                 return new CurrentNode(Result.error(parseResult.unwrapError()), nodeList, args, false);
             }
-            ApplicableNode applicableNode = parseResult.unwrap();
+            ApplicableNode<?> applicableNode = parseResult.unwrap();
             node = applicableNode.node;
             nodeSet = node.getChildren();
             nodeList.add(node);
             args.add(applicableNode.argument);
 
-            if (reader.atEnd() && reader.get() == ' ') args.add("");
+            if (reader.atEnd() && reader.get() == ' ') args.add(new ParsedArgument<>("", ""));
         } while (!reader.atEnd());
         return new CurrentNode(Result.ok(node), nodeList, args, false);
     }
 
-    private record ApplicableNode(CommandNode<?> node, String argument) {
-    }
+    private record ApplicableNode<T>(CommandNode<?> node, ParsedArgument<T> argument, int afterIndex) { }
 
-    private record CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<String> args, boolean extraInput) {
-    }
+    private record CurrentNode(Result<CommandNode<?>, List<String>> node, List<CommandNode<?>> nodes, List<ParsedArgument<?>> args, boolean extraInput) { }
 }
