@@ -1,5 +1,14 @@
 # CommandCore
 CommandCore is a simple, yet powerful command framework for the Spigot API.
+
+## Features
+- Simple and intuitive
+- Support for custom, user-created argument types
+- Extendable command API that allows the creation of custom nodes
+- Support for argument types with multiple spaces
+- Auto-generation of a help command
+- Builder-style command creation
+
 ## Installation
 **Java 8 or higher is required**
 
