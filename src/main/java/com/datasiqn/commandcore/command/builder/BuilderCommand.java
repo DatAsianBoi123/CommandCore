@@ -167,7 +167,7 @@ class BuilderCommand implements Command {
         int beforeIndex = reader.index();
         for (CommandNode<?> node : nodes) {
             node.parse(reader).match(val -> {
-                String stringArg = reader.substring(beforeIndex, reader.index());
+                String stringArg = reader.substring(beforeIndex, reader.index() + 1);
                 options.add(new ApplicableNode<>(node, new ParsedArgument<>(val, stringArg), reader.index()));
             }, e -> {
                 if (!e.isEmpty()) exceptions.add(e);
