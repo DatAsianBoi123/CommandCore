@@ -32,7 +32,7 @@ public class ParsedArguments implements Arguments {
         Arguments.checkBounds(i, size());
         ParsedArgument<?> argument = arguments.get(i);
         Class<?> argClass = argument.arg.getClass();
-        if (type.getArgumentClass() != argClass) {
+        if (!type.getArgumentClass().isAssignableFrom(argClass)) {
             String className = argClass.getName();
             String typeName = type.getName();
             String typeClassName = type.getArgumentClass().getName();
