@@ -175,7 +175,6 @@ class BuilderCommand implements Command {
             reader.jumpTo(beforeIndex);
         }
         if (options.isEmpty()) return Result.error(exceptions);
-        options.sort((option1, option2) -> CommandNode.getComparator().compare(option1.node(), option2.node()));
         ApplicableNode<?> option = options.get(0);
         reader.jumpTo(option.afterIndex);
         return Result.ok(option);

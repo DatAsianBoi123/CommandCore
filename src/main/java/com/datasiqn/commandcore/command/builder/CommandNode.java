@@ -7,7 +7,6 @@ import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,8 +14,6 @@ import java.util.List;
  * @param <T> The type of the extended class
  */
 public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<CommandNode<T>> {
-    private static final Comparator<CommandNode<?>> COMPARATOR = Comparator.comparingInt(CommandNode::getPriority);
-
     /**
      * Executes this node
      * @param context The context in which the command was executed
@@ -54,8 +51,7 @@ public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<
         if (executor != null) usages.add(getUsageArgument(isOptional));
         boolean hasOptional = false;
         boolean canBeOptional = false;
-        List<CommandNode<?>> sortedChildren = children.stream().sorted(COMPARATOR).toList();
-        for (CommandNode<?> node : sortedChildren) {
+        for (CommandNode<?> node : children) {
             if (node.executor != null) hasOptional = true;
             if (node.canBeOptional()) canBeOptional = true;
             usages.addAll(node.getUsages(executor != null).stream().map(str -> getUsageArgument(isOptional) + " " + str).toList());
@@ -64,21 +60,9 @@ public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<
         return usages;
     }
 
-    protected int getPriority() {
-        return 1;
-    }
-
     protected abstract String getUsageArgument(boolean isOptional);
 
     protected boolean canBeOptional() {
         return false;
-    }
-
-    /**
-     * Gets the comparator for command nodes
-     * @return The comparator
-     */
-    public static Comparator<CommandNode<?>> getComparator() {
-        return COMPARATOR;
     }
 }

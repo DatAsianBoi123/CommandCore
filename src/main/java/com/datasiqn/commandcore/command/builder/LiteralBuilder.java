@@ -43,11 +43,6 @@ public class LiteralBuilder extends CommandNode<LiteralBuilder> {
     }
 
     @Override
-    protected int getPriority() {
-        return 10;
-    }
-
-    @Override
     protected @NotNull LiteralBuilder getThis() {
         return this;
     }

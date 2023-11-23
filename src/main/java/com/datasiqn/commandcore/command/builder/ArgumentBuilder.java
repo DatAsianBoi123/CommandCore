@@ -44,11 +44,6 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
     }
 
     @Override
-    protected int getPriority() {
-        return 5;
-    }
-
-    @Override
     protected boolean canBeOptional() {
         return true;
     }
