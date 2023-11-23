@@ -82,14 +82,14 @@ public class GreetCommand {
     public CommandBuilder getCommand() {
         return new CommandBuilder()
                 .description("Greets a player")
-                .executes(context -> context.getSource().sendMessage("You ran this command with no arguments")) // Line 5
+                .executes((context, source, arguments) -> source.sendMessage("You ran this command with no arguments")) // Line 5
                 .then(LiteralBuilder.literal("player")
                         .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
                                 .requiresPlayer()
-                                .executes(context -> context.getSource().getPlayer().chat("Hello " + context.getArguments().get(1, ArgumentType.PLAYER).getName()))))
+                                .executes((context, source, arguments) -> source.getPlayer().chat("Hello " + arguments.get(1, ArgumentType.PLAYER).getName()))))
                 .then(LiteralBuilder.literal("server")
                         .requiresPlayer()
-                        .executes(context -> context.getSource().getPlayer().chat("Hello Server!")));
+                        .executes((context, source, arguments) -> source.getPlayer().chat("Hello Server!")));
     }
 }
 ```
