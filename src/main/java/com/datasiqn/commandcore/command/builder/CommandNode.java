@@ -22,7 +22,7 @@ public abstract class CommandNode<T extends CommandNode<T>> extends CommandLink<
      */
     public final @NotNull Result<None, String> executeWith(CommandContext context) {
         if (executor == null) throw new IllegalStateException("This CommandNode has no executor");
-        for (Requirement require : requires){
+        for (Requirement require : requires) {
             Result<None, String> result = require.testRequirement(context);
             if (result.isError()) return result;
         }
