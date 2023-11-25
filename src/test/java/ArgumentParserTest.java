@@ -184,6 +184,48 @@ public class ArgumentParserTest {
         testErr("number", ranged);
     }
 
+    @Test
+    public void testRangedDouble() {
+        ArgumentType<Double> minRanged = rangedDouble(2.3);
+        testOk("8.2", minRanged, 8.2);
+        testOk("2.5", minRanged, 2.5);
+        testOk("2.3", minRanged, 2.3);
+        testErr("2.2", minRanged);
+        testErr("-8.2", minRanged);
+        testErr("blaalakd", minRanged);
+
+        ArgumentType<Double> ranged = rangedDouble(-1.1, 8.2);
+        testOk("7", ranged, 7.0);
+        testOk("2.2", ranged, 2.2);
+        testOk("-1.1", ranged, -1.1);
+        testOk("8.2", ranged, 8.2);
+        testErr("8.3", ranged);
+        testErr("13", ranged);
+        testErr("-2.8", ranged);
+        testErr("aaaaaa", ranged);
+    }
+
+    @Test
+    public void testRangedFloat() {
+        ArgumentType<Float> minRanged = rangedFloat(2.3f);
+        testOk("8.2", minRanged, 8.2f);
+        testOk("2.5", minRanged, 2.5f);
+        testOk("2.3", minRanged, 2.3f);
+        testErr("2.2", minRanged);
+        testErr("-8.2", minRanged);
+        testErr("blaalakd", minRanged);
+
+        ArgumentType<Float> ranged = rangedFloat(-1.1f, 8.2f);
+        testOk("7", ranged, 7.0f);
+        testOk("2.2", ranged, 2.2f);
+        testOk("-1.1", ranged, -1.1f);
+        testOk("8.2", ranged, 8.2f);
+        testErr("8.3", ranged);
+        testErr("13", ranged);
+        testErr("-2.8", ranged);
+        testErr("aaaaaa", ranged);
+    }
+
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type) {
         this.<T>testOk(arg, type, val -> true);
     }
