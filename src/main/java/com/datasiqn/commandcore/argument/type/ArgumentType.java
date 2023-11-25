@@ -142,7 +142,7 @@ public interface ArgumentType<T> {
     }
 
     /**
-     * Creates an {@code ArgumentType} that represents a double with a minimum (inclusive)
+     * Creates an {@code ArgumentType} that represents a double with a minimum value (inclusive)
      * @param min The inclusive minimum value
      * @return The newly created {@code ArgumentType}
      */
