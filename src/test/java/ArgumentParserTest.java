@@ -58,6 +58,13 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testFloat() {
+        testOk("2.3", FLOAT, 2.3f);
+        testOk("-283.287", FLOAT, -283.287f);
+        testErr("number", FLOAT);
+    }
+
+    @Test
     public void testBoolean() {
         testOk("true", BOOLEAN, true);
         testOk("false", BOOLEAN, false);
