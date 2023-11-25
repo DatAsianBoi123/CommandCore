@@ -55,6 +55,11 @@ public interface ArgumentType<T> {
     ArgumentType<Double> DOUBLE = new DoubleArgumentType();
 
     /**
+     * {@code ArgumentType} that represents a float
+     */
+    ArgumentType<Float> FLOAT = new FloatArgumentType();
+
+    /**
      * {@code ArgumentType} that represents a boolean
      */
     ArgumentType<Boolean> BOOLEAN = new BoolArgumentType();
@@ -159,6 +164,26 @@ public interface ArgumentType<T> {
     @Contract("_, _ -> new")
     static @NotNull ArgumentType<Double> rangedDouble(int min, int max) {
         return new RangedDoubleArgumentType(min, max);
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents a float with a minimum value (inclusive)
+     * @param min The inclusive minimum value
+     * @return The newly created {@code ArgumentType}
+     */
+    @Contract("_ -> new")
+    static @NotNull ArgumentType<Float> rangedFloat(int min) {
+        return new RangedFloatArgumentType(min);
+    }
+    /**
+     * Creates an {@code ArgumentType} that represents a float with a minimum (inclusive) and maximum (inclusive) value
+     * @param min The inclusive minimum value
+     * @param max The inclusive maximum value
+     * @return The newly created {@code ArgumentType}
+     */
+    @Contract("_, _ -> new")
+    static @NotNull ArgumentType<Float> rangedFloat(int min, int max) {
+        return new RangedFloatArgumentType(min, max);
     }
 
     /**
