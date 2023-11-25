@@ -152,7 +152,7 @@ public interface ArgumentType<T> {
      * @return The newly created {@code ArgumentType}
      */
     @Contract("_ -> new")
-    static @NotNull ArgumentType<Double> rangedDouble(int min) {
+    static @NotNull ArgumentType<Double> rangedDouble(double min) {
         return new RangedDoubleArgumentType(min);
     }
     /**
@@ -162,7 +162,7 @@ public interface ArgumentType<T> {
      * @return The newly created {@code ArgumentType}
      */
     @Contract("_, _ -> new")
-    static @NotNull ArgumentType<Double> rangedDouble(int min, int max) {
+    static @NotNull ArgumentType<Double> rangedDouble(double min, double max) {
         return new RangedDoubleArgumentType(min, max);
     }
 
@@ -172,7 +172,7 @@ public interface ArgumentType<T> {
      * @return The newly created {@code ArgumentType}
      */
     @Contract("_ -> new")
-    static @NotNull ArgumentType<Float> rangedFloat(int min) {
+    static @NotNull ArgumentType<Float> rangedFloat(float min) {
         return new RangedFloatArgumentType(min);
     }
     /**
@@ -182,7 +182,7 @@ public interface ArgumentType<T> {
      * @return The newly created {@code ArgumentType}
      */
     @Contract("_, _ -> new")
-    static @NotNull ArgumentType<Float> rangedFloat(int min, int max) {
+    static @NotNull ArgumentType<Float> rangedFloat(float min, float max) {
         return new RangedFloatArgumentType(min, max);
     }
 
