@@ -10,9 +10,11 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import static com.datasiqn.commandcore.argument.type.ArgumentType.*;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class ArgumentParserTest {
@@ -33,35 +35,6 @@ public class ArgumentParserTest {
     @Test
     public void testName() {
         testOk("very cool name", NAME, "very cool name");
-    }
-
-    @Test
-    public void testInt() {
-        testOk("29", INTEGER, 29);
-        testOk("-13", INTEGER, -13);
-        testErr("bla", INTEGER);
-        testErr("12.3", INTEGER);
-    }
-
-    @Test
-    public void testNaturalNumber() {
-        testOk("382", NATURAL_NUMBER, 382);
-        testErr("0", NATURAL_NUMBER);
-        testErr("12.3", NATURAL_NUMBER);
-    }
-
-    @Test
-    public void testDouble() {
-        testOk("38.2", DOUBLE, 38.2);
-        testOk("-1.202", DOUBLE, -1.202);
-        testErr("word", DOUBLE);
-    }
-
-    @Test
-    public void testFloat() {
-        testOk("2.3", FLOAT, 2.3f);
-        testOk("-283.287", FLOAT, -283.287f);
-        testErr("number", FLOAT);
     }
 
     @Test
@@ -166,64 +139,97 @@ public class ArgumentParserTest {
     // public void testCommand() {}
 
     @Test
-    public void testRangedInt() {
-        ArgumentType<Integer> minRanged = rangedInt(8);
-        testOk("10", minRanged, 10);
-        testOk("8", minRanged, 8);
-        testErr("3", minRanged);
-        testErr("9.23", minRanged);
-        testErr("string", minRanged);
+    public void testByte() {
+        {
+            ArgumentType<Byte> byteType = number(byte.class);
+            testOk("29", byteType, (byte) 29);
+            testOk("-13", byteType, (byte) -13);
+            testErr("280", byteType);
+            testErr("bla", byteType);
+            testErr("12.3", byteType);
+        }
 
-        ArgumentType<Integer> ranged = rangedInt(2, 10);
-        testOk("7", ranged, 7);
-        testOk("2", ranged, 2);
-        testOk("10", ranged, 10);
-        testErr("1", ranged);
-        testErr("13", ranged);
-        testErr("8.9", ranged);
-        testErr("number", ranged);
+        {
+            ArgumentType<Byte> byteType = number(Byte.class);
+            testOk("29", byteType, (byte) 29);
+            testOk("-13", byteType, (byte) -13);
+            testErr("280", byteType);
+            testErr("bla", byteType);
+            testErr("12.3", byteType);
+        }
     }
 
     @Test
-    public void testRangedDouble() {
-        ArgumentType<Double> minRanged = rangedDouble(2.3);
-        testOk("8.2", minRanged, 8.2);
-        testOk("2.5", minRanged, 2.5);
-        testOk("2.3", minRanged, 2.3);
-        testErr("2.2", minRanged);
-        testErr("-8.2", minRanged);
-        testErr("blaalakd", minRanged);
-
-        ArgumentType<Double> ranged = rangedDouble(-1.1, 8.2);
-        testOk("7", ranged, 7.0);
-        testOk("2.2", ranged, 2.2);
-        testOk("-1.1", ranged, -1.1);
-        testOk("8.2", ranged, 8.2);
-        testErr("8.3", ranged);
-        testErr("13", ranged);
-        testErr("-2.8", ranged);
-        testErr("aaaaaa", ranged);
+    public void testShort() {
+        ArgumentType<Short> shortType = number(short.class);
+        testOk("0", shortType, (short) 0);
+        testOk("10", shortType, (short) 10);
+        testOk("-8", shortType, (short) -8);
+        testErr("40000", shortType);
+        testErr("bignumber", shortType);
+        testErr("8.2", shortType);
     }
 
     @Test
-    public void testRangedFloat() {
-        ArgumentType<Float> minRanged = rangedFloat(2.3f);
-        testOk("8.2", minRanged, 8.2f);
-        testOk("2.5", minRanged, 2.5f);
-        testOk("2.3", minRanged, 2.3f);
-        testErr("2.2", minRanged);
-        testErr("-8.2", minRanged);
-        testErr("blaalakd", minRanged);
+    public void testInteger() {
+        ArgumentType<Integer> intType = number(int.class);
+        testOk("2", intType, 2);
+        testOk("-3", intType, -3);
+        testOk("100", intType, 100);
+        testErr("10000000000000", intType);
+        testErr("word", intType);
+        testErr("-2.3", intType);
+    }
 
-        ArgumentType<Float> ranged = rangedFloat(-1.1f, 8.2f);
-        testOk("7", ranged, 7.0f);
-        testOk("2.2", ranged, 2.2f);
-        testOk("-1.1", ranged, -1.1f);
-        testOk("8.2", ranged, 8.2f);
-        testErr("8.3", ranged);
-        testErr("13", ranged);
-        testErr("-2.8", ranged);
-        testErr("aaaaaa", ranged);
+    @Test
+    public void testLong() {
+        ArgumentType<Long> longType = number(long.class);
+        testOk("88", longType, 88L);
+        testOk("-10000", longType, -10_000L);
+        testErr("10000000000000000000", longType);
+        testErr("abbb", longType);
+        testErr("8.2", longType);
+    }
+
+    @Test
+    public void testFloat() {
+        ArgumentType<Float> floatType = number(float.class);
+        testOk("1", floatType, 1f);
+        testOk("8.2", floatType, 8.2f);
+        testOk("-188.333", floatType, -188.333f);
+        testErr("25performances??", floatType);
+    }
+
+    @Test
+    public void testDouble() {
+        ArgumentType<Double> doubleType = number(double.class);
+        testOk("8.2", doubleType, 8.2);
+        testOk("11.2", doubleType, 11.2);
+        testErr("tax,license,andfees", doubleType);
+    }
+
+    @Test
+    public void testNumber() {
+        assertThrows(IllegalArgumentException.class, () -> number(AtomicInteger.class));
+    }
+
+    @Test
+    public void testRangedNumber() {
+        ArgumentType<Double> rangedMin = rangedNumber(double.class, 5.2);
+        testOk("5.2", rangedMin, 5.2);
+        testOk("58.1", rangedMin, 58.1);
+        testErr("4.9", rangedMin);
+        testErr("-2.1", rangedMin);
+        testErr("modernfamily", rangedMin);
+
+        ArgumentType<Double> ranged = rangedNumber(double.class, 0.1, 5.6);
+        testOk("5", ranged, 5.0);
+        testOk("0.1", ranged, 0.1);
+        testOk("5.6", ranged, 5.6);
+        testErr("0", ranged);
+        testErr("-10", ranged);
+        testErr("28.3", ranged);
+        testErr("al", ranged);
     }
 
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type) {
