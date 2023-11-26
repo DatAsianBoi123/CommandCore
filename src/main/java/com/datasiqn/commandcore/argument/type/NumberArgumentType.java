@@ -7,11 +7,12 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
     private final Class<T> numberClass;
     private final Class<T> primitiveClass;
-    private final Parser<T> parser;
+    private final Function<String, Result<T, None>> parser;
 
     public NumberArgumentType(Class<T> numberClass) {
         Class<T> primitiveClass = Primitives.unwrap(numberClass);
@@ -49,10 +50,6 @@ class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
 
     @Override
     public @NotNull Result<T, None> parseWord(String word) {
-        return parser.parse(word);
-    }
-
-    private interface Parser<T> {
-        Result<T, None> parse(String str);
+        return parser.apply(word);
     }
 }
