@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 class VectorArgumentType implements ArgumentType<Vector> {
+    private static final ArgumentType<Integer> INT_TYPE = ArgumentType.number(int.class);
+
     @Override
     public @NotNull String getName() {
         return "vector";
@@ -19,17 +21,17 @@ class VectorArgumentType implements ArgumentType<Vector> {
 
     @Override
     public @NotNull Result<Vector, String> parse(@NotNull ArgumentReader reader) {
-        Result<Integer, String> x = INTEGER.parse(reader);
+        Result<Integer, String> x = INT_TYPE.parse(reader);
         if (x.isError()) return Result.error(x.unwrapError());
         if (reader.atEnd()) return Result.error("Expected 3 integers for a location, but got 1 instead");
         reader.next();
 
-        Result<Integer, String> y = INTEGER.parse(reader);
+        Result<Integer, String> y = INT_TYPE.parse(reader);
         if (y.isError()) return Result.error(y.unwrapError());
         if (reader.atEnd()) return Result.error("Expected 3 integers for a location, but got 2 instead");
         reader.next();
 
-        Result<Integer, String> z = INTEGER.parse(reader);
+        Result<Integer, String> z = INT_TYPE.parse(reader);
         if (z.isError()) return Result.error(z.unwrapError());
         if (!reader.atEnd()) reader.next();
 
