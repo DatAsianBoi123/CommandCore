@@ -187,6 +187,45 @@ public interface ArgumentType<T> {
     }
 
     /**
+     * Creates an {@code ArgumentType} that represents a number
+     * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
+     *                    For example, {@code int.class}, {@code Long.class}
+     * @return The newly created {@code ArgumentType}
+     * @param <T> The type of the number
+     * @throws IllegalArgumentException If {@code numberClass} isn't a primitive class or a primitive wrapper
+     */
+    @Contract("_ -> new")
+    static @NotNull <T extends Number> ArgumentType<T> number(Class<T> numberClass) {
+        return new NumberArgumentType<>(numberClass);
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents a number with a minimum value (inclusive)
+     * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
+     *                    For example, {@code int.class}, {@code Long.class}
+     * @param min The inclusive minimum value
+     * @return The newly created {@code ArgumentType}
+     * @param <T> The type of the number
+     */
+    @Contract("_, _ -> new")
+    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> rangedNumber(Class<T> numberClass, T min) {
+        return new RangedArgumentType<>(numberClass, min);
+    }
+    /**
+     * Creates an {@code ArgumentType} that represents a number with a minimum (inclusive) and maximum (inclusive) value
+     * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
+     *                    For example, {@code int.class}, {@code Long.class}
+     * @param min The inclusive minimum value
+     * @param max The inclusive maximum value
+     * @return The newly created {@code ArgumentType}
+     * @param <T> The type of the number
+     */
+    @Contract("_, _, _ -> new")
+    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> rangedNumber(Class<T> numberClass, T min, T max) {
+        return new RangedArgumentType<>(numberClass, min, max);
+    }
+
+    /**
      * Gets the name of this argument type
      * @return The name
      */
