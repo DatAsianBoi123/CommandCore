@@ -40,26 +40,6 @@ public interface ArgumentType<T> {
     ArgumentType<String> NAME = new NameArgumentType();
 
     /**
-     * {@code ArgumentType} that represents an integer
-     */
-    ArgumentType<Integer> INTEGER = new IntArgumentType();
-
-    /**
-     * {@code ArgumentType} that represents an integer that is no smaller than 1
-     */
-    ArgumentType<Integer> NATURAL_NUMBER = rangedInt(1);
-
-    /**
-     * {@code ArgumentType} that represents a double
-     */
-    ArgumentType<Double> DOUBLE = new DoubleArgumentType();
-
-    /**
-     * {@code ArgumentType} that represents a float
-     */
-    ArgumentType<Float> FLOAT = new FloatArgumentType();
-
-    /**
      * {@code ArgumentType} that represents a boolean
      */
     ArgumentType<Boolean> BOOLEAN = new BoolArgumentType();
@@ -125,66 +105,6 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents a {@code CommandCore} command
      */
     ArgumentType<Command> COMMAND = new CommandArgumentType();
-
-    /**
-     * Creates an {@code ArgumentType} that represents an integer with a minimum value (inclusive)
-     * @param min The inclusive minimum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_ -> new")
-    static @NotNull ArgumentType<Integer> rangedInt(int min) {
-        return new RangedIntArgumentType(min);
-    }
-    /**
-     * Creates an {@code ArgumentType} that represents an integer with a minimum (inclusive) and maximum (inclusive) value
-     * @param min The inclusive minimum value
-     * @param max The inclusive maximum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_, _ -> new")
-    static @NotNull ArgumentType<Integer> rangedInt(int min, int max) {
-        return new RangedIntArgumentType(min, max);
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents a double with a minimum value (inclusive)
-     * @param min The inclusive minimum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_ -> new")
-    static @NotNull ArgumentType<Double> rangedDouble(double min) {
-        return new RangedDoubleArgumentType(min);
-    }
-    /**
-     * Creates an {@code ArgumentType} that represents a double with a minimum (inclusive) and maximum (inclusive) value
-     * @param min The inclusive minimum value
-     * @param max The inclusive maximum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_, _ -> new")
-    static @NotNull ArgumentType<Double> rangedDouble(double min, double max) {
-        return new RangedDoubleArgumentType(min, max);
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents a float with a minimum value (inclusive)
-     * @param min The inclusive minimum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_ -> new")
-    static @NotNull ArgumentType<Float> rangedFloat(float min) {
-        return new RangedFloatArgumentType(min);
-    }
-    /**
-     * Creates an {@code ArgumentType} that represents a float with a minimum (inclusive) and maximum (inclusive) value
-     * @param min The inclusive minimum value
-     * @param max The inclusive maximum value
-     * @return The newly created {@code ArgumentType}
-     */
-    @Contract("_, _ -> new")
-    static @NotNull ArgumentType<Float> rangedFloat(float min, float max) {
-        return new RangedFloatArgumentType(min, max);
-    }
 
     /**
      * Creates an {@code ArgumentType} that represents a number
