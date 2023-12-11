@@ -5,6 +5,8 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.util.EnumUtils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -143,6 +146,36 @@ public interface ArgumentType<T> {
     @Contract("_, _, _ -> new")
     static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> rangedNumber(Class<T> numberClass, T min, T max) {
         return new RangedArgumentType<>(numberClass, min, max);
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents a deserialized json value.
+     * If the type you are deserializing is generic, use the method {@link #json(Class, Type)} instead.
+     * @param clazz The class of the object that the json will be deserialized into
+     * @return The deserialized object
+     * @param <T> The type of the deserialized object
+     */
+    static @NotNull <T> ArgumentType<T> json(Class<T> clazz) {
+        return new JsonArgumentType<>(clazz);
+    }
+    /**
+     * Creates an {@code ArgumentType} that represents a deserialized json value.
+     * This method should be used if the type that is being deserialized is generic. If it isn't, use the method {@link #json(Class)} instead.
+     * @param clazz The class of the object that the json will be deserialized into
+     * @param type The type of the object that the json will be deserialized into.
+     *             You can get this type by using a {@link TypeToken}.
+     *             For example, to get the type of {@code Set<String>}, you should use
+     *             <pre>
+     *             {@code
+     *             Type stringSetType = new TypeToken<Set<String>>() {}.getType();
+     *             }
+     *             </pre>
+     * @return The deserialized object
+     * @param <T> The type of the deserialized object
+     * @see Gson#fromJson(String, Type)
+     */
+    static @NotNull <T> ArgumentType<T> json(Class<T> clazz, Type type) {
+        return new JsonArgumentType<>(clazz, type);
     }
 
     /**
