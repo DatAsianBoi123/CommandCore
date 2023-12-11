@@ -1,6 +1,9 @@
 import com.datasiqn.commandcore.argument.StringArgumentReader;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.resultapi.Result;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,6 +13,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -139,6 +145,59 @@ public class ArgumentParserTest {
     // public void testCommand() {}
 
     @Test
+    public void testJson() {
+        {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("hi", 12);
+
+            JsonObject inner = new JsonObject();
+            JsonArray innerArray = new JsonArray(3);
+            innerArray.add(1);
+            innerArray.add(3);
+            innerArray.add(8);
+            inner.add("names", innerArray);
+
+            jsonObject.add("bye", inner);
+
+            testOk("""
+                    {"hi": 12, "bye": {"names": [1, 3, 8]}}""", json(JsonObject.class), jsonObject);
+        }
+
+        {
+            JsonArray jsonArray = new JsonArray();
+            jsonArray.add("a");
+            jsonArray.add("b");
+
+            JsonObject inner = new JsonObject();
+            inner.addProperty("hi", 12);
+            inner.addProperty("aaa", "jim");
+
+            jsonArray.add(inner);
+
+            testOk("""
+                ["a", "b", {"hi": 12, "aaa": "jim"}]""", json(JsonArray.class), jsonArray);
+        }
+
+        testErr("""
+                {"hi": true}""", json(JsonArray.class));
+
+        assertThrows(IllegalArgumentException.class, () -> json(Person.class, new TypeToken<School>() {}.getType()));
+
+        Person person = new Person("Jim", 14, true, new School("Cool High School", SchoolType.HIGH), Collections.emptyList());
+        testOk("""
+                {
+                    "name": "Jim",
+                    "age": 14,
+                    "cool": true,
+                    "school": {
+                        "name": "Cool High School",
+                        "type": "HIGH"
+                    },
+                    "friends": []
+                }""", json(Person.class), person);
+    }
+
+    @Test
     public void testByte() {
         {
             ArgumentType<Byte> byteType = number(byte.class);
@@ -258,5 +317,91 @@ public class ArgumentParserTest {
         PascalCase,
         lowercase,
         camelCase,
+    }
+
+    private static class Person {
+        private final String name;
+        private final int age;
+        private final boolean cool;
+        private final School school;
+        private final List<Person> friends;
+
+        private Person(String name, int age, boolean cool, School school, List<Person> friends) {
+            this.name = name;
+            this.age = age;
+            this.cool = cool;
+            this.school = school;
+            this.friends = friends;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Person person = (Person) o;
+
+            if (age != person.age) return false;
+            if (cool != person.cool) return false;
+            if (!Objects.equals(name, person.name)) return false;
+            if (!Objects.equals(school, person.school)) return false;
+            return Objects.equals(friends, person.friends);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + age;
+            result = 31 * result + (cool ? 1 : 0);
+            result = 31 * result + (school != null ? school.hashCode() : 0);
+            result = 31 * result + (friends != null ? friends.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Person{" +
+                   "name='" + name + '\'' +
+                   ", age=" + age +
+                   ", cool=" + cool +
+                   ", school=" + school +
+                   ", friends=" + friends +
+                   '}';
+        }
+    }
+
+    private static class School {
+        private final String name;
+        private final SchoolType type;
+
+        private School(String name, SchoolType type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            School school = (School) o;
+
+            if (!Objects.equals(name, school.name)) return false;
+            return type == school.type;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + (type != null ? type.hashCode() : 0);
+            return result;
+        }
+    }
+
+    private enum SchoolType {
+        ELEMENTARY,
+        MIDDLE,
+        HIGH,
+        COLLEGE,
     }
 }
