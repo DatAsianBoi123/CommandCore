@@ -20,8 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import static com.datasiqn.commandcore.argument.type.ArgumentType.*;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ArgumentParserTest {
     static {
@@ -36,6 +35,20 @@ public class ArgumentParserTest {
     @Test
     public void testWord() {
         testOk("hello there", WORD, "hello");
+    }
+
+    @Test
+    public void testQuotedWord() {
+        testOk("\"\"", QUOTED_WORD, "");
+        testOk("\"cool name\" bob", QUOTED_WORD, "cool name");
+        testOk("\"hi\"", QUOTED_WORD, "hi");
+        testOk("\"name with \\\"quotes\\\"\"", QUOTED_WORD, "name with \"quotes\"");
+        testOk("\"word with backslashes \\\\\"", QUOTED_WORD, "word with backslashes \\");
+        testOk("\"another word with \\ backslashes\"", QUOTED_WORD, "another word with \\ backslashes");
+        testErr("name \"", QUOTED_WORD);
+        testErr("\" aaaa another arg", QUOTED_WORD);
+        testErr("\"some thing\"uh oh", QUOTED_WORD);
+        testErr("\"woah is that \\\"jim\\\"?", QUOTED_WORD);
     }
 
     @Test
@@ -295,7 +308,9 @@ public class ArgumentParserTest {
         this.<T>testOk(arg, type, val -> true);
     }
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type, T val) {
-        this.<T>testOk(arg, type, parsed -> parsed.equals(val));
+        Result<T, String> result = type.parse(new StringArgumentReader(arg));
+        assertTrue(result.isOk());
+        assertEquals(result.unwrap(), val);
     }
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type, @NotNull Predicate<T> tester) {
         Result<T, String> result = type.parse(new StringArgumentReader(arg));
@@ -398,6 +413,7 @@ public class ArgumentParserTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private enum SchoolType {
         ELEMENTARY,
         MIDDLE,
