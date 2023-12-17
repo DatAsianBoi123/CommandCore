@@ -5,6 +5,7 @@ import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.ParsedArguments;
 import com.datasiqn.commandcore.argument.ParsedArguments.ParsedArgument;
+import com.datasiqn.commandcore.argument.StringArguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
@@ -106,10 +107,15 @@ class BuilderCommand implements Command {
 
         if (args.size() >= 1) {
             ArgumentReader reader = args.asReader();
-            CommandContext newContext = context;
+            StringBuilder combinedArgs = new StringBuilder();
+            for (int i = 0; i < args.size(); i++) {
+                combinedArgs.append(args.getString(i)).append(" ");
+            }
+            combinedArgs.deleteCharAt(combinedArgs.length() - 1);
+            CommandContext newContext = new CommandContext(context.source(), context.command(), context.label(), new StringArguments(Collections.singletonList(combinedArgs.toString())));
             List<CommandNode<?>> nodeSet = nodes;
 
-            String matchingString = args.getString(args.size() - 1);
+            String matchingString = context.arguments().getString(context.arguments().size() - 1);
 
             if (args.size() != 1) {
                 CurrentNode current = findCurrentNode(reader);
