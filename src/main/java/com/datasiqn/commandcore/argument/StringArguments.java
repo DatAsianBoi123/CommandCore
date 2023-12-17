@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Represents a list of arguments.
- * <p>
+ * <br>
  * Internally, this uses a {@code List<String>} to store arguments and parses the string it every time the user wants an argument.
  */
 public class StringArguments implements Arguments {

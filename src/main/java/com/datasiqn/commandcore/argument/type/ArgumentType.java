@@ -38,7 +38,17 @@ public interface ArgumentType<T> {
     ArgumentType<String> WORD = new WordArgumentType();
 
     /**
-     * {@code ArgumentType} that represents the name of something. Can have multiple spaces in the name
+     * {@code ArgumentType} that represents the name of something.
+     * Can have multiple spaces in the name, and does not need quotes enclosing them.
+     * <br>
+     * Examples of this include:
+     * <pre>
+     *     cool name
+     *     oneword
+     *     a lot of words
+     *     includes "special characters" (and numbers) and #symbols#
+     * </pre>
+     * <strong>WARNING: Using this {@code ArgumentType} will make it impossible to execute any other nodes off of it.</strong>
      */
     ArgumentType<String> NAME = new NameArgumentType();
 
