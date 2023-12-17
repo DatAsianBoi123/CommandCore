@@ -38,6 +38,19 @@ public interface ArgumentType<T> {
     ArgumentType<String> WORD = new WordArgumentType();
 
     /**
+     * {@code ArgumentType} that represents a word that is enclosed in quotes.
+     * <br>
+     * Examples of this include:
+     * <pre>
+     *     "name with multiple spaces" -> name with multiple spaces
+     *     "hey look, this one has \"quotes\" too!" -> hey look, this one has "quotes" too!
+     *     "i can also escape backslashes as well \\" -> i can also escape backslashes as well \
+     * </pre>
+     * If you don't have any other nodes connected to this one, you can use {@link #NAME} instead.
+     */
+    ArgumentType<String> QUOTED_WORD = new QuotedWordArgumentType();
+
+    /**
      * {@code ArgumentType} that represents the name of something.
      * Can have multiple spaces in the name, and does not need quotes enclosing them.
      * <br>
