@@ -47,9 +47,30 @@ class QuotedWordArgumentType implements ArgumentType<String> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         Arguments arguments = context.arguments();
+        ArgumentReader reader = arguments.asReader();
         String arg = arguments.getString(arguments.size() - 1);
         if (arg.isEmpty()) return Collections.singletonList("\"");
-        if (arg.lastIndexOf('"') == -1) return Collections.singletonList("\"" + arg + "\"");
+        if (arg.length() > 1) {
+            boolean foundEndQuote = false;
+            Character prev = null;
+            while (!reader.atEnd()) {
+                char next = reader.next();
+                if (next == '"') {
+                    if (prev == null || prev != '\\') {
+                        foundEndQuote = true;
+                        break;
+                    }
+                }
+                if (next == '\\' && prev != null && prev == '\\') {
+                    prev = null;
+                    continue;
+                }
+                prev = next;
+            }
+            if (!foundEndQuote) {
+                return Collections.singletonList(arg + "\"");
+            }
+        }
         return Collections.emptyList();
     }
 

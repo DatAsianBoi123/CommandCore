@@ -52,6 +52,11 @@ public class ParsedArguments implements Arguments {
         return new StringArgumentReader(stringArguments);
     }
 
+    @Override
+    public String toString() {
+        return arguments.stream().map(ParsedArgument::stringArg).reduce("", (prev, curr) -> prev + curr + ",");
+    }
+
     /**
      * Represents one argument that has already been parsed
      * @param <T> The type of the argument
