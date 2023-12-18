@@ -123,9 +123,9 @@ public interface ArgumentType<T> {
     ArgumentType<Material> ITEM = new FilteredEnumArgumentType<>(Material.class, Material::isItem, "item");
 
     /**
-     * {@code ArgumentType} that represents a player
+     * {@code ArgumentType} that represents a player that's online
      */
-    ArgumentType<Player> PLAYER = new PlayerArgumentType();
+    ArgumentType<Player> ONLINE_PLAYER = new PlayerArgumentType();
 
     /**
      * {@code ArgumentType} that represents a {@code CommandCore} command
