@@ -7,10 +7,7 @@ import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.LootTable;
@@ -74,6 +71,11 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents a UUID
      */
     ArgumentType<java.util.UUID> UUID = new UuidArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents a {@link NamespacedKey}
+     */
+    ArgumentType<NamespacedKey> NAMESPACED_KEY = new NamespacedKeyArgumentType();
 
     /**
      * {@code ArgumentType} that represents a vector
