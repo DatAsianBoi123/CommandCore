@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
@@ -108,6 +109,11 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents a loot table
      */
     ArgumentType<LootTable> LOOT_TABLE = new LootTableArgumentType();
+
+    /**
+     * {@code NamespacedKey} that represents a recipe
+     */
+    ArgumentType<Recipe> RECIPE = new RecipeArgumentType();
 
     /**
      * {@code ArgumentType} that represents a material
