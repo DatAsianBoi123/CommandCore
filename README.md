@@ -84,9 +84,9 @@ public class GreetCommand {
                 .description("Greets a player")
                 .executes((context, source, arguments) -> source.sendMessage("You ran this command with no arguments")) // Line 5
                 .then(LiteralBuilder.literal("player")
-                        .then(ArgumentBuilder.argument(ArgumentType.PLAYER, "player")
+                        .then(ArgumentBuilder.argument(ArgumentType.ONLINE_PLAYER, "player")
                                 .requiresPlayer()
-                                .executes((context, source, arguments) -> source.getPlayer().chat("Hello " + arguments.get(1, ArgumentType.PLAYER).getName()))))
+                                .executes((context, source, arguments) -> source.getPlayer().chat("Hello " + arguments.get(1, ArgumentType.ONLINE_PLAYER).getName()))))
                 .then(LiteralBuilder.literal("server")
                         .requiresPlayer()
                         .executes((context, source, arguments) -> source.getPlayer().chat("Hello Server!")));
