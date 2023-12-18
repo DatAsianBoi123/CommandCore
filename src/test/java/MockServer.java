@@ -38,10 +38,12 @@ import java.util.stream.Collectors;
 public class MockServer implements Server {
     private final Set<Player> players;
     private final List<World> worlds;
+    private final Map<NamespacedKey, MockRecipe> recipes;
 
     public MockServer(@NotNull Builder builder) {
         this.players = builder.players.stream().map(MockPlayer::new).collect(Collectors.toSet());
         this.worlds = builder.worlds.stream().map(MockWorld::new).collect(Collectors.toList());
+        this.recipes = builder.recipes;
     }
 
     @NotNull
@@ -389,7 +391,7 @@ public class MockServer implements Server {
     @Nullable
     @Override
     public Recipe getRecipe(@NotNull NamespacedKey recipeKey) {
-        return null;
+        return recipes.get(recipeKey);
     }
 
     @Nullable
@@ -858,6 +860,7 @@ public class MockServer implements Server {
     public static class Builder {
         private final Set<String> players = new HashSet<>();
         private final Set<String> worlds = new HashSet<>();
+        private final Map<NamespacedKey, MockRecipe> recipes = new HashMap<>();
 
         public Builder addPlayer(String name) {
             players.add(name);
@@ -866,6 +869,11 @@ public class MockServer implements Server {
 
         public Builder addWorld(String name) {
             worlds.add(name);
+            return this;
+        }
+
+        public Builder addRecipe(MockRecipe recipe) {
+            recipes.put(recipe.getKey(), recipe);
             return this;
         }
 

@@ -6,9 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import java.util.function.Predicate;
 import static com.datasiqn.commandcore.argument.type.ArgumentType.*;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("deprecation")
 public class ArgumentParserTest {
     static {
         Bukkit.setServer(new MockServer.Builder()
@@ -29,6 +32,8 @@ public class ArgumentParserTest {
                 .addPlayer("jim")
                 .addWorld("world")
                 .addWorld("nether")
+                .addRecipe(new MockRecipe(new NamespacedKey("coolplugin", "coolrecipe"), new ItemStack(Material.BLACK_DYE)))
+                .addRecipe(new MockRecipe(NamespacedKey.minecraft("diamond_sword"), new ItemStack(Material.DIAMOND_SWORD)))
                 .build());
     }
 
@@ -68,6 +73,14 @@ public class ArgumentParserTest {
     public void testUuid() {
         testOk("9bf53faf-7391-4dee-a47f-e3313af0f243", UUID, java.util.UUID.fromString("9bf53faf-7391-4dee-a47f-e3313af0f243"));
         testErr("382a-dcm-d", UUID);
+    }
+
+    @Test
+    public void testNamespacedKey() {
+        testOk("stone", NAMESPACED_KEY, NamespacedKey.minecraft("stone"));
+        testOk("plugin:key", NAMESPACED_KEY, new NamespacedKey("plugin", "key"));
+        testErr("invalidkey:::", NAMESPACED_KEY);
+        testErr(" ", NAMESPACED_KEY);
     }
 
     @Test
@@ -112,6 +125,15 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testRecipe() {
+        testOk("coolplugin:coolrecipe", RECIPE);
+        testOk("minecraft:diamond_sword", RECIPE);
+        testErr(":::aa:", RECIPE);
+        testErr("coolrecipe", RECIPE);
+        testErr("coolplugin:diamond_sword", RECIPE);
+    }
+
+    @Test
     public void testMaterial() {
         testOk("stick", MATERIAL, Material.STICK);
         testOk("DIAmOnd_SWOrd", MATERIAL, Material.DIAMOND_SWORD);
@@ -148,10 +170,10 @@ public class ArgumentParserTest {
 
     @Test
     public void testPlayer() {
-        this.<Player>testOk("jim", PLAYER, player -> player.getName().equals("jim"));
-        this.<Player>testOk("bob", PLAYER, player -> player.getName().equals("bob"));
-        testErr("joe", PLAYER);
-        testErr("b", PLAYER);
+        this.<Player>testOk("jim", ONLINE_PLAYER, player -> player.getName().equals("jim"));
+        this.<Player>testOk("bob", ONLINE_PLAYER, player -> player.getName().equals("bob"));
+        testErr("joe", ONLINE_PLAYER);
+        testErr("b", ONLINE_PLAYER);
     }
 
     // Skip command because that won't work in a testing environment
