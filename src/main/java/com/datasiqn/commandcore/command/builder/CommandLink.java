@@ -17,7 +17,7 @@ import java.util.List;
  * It shares many common methods that are all present in a {@code CommandBuilder} and a {@code CommandNode}.
  * @param <T> The type of "This". It is returned every time a chaining method is called, allowing unique methods on the subclass to be called.
  */
-public abstract class CommandLink<T> {
+public abstract class CommandLink<T extends CommandLink<T>> {
     protected final List<CommandNode<?>> children = new ArrayList<>();
     protected final List<Requirement> requires = new ArrayList<>();
 
