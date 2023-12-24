@@ -5,7 +5,6 @@ import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
 import com.datasiqn.commandcore.argument.ParsedArguments;
 import com.datasiqn.commandcore.argument.ParsedArguments.ParsedArgument;
-import com.datasiqn.commandcore.argument.StringArguments;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.TabComplete;
@@ -106,25 +105,19 @@ class BuilderCommand implements Command {
         Arguments args = context.arguments();
 
         if (args.size() >= 1) {
-            ArgumentReader reader = args.asReader();
-            StringBuilder combinedArgs = new StringBuilder();
-            for (int i = 0; i < args.size(); i++) {
-                combinedArgs.append(args.getString(i)).append(" ");
-            }
-            combinedArgs.deleteCharAt(combinedArgs.length() - 1);
-            CommandContext newContext = new CommandContext(context.source(), context.command(), context.label(), new StringArguments(Collections.singletonList(combinedArgs.toString())));
             List<CommandNode<?>> nodeSet = nodes;
 
-            String matchingString = context.arguments().getString(context.arguments().size() - 1);
-
-            if (args.size() != 1) {
+            ArgumentReader reader = args.asReader();
+            CommandContext newContext = context;
+            String matchingString = "";
+            if (reader.size() != 0) {
                 CurrentNode current = findCurrentNode(reader);
                 List<CommandNode<?>> nodeList = current.nodes;
                 if (nodeList.size() != 0) {
                     CommandNode<?> node = nodeList.get(nodeList.size() - 1);
-                    newContext = buildContext(context, current);
                     nodeSet = node.getChildren();
                 }
+                newContext = buildContext(context, current);
                 matchingString = current.args.get(current.args.size() - 1).stringArg();
             }
             List<String> tabcomplete = new ArrayList<>();
