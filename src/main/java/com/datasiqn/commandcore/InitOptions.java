@@ -189,15 +189,15 @@ public class InitOptions {
         MISSING_PERMISSION("Command %s is missing a permission"),
         ;
 
-        private final String displayName;
+        private final String message;
 
-        Warning(String displayName) {
-            this.displayName = displayName;
+        Warning(String message) {
+            this.message = message;
         }
 
         @Override
         public String toString() {
-            return displayName;
+            return message;
         }
     }
 }
