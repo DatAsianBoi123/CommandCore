@@ -86,7 +86,7 @@ public class InitOptions {
      * @param args The args used to format the warning message
      */
     public void warnIf(@NotNull Warning warning, boolean condition, Object... args) {
-        if (shouldWarn(warning) && condition) Bukkit.getLogger().warning(String.format("[CommandCore] " + warning, args));
+        if (shouldWarn(warning) && condition) Bukkit.getLogger().warning("[CommandCore] " + String.format(warning.message, args));
     }
 
     /**
@@ -179,12 +179,12 @@ public class InitOptions {
      */
     public enum Warning {
         /**
-         * The command is missing a description field
+         * The command is missing a description field. This has 1 format argument that is the command name.
          */
         MISSING_DESCRIPTION("Command %s is missing a description"),
 
         /**
-         * The command is missing a permission
+         * The command is missing a permission. This has 1 format argument that is the command name.
          */
         MISSING_PERMISSION("Command %s is missing a permission"),
         ;
@@ -195,8 +195,11 @@ public class InitOptions {
             this.message = message;
         }
 
-        @Override
-        public String toString() {
+        /**
+         * Gets the message of the warning. This should be used along with {@link String#format(String, Object...)} to get a correctly formatted message.
+         * @return The message of the warning
+         */
+        public String getMessage() {
             return message;
         }
     }
