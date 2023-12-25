@@ -22,6 +22,7 @@ public class InitOptions {
     private final boolean helpCommand;
     private final List<String> aliases;
     private final Set<Warning> warnings;
+    private final int commandsPerPage;
 
     /**
      * Creates an {@code InitOptions} from a {@code Builder}
@@ -34,6 +35,7 @@ public class InitOptions {
         this.pluginName = builder.pluginName;
         this.aliases = Arrays.asList(builder.aliases);
         this.warnings = Arrays.stream(builder.warnings).collect(Collectors.toSet());
+        this.commandsPerPage = builder.commandsPerPage;
     }
 
     /**
@@ -67,6 +69,14 @@ public class InitOptions {
     @UnmodifiableView
     public List<String> getAliases() {
         return Collections.unmodifiableList(aliases);
+    }
+
+    /**
+     * Gets the commands per help page
+     * @return The commands per help page
+     */
+    public int getCommandsPerPage() {
+        return commandsPerPage;
     }
 
     /**
@@ -106,6 +116,7 @@ public class InitOptions {
         private boolean helpCommand = true;
         private String[] aliases = new String[0];
         private Warning[] warnings = new Warning[0];
+        private int commandsPerPage = 5;
 
         /**
          * Creates a new {@code Builder} class
@@ -152,6 +163,16 @@ public class InitOptions {
          */
         public Builder warnOn(@NotNull Warning @NotNull ... warnings) {
             this.warnings = warnings;
+            return this;
+        }
+
+        /**
+         * Sets the number of commands per help page. Default is 5.
+         * @param commandsPerPage The new commands per page
+         * @return The builder, for chaining
+         */
+        public Builder commandsPerPage(int commandsPerPage) {
+            this.commandsPerPage = commandsPerPage;
             return this;
         }
 

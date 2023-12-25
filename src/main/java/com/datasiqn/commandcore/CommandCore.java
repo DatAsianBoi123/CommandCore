@@ -1,11 +1,9 @@
 package com.datasiqn.commandcore;
 
-import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.Command;
-import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
-import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import com.datasiqn.commandcore.command.source.*;
 import com.datasiqn.commandcore.managers.CommandManager;
+import com.datasiqn.commandcore.managers.HelpManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
@@ -31,11 +29,13 @@ import java.util.List;
 public class CommandCore {
     private static CommandCore instance;
     private final CommandManager commandManager = new CommandManager();
+    private final HelpManager helpManager;
     private final JavaPlugin plugin;
     private final org.bukkit.command.Command bukkitCommand;
     private final InitOptions options;
 
-    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command, InitOptions options) {
+    private CommandCore(JavaPlugin plugin, org.bukkit.command.Command command, @NotNull InitOptions options) {
+        this.helpManager = new HelpManager(options.getCommandsPerPage());
         this.plugin = plugin;
         this.bukkitCommand = command;
         this.options = options;
@@ -47,6 +47,14 @@ public class CommandCore {
      */
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    /**
+     * Gets the help manager
+     * @return The help manager
+     */
+    public HelpManager getHelpManager() {
+        return helpManager;
     }
 
     /**
@@ -74,18 +82,26 @@ public class CommandCore {
     }
 
     /**
-     * Sends the help menu to {@code sender}
+     * Sends the 1st page of the help menu to {@code sender}
      * @param sender The sender
      */
     public void sendHelpMenu(@NotNull CommandSender sender) {
+        sendHelpMenu(sender, 1);
+    }
+    /**
+     * Sends a specific page of the help menu to {@code sender}
+     * @param sender The sender
+     * @param page The page
+     */
+    public void sendHelpMenu(@NotNull CommandSender sender, int page) {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
-        commandManager.getCommandNames(false).stream().sorted().forEach(name -> {
+        for (String name : helpManager.getCommandNames(page)) {
             Command command = commandManager.getCommand(name, false);
             if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) {
                 String description = command.hasDescription() ? command.getDescription() : "No description provided";
-                sender.sendMessage(ChatColor.YELLOW + " " + name, ChatColor.GRAY + "  ↳ " + description);
+                sender.sendMessage(ChatColor.DARK_GRAY + "/" + ChatColor.WHITE + options.getRootCommand() + ChatColor.YELLOW + " " + name, ChatColor.GRAY + description);
             }
-        });
+        }
     }
 
     /**
@@ -169,19 +185,7 @@ public class CommandCore {
         command.setExecutor(mainCommand);
         command.setTabCompleter(mainCommand);
 
-        if (options.createHelpCommand()) instance.commandManager.registerCommand(new CommandBuilder("help")
-                .description("Shows the help menu")
-                .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
-                        .executes((context, source, arguments) -> {
-                            Command cmd = arguments.get(0, ArgumentType.COMMAND);
-                            String commandName = arguments.getString(0);
-                            if (!source.hasPermission(cmd.getPermissionString())) {
-                                source.sendMessage(ChatColor.RED + "No help for " + commandName);
-                                return;
-                            }
-                            instance.sendCommandHelp(source.sender(), commandName);
-                        }))
-                .executes((context, source, arguments) -> instance.sendHelpMenu(source.sender())));
+        if (options.createHelpCommand()) instance.commandManager.registerCommand(HelpCommand.createCommand());
 
         return instance;
     }

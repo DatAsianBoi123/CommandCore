@@ -37,6 +37,7 @@ public class CommandManager {
             options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
         }
         if (commandMap.putIfAbsent(name, builtCommand) != null) throw new IllegalArgumentException("Command name already in use");
+        CommandCore.getInstance().getHelpManager().addCommandName(name);
         for (String alias : builtCommand.getAliases()) {
             if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
             if (alias.isEmpty()) throw new IllegalArgumentException("Command aliases cannot be empty");
