@@ -33,7 +33,7 @@ public class HelpManager {
     /**
      * Gets the command names on a certain page
      * @param page The page to get
-     * @return The command names on that page. The size of this list will always be <= {@code commandsPerPage}.
+     * @return The command names on that page. The size of this list will always be {@literal <}= {@code commandsPerPage}.
      */
     @UnmodifiableView
     public List<String> getCommandNames(int page) {
