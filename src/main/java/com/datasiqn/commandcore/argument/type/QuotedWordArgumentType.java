@@ -2,6 +2,7 @@ package com.datasiqn.commandcore.argument.type;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
+import com.datasiqn.commandcore.argument.StringArgumentReader;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
@@ -47,8 +48,8 @@ class QuotedWordArgumentType implements ArgumentType<String> {
     @Override
     public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
         Arguments arguments = context.arguments();
-        ArgumentReader reader = arguments.asReader();
         String arg = arguments.getString(arguments.size() - 1);
+        ArgumentReader reader = new StringArgumentReader(arg);
         if (arg.isEmpty()) return Collections.singletonList("\"");
         if (arg.length() > 1) {
             boolean foundEndQuote = false;
