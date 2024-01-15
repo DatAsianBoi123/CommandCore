@@ -95,12 +95,15 @@ public class CommandCore {
      */
     public void sendHelpMenu(@NotNull CommandSender sender, int page) {
         sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
-        for (String name : helpManager.getCommandNames(page)) {
+        List<String> filteredNames = helpManager.getCommandNames(page, name -> {
             Command command = commandManager.getCommand(name, false);
-            if (!command.hasPermission() || sender.hasPermission(command.getPermissionString())) {
-                String description = command.hasDescription() ? command.getDescription() : "No description provided";
-                sender.sendMessage(ChatColor.DARK_GRAY + "/" + ChatColor.WHITE + options.getRootCommand() + ChatColor.YELLOW + " " + name, ChatColor.GRAY + description);
-            }
+            //noinspection ConstantConditions
+            return !command.hasPermission() || sender.hasPermission(command.getPermissionString());
+        });
+        for (String name : filteredNames) {
+            Command command = commandManager.getCommand(name, false);
+            String description = command.hasDescription() ? command.getDescription() : "No description provided";
+            sender.sendMessage(ChatColor.DARK_GRAY + "/" + ChatColor.WHITE + options.getRootCommand() + ChatColor.YELLOW + " " + name, ChatColor.GRAY + description);
         }
     }
 

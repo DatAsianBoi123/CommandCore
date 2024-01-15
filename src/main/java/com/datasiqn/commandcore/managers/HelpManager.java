@@ -5,6 +5,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Class that manages help page(s)
@@ -33,13 +34,16 @@ public class HelpManager {
     /**
      * Gets the command names on a certain page
      * @param page The page to get
+     * @param filter The filter that all command names have to pass.
+     *               When this filter returns true, that command name is included in the returned list, otherwise it is not included.
      * @return The command names on that page. The size of this list will always be {@literal <}= {@code commandsPerPage}.
      */
     @UnmodifiableView
-    public List<String> getCommandNames(int page) {
+    public List<String> getCommandNames(int page, Predicate<String> filter) {
+        List<String> filteredNames = commandNames.stream().filter(filter).toList();
         int startingIndex = commandsPerPage * (page - 1);
-        if (startingIndex >= commandNames.size()) return Collections.emptyList();
-        return Collections.unmodifiableList(commandNames.subList(startingIndex, Math.min(commandNames.size(), startingIndex + commandsPerPage)));
+        if (startingIndex >= filteredNames.size()) return Collections.emptyList();
+        return Collections.unmodifiableList(filteredNames.subList(startingIndex, Math.min(filteredNames.size(), startingIndex + commandsPerPage)));
     }
 
     /**
