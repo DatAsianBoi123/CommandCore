@@ -29,7 +29,6 @@ class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
                     return (T) valueOf.invoke(null, str);
                 } catch (IllegalAccessException e) {
                     Bukkit.getLogger().severe("[CommandCore] could not parse number. please report this!");
-                    e.printStackTrace();
                     return null;
                 }
             });

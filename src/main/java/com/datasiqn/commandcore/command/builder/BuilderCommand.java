@@ -114,12 +114,12 @@ class BuilderCommand implements Command {
                 CurrentNode current = findCurrentNode(reader);
                 List<CommandNode<?>> nodeList = current.nodes;
                 List<ParsedArgument<?>> currentArgs = current.args;
-                if (nodeList.size() != 0) {
+                if (!nodeList.isEmpty()) {
                     CommandNode<?> node = nodeList.get(nodeList.size() - 1);
                     nodeSet = node.getChildren();
                 }
                 newContext = buildContext(context, current);
-                if (currentArgs.size() > 0) matchingString = currentArgs.get(currentArgs.size() - 1).stringArg();
+                if (!currentArgs.isEmpty()) matchingString = currentArgs.get(currentArgs.size() - 1).stringArg();
             }
             List<String> tabcomplete = new ArrayList<>();
             for (CommandNode<?> node : nodeSet) {

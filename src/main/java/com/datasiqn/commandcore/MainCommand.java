@@ -74,6 +74,14 @@ class MainCommand implements CommandExecutor, TabCompleter {
             tabComplete.addAll(complete.values());
         }
 
+        List<String> partialMatches = getPartialMatches(matchingString, tabComplete);
+        partialMatches.sort(Comparator.naturalOrder());
+
+        return partialMatches;
+    }
+
+    @NotNull
+    private static List<String> getPartialMatches(@NotNull String matchingString, List<String> tabComplete) {
         List<String> partialMatches = new ArrayList<>();
         int spaces = 0;
         for (char c : matchingString.toCharArray()) if (c == ' ') spaces++;
@@ -87,8 +95,6 @@ class MainCommand implements CommandExecutor, TabCompleter {
             }
             partialMatches.add(match.substring(substringIndex));
         }
-        partialMatches.sort(Comparator.naturalOrder());
-
         return partialMatches;
     }
 }
