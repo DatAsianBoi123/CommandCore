@@ -56,7 +56,7 @@ public interface CommandSource {
 
     /**
      * Gets the block executing command
-     * @return The block. This can be safely called if the command link {@link CommandLink#requiresBlock()} requiresBlock}.
+     * @return The block. This can be safely called if the command link {@link CommandLink#requiresBlock() requiresBlock}.
      * @throws IllegalStateException If the sender is not a block
      */
     default @NotNull BlockCommandSender getBlock() {
@@ -66,7 +66,7 @@ public interface CommandSource {
     /**
      * Same as {@link #getBlock()}, except checks if the sender is a command block and returns a {@code Result}
      *
-     * @return A result describing the command block. If the command link {@link CommandLink#requiresBlock()} requiresCommandBlock}, use {@link #getBlock()} instead
+     * @return A result describing the command block. If the command link {@link CommandLink#requiresBlock() requiresCommandBlock}, use {@link #getBlock()} instead
      */
     @NotNull
     default Result<BlockCommandSender, String> getBlockChecked() {
@@ -85,7 +85,7 @@ public interface CommandSource {
     /**
      * Same as {@link #getLocatable()}, except checks if the sender is locatable and returns a {@code Result}
      *
-     * @return A result describing the locatable sender. If the command link {@link CommandLink#requiresLocatable()} requiresCommandBlock}, use {@link #getLocatable()} instead
+     * @return A result describing the locatable sender. If the command link {@link CommandLink#requiresLocatable() requiresCommandBlock}, use {@link #getLocatable()} instead
      */
     @NotNull
     default Result<LocatableCommandSender, String> getLocatableChecked() {
