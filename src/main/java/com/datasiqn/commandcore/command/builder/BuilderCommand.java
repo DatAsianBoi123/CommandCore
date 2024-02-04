@@ -161,23 +161,25 @@ class BuilderCommand implements Command {
     }
 
     private @NotNull Result<ApplicableNode<?>, List<String>> checkApplicable(@NotNull ArgumentReader reader, @NotNull List<CommandNode<?>> nodes) {
-        List<ApplicableNode<?>> options = new ArrayList<>();
+        ApplicableNode<?> applicable = null;
         List<String> exceptions = new ArrayList<>();
         if (reader.index() != 0 && !reader.atEnd()) reader.next();
         int beforeIndex = reader.index();
         for (CommandNode<?> node : nodes) {
-            node.parse(reader).match(val -> {
+            Result<?, String> parseResult = node.parse(reader);
+            if (parseResult.isOk()) {
                 String stringArg = reader.substring(beforeIndex, reader.index() + 1);
-                options.add(new ApplicableNode<>(node, new ParsedArgument<>(val, stringArg), reader.index()));
-            }, e -> {
-                if (!e.isEmpty()) exceptions.add(e);
-            });
+                applicable = new ApplicableNode<>(node, new ParsedArgument<>(parseResult.unwrap(), stringArg), reader.index());
+                break;
+            } else {
+                String error = parseResult.unwrapError();
+                if (!error.isEmpty()) exceptions.add(error);
+            }
             reader.jumpTo(beforeIndex);
         }
-        if (options.isEmpty()) return Result.error(exceptions);
-        ApplicableNode<?> option = options.get(0);
-        reader.jumpTo(option.afterIndex);
-        return Result.ok(option);
+        if (applicable == null) return Result.error(exceptions);
+        reader.jumpTo(applicable.afterIndex);
+        return Result.ok(applicable);
     }
 
     @Contract("_ -> new")
