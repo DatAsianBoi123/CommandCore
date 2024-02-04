@@ -35,7 +35,7 @@ public class ArgumentBuilder<T> extends CommandNode<ArgumentBuilder<T>> {
 
     @Override
     public String toString() {
-        return "Argument(" + argName + ")";
+        return "Argument(" + argName + ": " + type.getName() + ")";
     }
 
     @Override
