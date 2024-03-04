@@ -4,8 +4,12 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.source.*;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.commandcore.managers.HelpManager;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -91,20 +95,45 @@ public class CommandCore {
     /**
      * Sends a specific page of the help menu to {@code sender}
      * @param sender The sender
-     * @param page The page
+     * @param page The page, starting at 1
+     * @throws IllegalArgumentException If {@code page} is {@literal <} 1 or {@literal >} the total number of pages
      */
     public void sendHelpMenu(@NotNull CommandSender sender, int page) {
-        sender.sendMessage(ChatColor.GOLD + (options.hasCustomPluginName() ? options.getPluginName() : plugin.getName()) + " Commands");
-        List<String> filteredNames = helpManager.getCommandNames(page, name -> {
+        HelpManager.HelpPage helpPage = helpManager.getHelpPage(page, name -> {
             Command command = commandManager.getCommand(name, false);
             //noinspection ConstantConditions
             return !command.hasPermission() || sender.hasPermission(command.getPermissionString());
         });
-        for (String name : filteredNames) {
+        sender.sendMessage("-".repeat(20));
+        String pluginName = options.hasCustomPluginName() ? options.getPluginName() : plugin.getName();
+        String pageCounter = ChatColor.GRAY + "[" + ChatColor.WHITE + helpPage.page() + ChatColor.GRAY + "/" + ChatColor.YELLOW + helpPage.totalPages() + ChatColor.GRAY + "]";
+        sender.sendMessage(ChatColor.GOLD + pluginName + " Help " + pageCounter + ChatColor.WHITE);
+        for (String name : helpPage.names()) {
             Command command = commandManager.getCommand(name, false);
             String description = command.hasDescription() ? command.getDescription() : "No description provided";
             sender.sendMessage(ChatColor.DARK_GRAY + "/" + ChatColor.WHITE + options.getRootCommand() + ChatColor.YELLOW + " " + name, ChatColor.GRAY + description);
         }
+        ComponentBuilder componentBuilder = new ComponentBuilder();
+        componentBuilder.append("<<").color(ChatColor.DARK_GRAY).bold(true);
+        if (page > 1) {
+            componentBuilder
+                    .color(ChatColor.GOLD)
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + options.getRootCommand() + " help " + (page - 1)))
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Previous page")));
+        }
+
+        componentBuilder
+                .append("       ").reset()
+                .append(">>").color(ChatColor.DARK_GRAY).bold(true);
+
+        if (page < helpPage.totalPages()) {
+            componentBuilder
+                    .color(ChatColor.GOLD)
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + options.getRootCommand() + " help " + (page + 1)))
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Next page")));
+        }
+        sender.spigot().sendMessage(componentBuilder.create());
+        sender.sendMessage("-".repeat(20));
     }
 
     /**
