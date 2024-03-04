@@ -57,7 +57,7 @@ public interface ArgumentReader {
     void jumpTo(int index);
 
     /**
-     * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@link #size()}
+     * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@link #size()}.
      * The character at index {@code beginning} is included.
      *
      * <pre>
@@ -79,7 +79,7 @@ public interface ArgumentReader {
     }
     /**
      * Performs a substring that gets a string starting at index {@code beginning} and ending at index {@code end}.
-     * The character at index {@code beginning} is included, but the character at index {@code end} isn't
+     * The character at index {@code beginning} is included, but the character at index {@code end} isn't.
      *
      * <pre>
      *     {@code
