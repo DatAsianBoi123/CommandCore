@@ -84,7 +84,7 @@ class BuilderCommand implements Command {
             if (node.getExecutor() == null) return Result.error(Collections.emptyList());
             Result<None, String> executeResult = node.executeWith(newContext);
             if (executeResult.isError()) {
-                source.sender().sendMessage(ChatColor.RED + executeResult.unwrapError());
+                source.getSender().sendMessage(ChatColor.RED + executeResult.unwrapError());
                 return Result.ok();
             }
             return Result.ok();
@@ -93,7 +93,7 @@ class BuilderCommand implements Command {
         if (executor == null) return Result.error(Collections.singletonList("Expected parameters, but got no parameters instead"));
         Result<None, String> requireResult = requires.stream().map(requirement -> requirement.testRequirement(context)).reduce(Result.ok(), Result::and);
         if (requireResult.isError()) {
-            source.sender().sendMessage(ChatColor.RED + requireResult.unwrapError());
+            source.getSender().sendMessage(ChatColor.RED + requireResult.unwrapError());
             return Result.ok();
         }
         executor.execute(context, source, args);

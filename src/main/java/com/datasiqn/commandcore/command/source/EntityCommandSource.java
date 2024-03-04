@@ -37,7 +37,7 @@ public class EntityCommandSource implements CommandSource {
     }
 
     @Override
-    public @NotNull CommandSender sender() {
+    public @NotNull CommandSender getSender() {
         return sender;
     }
 }

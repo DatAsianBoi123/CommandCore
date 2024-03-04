@@ -23,7 +23,7 @@ class HelpCommand {
                                 source.sendMessage(ChatColor.RED + "No help for " + commandName);
                                 return;
                             }
-                            instance.sendCommandHelp(source.sender(), commandName);
+                            instance.sendCommandHelp(source.getSender(), commandName);
                         }))
                 .then(ArgumentBuilder.argument(ArgumentType.number(int.class), "page")
                         .executes(HelpCommand::sendHelp))
@@ -34,6 +34,6 @@ class HelpCommand {
         int page;
         if (arguments.size() == 0) page = 1;
         else page = arguments.getChecked(0, ArgumentType.rangedNumber(int.class, 1)).unwrapOr(1);
-        CommandCore.getInstance().sendHelpMenu(source.sender(), page);
+        CommandCore.getInstance().sendHelpMenu(source.getSender(), page);
     }
 }

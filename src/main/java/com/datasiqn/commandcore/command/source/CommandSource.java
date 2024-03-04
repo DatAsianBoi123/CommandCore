@@ -96,14 +96,14 @@ public interface CommandSource {
      * Gets the sender of the command
      * @return The sender
      */
-    @NotNull CommandSender sender();
+    @NotNull CommandSender getSender();
 
     /**
      * Sends the command source a message
      * @param messages The messages to send
      */
     default void sendMessage(@NotNull String @NotNull ... messages) {
-        sender().sendMessage(messages);
+        getSender().sendMessage(messages);
     }
 
     /**
@@ -112,7 +112,7 @@ public interface CommandSource {
      * @return {@code true} if the source has {@code permission}, {@code false} otherwise
      */
     default boolean hasPermission(@NotNull Permission permission) {
-        return sender().hasPermission(permission);
+        return getSender().hasPermission(permission);
     }
     /**
      * Gets whether the source of the command has a permission or not
@@ -120,6 +120,6 @@ public interface CommandSource {
      * @return {@code true} if the source has {@code permission}, {@code false} otherwise
      */
     default boolean hasPermission(@Nullable String permission) {
-        return permission == null || sender().hasPermission(permission);
+        return permission == null || getSender().hasPermission(permission);
     }
 }

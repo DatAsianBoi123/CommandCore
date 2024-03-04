@@ -19,7 +19,7 @@ public record GenericCommandSource(CommandSender sender) implements CommandSourc
     public GenericCommandSource { }
 
     @Override
-    public @NotNull CommandSender sender() {
+    public @NotNull CommandSender getSender() {
         return sender;
     }
 }
