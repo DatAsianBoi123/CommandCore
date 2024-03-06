@@ -5,6 +5,7 @@ import com.datasiqn.resultapi.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents arguments that have already been parsed
@@ -54,7 +55,7 @@ public class ParsedArguments implements Arguments {
 
     @Override
     public String toString() {
-        return arguments.stream().map(ParsedArgument::stringArg).reduce("", (prev, curr) -> prev + curr + ",");
+        return "ParsedArguments(" + arguments.stream().map(ParsedArgument::stringArg).collect(Collectors.joining(",")) + ")";
     }
 
     /**

@@ -46,4 +46,8 @@ public class StringArguments implements Arguments {
         return new StringArgumentReader(stringArguments);
     }
 
+    @Override
+    public String toString() {
+        return "StringArguments(" + stringArguments + ")";
+    }
 }
