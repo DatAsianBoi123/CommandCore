@@ -31,6 +31,7 @@ class OfflinePlayerArgumentType implements SimpleArgumentType<CompletableFuture<
 
     @Override
     public @NotNull Class<CompletableFuture<OfflinePlayer>> getArgumentClass() {
+        //noinspection unchecked,UnstableApiUsage
         return (Class<CompletableFuture<OfflinePlayer>>) new TypeToken<CompletableFuture<OfflinePlayer>>() {}.getRawType();
     }
 }
