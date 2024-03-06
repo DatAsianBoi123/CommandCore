@@ -83,9 +83,10 @@ class MainCommand implements CommandExecutor, TabCompleter {
     @NotNull
     private static List<String> getPartialMatches(@NotNull String matchingString, List<String> tabComplete) {
         List<String> partialMatches = new ArrayList<>();
-        int spaces = 0;
-        for (char c : matchingString.toCharArray()) if (c == ' ') spaces++;
+        int allSpaces = 0;
+        for (char c : matchingString.toCharArray()) if (c == ' ') allSpaces++;
         for (String match : tabComplete) {
+            int spaces = allSpaces;
             if (!match.startsWith(matchingString)) continue;
             int substringIndex;
             char[] charArray = match.toCharArray();
