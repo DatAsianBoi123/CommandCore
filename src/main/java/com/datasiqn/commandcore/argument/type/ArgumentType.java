@@ -8,6 +8,7 @@ import com.datasiqn.resultapi.Result;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Recipe;
@@ -135,9 +136,22 @@ public interface ArgumentType<T> {
     ArgumentType<Player> ONLINE_PLAYER = new PlayerArgumentType();
 
     /**
-     * {@code ArgumentType} that represents a {@code CommandCore} command
+     * {@code ArgumentType} that represents an offline player
      */
-    ArgumentType<Command> COMMAND = new CommandArgumentType();
+    ArgumentType<CompletableFuture<OfflinePlayer>> OFFLINE_PLAYER = new OfflinePlayerArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents a {@code CommandCore} command name
+     */
+    ArgumentType<Command> COMMAND_NAME = new CommandNameArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents an executable command.
+     * <p>
+     * Note: due to the way vanilla commands are executed, there will be no tabcompletes for those commands. However, custom plugin commands will have tabcompletes.
+     * Both types of commands will still be able to execute.
+     */
+    ArgumentType<Consumer<CommandSender>> COMMAND = new CommandArgumentType();
 
     /**
      * Creates an {@code ArgumentType} that represents a number

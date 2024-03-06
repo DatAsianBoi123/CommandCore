@@ -15,9 +15,9 @@ class HelpCommand {
         CommandCore instance = CommandCore.getInstance();
         return new CommandBuilder("help")
                 .description("Shows the help menu")
-                .then(ArgumentBuilder.argument(ArgumentType.COMMAND, "command")
+                .then(ArgumentBuilder.argument(ArgumentType.COMMAND_NAME, "command")
                         .executes((context, source, arguments) -> {
-                            Command cmd = arguments.get(0, ArgumentType.COMMAND);
+                            Command cmd = arguments.get(0, ArgumentType.COMMAND_NAME);
                             String commandName = arguments.getString(0);
                             if (!source.hasPermission(cmd.getPermissionString())) {
                                 source.sendMessage(ChatColor.RED + "No help for " + commandName);
