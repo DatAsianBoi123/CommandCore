@@ -51,6 +51,7 @@ class QuotedWordArgumentType implements ArgumentType<String> {
         String arg = arguments.getString(arguments.size() - 1);
         ArgumentReader reader = new StringArgumentReader(arg);
         if (arg.isEmpty()) return Collections.singletonList("\"");
+        if (!arg.startsWith("\"")) return ArgumentType.super.getTabComplete(context);
         if (arg.length() > 1) {
             boolean foundEndQuote = false;
             Character prev = null;
@@ -72,7 +73,7 @@ class QuotedWordArgumentType implements ArgumentType<String> {
                 return Collections.singletonList(arg + "\"");
             }
         }
-        return Collections.emptyList();
+        return ArgumentType.super.getTabComplete(context);
     }
 
     @Override
