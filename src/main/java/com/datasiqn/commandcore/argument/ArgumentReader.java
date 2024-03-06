@@ -115,4 +115,15 @@ public interface ArgumentReader {
      * @return The next word
      */
     @NotNull String nextWord();
+
+    /**
+     * Returns the rest of the reader, including the current character (the one returned by {@link #get()}).
+     * This will place the reader on the last character in the reader.
+     * @return The rest of the characters in this reader
+     */
+    default @NotNull String rest() {
+        String rest = substring(index());
+        jumpTo(size() - 1);
+        return rest;
+    }
 }
