@@ -18,10 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -232,7 +231,7 @@ public interface ArgumentType<T> {
      */
     @NotNull
     default List<String> getTabComplete(@NotNull CommandContext context) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     /**
