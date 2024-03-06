@@ -35,4 +35,13 @@ public class ArgumentReaderTest {
         reader.nextWord();
         assertTrue(reader.atEnd());
     }
+
+    @Test
+    public void testRest() {
+        ArgumentReader reader = new StringArgumentReader("very much super cool");
+        reader.nextWord();
+        reader.next();
+        assertEquals(reader.rest(), "much super cool");
+        assertTrue(reader.atEnd());
+    }
 }
