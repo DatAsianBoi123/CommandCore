@@ -175,8 +175,8 @@ public interface ArgumentType<T> {
      * @param <T> The type of the number
      */
     @Contract("_, _ -> new")
-    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> rangedNumber(Class<T> numberClass, T min) {
-        return new RangedArgumentType<>(numberClass, min);
+    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> boundedNumber(Class<T> numberClass, T min) {
+        return new BoundedNumberArgumentType<>(numberClass, min);
     }
     /**
      * Creates an {@code ArgumentType} that represents a number with a minimum (inclusive) and maximum (inclusive) value
@@ -188,8 +188,8 @@ public interface ArgumentType<T> {
      * @param <T> The type of the number
      */
     @Contract("_, _, _ -> new")
-    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> rangedNumber(Class<T> numberClass, T min, T max) {
-        return new RangedArgumentType<>(numberClass, min, max);
+    static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> boundedNumber(Class<T> numberClass, T min, T max) {
+        return new BoundedNumberArgumentType<>(numberClass, min, max);
     }
 
     /**
