@@ -169,7 +169,7 @@ public interface ArgumentType<T> {
     /**
      * Creates an {@code ArgumentType} that represents a number with a minimum value (inclusive)
      * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
-     *                    For example, {@code int.class}, {@code Long.class}
+     *                    For example, {@code int.class}, {@code Long.class}.
      * @param min The inclusive minimum value
      * @return The newly created {@code ArgumentType}
      * @param <T> The type of the number
@@ -182,7 +182,7 @@ public interface ArgumentType<T> {
     /**
      * Creates an {@code ArgumentType} that represents a number with a minimum (inclusive) and maximum (inclusive) value
      * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
-     *                    For example, {@code int.class}, {@code Long.class}
+     *                    For example, {@code int.class}, {@code Long.class}.
      * @param min The inclusive minimum value
      * @param max The inclusive maximum value
      * @return The newly created {@code ArgumentType}
