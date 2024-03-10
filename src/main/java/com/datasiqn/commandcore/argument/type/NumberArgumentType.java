@@ -51,4 +51,8 @@ class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
     public @NotNull Result<T, None> parseWord(String word) {
         return parser.apply(word);
     }
+
+    public Class<T> getPrimitiveClass() {
+        return primitiveClass;
+    }
 }
