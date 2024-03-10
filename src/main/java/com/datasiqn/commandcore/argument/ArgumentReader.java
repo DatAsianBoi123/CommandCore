@@ -122,6 +122,7 @@ public interface ArgumentReader {
      * @return The rest of the characters in this reader
      */
     default @NotNull String rest() {
+        if (size() == 0) return "";
         String rest = substring(index());
         jumpTo(size() - 1);
         return rest;
