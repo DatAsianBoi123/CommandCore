@@ -33,7 +33,7 @@ class HelpCommand {
     private static void sendHelp(CommandContext context, @NotNull CommandSource source, @NotNull Arguments arguments) {
         int page;
         if (arguments.size() == 0) page = 1;
-        else page = arguments.getChecked(0, ArgumentType.rangedNumber(int.class, 1)).unwrapOr(1);
+        else page = arguments.getChecked(0, ArgumentType.boundedNumber(int.class, 1)).unwrapOr(1);
         CommandCore.getInstance().sendHelpMenu(source.getSender(), page);
     }
 }
