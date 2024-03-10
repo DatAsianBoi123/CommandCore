@@ -195,6 +195,27 @@ public interface ArgumentType<T> {
     }
 
     /**
+     * Creates an {@code ArgumentType} that represents a range. Ranges are typed with a double dot (..) format.
+     * <p>
+     * <pre>
+     *     5        Range that includes any number, x, such that x == 5
+     *     0..      Range that includes any number, x, such that 0 <= x
+     *     ..0      Range that includes any number, x, such that x <= 0
+     *     -3..5    Range that includes any number, x, such that -3 <= x <= 5
+     *     ..       Range that includes any number
+     * </pre>
+     * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
+     *                    For example, {@code int.class}, {@code Long.class}.
+     * @return The newly created {@code ArgumentType}
+     * @param <T> The type of the number
+     * @throws IllegalArgumentException If {@code numberClass} isn't a primitive class or a primitive wrapper
+     */
+    @Contract("_ -> new")
+    static @NotNull <T extends Number & Comparable<T>> ArgumentType<NumberRange<T>> numberRange(Class<T> numberClass) {
+        return new NumberRangeArgumentType<>(numberClass);
+    }
+
+    /**
      * Creates an {@code ArgumentType} that represents a deserialized json value.
      * If the type you are deserializing is generic, use the method {@link #json(Class, Type)} instead.
      * @param clazz The class of the object that the json will be deserialized into
