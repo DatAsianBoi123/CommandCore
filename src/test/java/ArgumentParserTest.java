@@ -332,7 +332,7 @@ public class ArgumentParserTest {
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type, T val) {
         Result<T, String> result = type.parse(new StringArgumentReader(arg));
         assertTrue(result.isOk());
-        assertEquals(result.unwrap(), val);
+        assertEquals(val, result.unwrap());
     }
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type, @NotNull Predicate<T> tester) {
         Result<T, String> result = type.parse(new StringArgumentReader(arg));
