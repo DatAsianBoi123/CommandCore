@@ -50,6 +50,7 @@ public class ArgumentParserTest {
         testOk("\"name with \\\"quotes\\\"\"", QUOTED_WORD, "name with \"quotes\"");
         testOk("\"word with backslashes \\\\\"", QUOTED_WORD, "word with backslashes \\");
         testOk("\"another word with \\ backslashes\"", QUOTED_WORD, "another word with \\ backslashes");
+        testErr("\"", QUOTED_WORD);
         testErr("name \"", QUOTED_WORD);
         testErr("\" aaaa another arg", QUOTED_WORD);
         testErr("\"some thing\"uh oh", QUOTED_WORD);
