@@ -64,7 +64,7 @@ public interface ArgumentReader {
      *     {@code
      *
      *     // reader has the internal string of "hello there"
-     *     String spliced = reader.splice(2);
+     *     String spliced = reader.substring(2);
      *     assert spliced.equals("llo there");
      *
      *     }
@@ -72,7 +72,7 @@ public interface ArgumentReader {
      *
      * @param beginning The index to start at
      * @return The spliced string
-     * @throws IndexOutOfBoundsException If {@code beginning} is negative, or if it is greater than {@link #size()}
+     * @throws IndexOutOfBoundsException If {@code beginning} is negative
      */
     default @NotNull String substring(int beginning) {
         return substring(beginning, size());
@@ -85,7 +85,7 @@ public interface ArgumentReader {
      *     {@code
      *
      *     // reader has the internal string of "hello there"
-     *     String spliced = reader.splice(2, 8);
+     *     String spliced = reader.substring(2, 8);
      *     assert spliced.equals("llo th");
      *
      *     }
@@ -94,7 +94,7 @@ public interface ArgumentReader {
      * @param beginning The index to start at
      * @param end The index to end at
      * @return The spliced string
-     * @throws IndexOutOfBoundsException If {@code end} is greater than {@link #size()}, {@code beginning} is negative, or if it is greater than {@code end}
+     * @throws IndexOutOfBoundsException If {@code end} is greater than {@link #size()}, {@code beginning} is negative, or {@code beginning} is greater than {@code end}
      */
     @NotNull String substring(int beginning, int end);
 
