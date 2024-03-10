@@ -33,21 +33,21 @@ public class ArgumentReaderTest {
     public void testReadUntilEscaped() {
         ArgumentReader reader = new StringArgumentReader("[thing,and\\, thing,[ooh thing in brackets\\],something \\ other thing,ending \\\\]");
         reader.next();
-        assertEquals(reader.readUntilEscaped(',', ']'), ReadUntilResult.found("thing"));
+        assertEquals(ReadUntilResult.found("thing"), reader.readUntilEscaped(',', ']'));
         reader.next();
-        assertEquals(reader.readUntilEscaped(',', ']'), ReadUntilResult.found("and, thing"));
+        assertEquals(ReadUntilResult.found("and, thing"), reader.readUntilEscaped(',', ']'));
         reader.next();
-        assertEquals(reader.readUntilEscaped(',', ']'), ReadUntilResult.found("[ooh thing in brackets]"));
+        assertEquals(ReadUntilResult.found("[ooh thing in brackets]"), reader.readUntilEscaped(',', ']'));
         reader.next();
-        assertEquals(reader.readUntilEscaped(',', ']'), ReadUntilResult.found("something \\ other thing"));
+        assertEquals(ReadUntilResult.found("something \\ other thing"), reader.readUntilEscaped(',', ']'));
         reader.next();
-        assertEquals(reader.readUntilEscaped(',', ']'), ReadUntilResult.found("ending \\"));
+        assertEquals(ReadUntilResult.found("ending \\"), reader.readUntilEscaped(',', ']'));
         assertEquals(reader.get(), ']');
 
         reader = new StringArgumentReader("something,not found\\,");
-        assertEquals(reader.readUntilEscaped(','), ReadUntilResult.found("something"));
+        assertEquals(ReadUntilResult.found("something"), reader.readUntilEscaped(','));
         reader.next();
-        assertEquals(reader.readUntilEscaped(','), ReadUntilResult.notFound("not found,"));
+        assertEquals(ReadUntilResult.notFound("not found,"), reader.readUntilEscaped(','));
     }
 
     @Test
