@@ -19,30 +19,14 @@ class QuotedWordArgumentType implements ArgumentType<String> {
     @Override
     public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
         if (reader.get() != '"') return Result.error("expected quotes");
-        StringBuilder builder = new StringBuilder();
-        boolean foundEndQuote = false;
-        Character prev = null;
-        while (!reader.atEnd()) {
-            char next = reader.next();
-            if (next == '"') {
-                if (prev == null || prev != '\\') {
-                    foundEndQuote = true;
-                    break;
-                }
-                builder.deleteCharAt(builder.length() - 1);
-            }
-            if (next == '\\' && prev != null && prev == '\\') {
-                prev = null;
-                continue;
-            }
-            builder.append(next);
-            prev = next;
-        }
-        if (!foundEndQuote) return Result.error("missing end quote");
+        if (reader.atEnd()) return Result.error("missing end quote");
+        reader.next();
+        ArgumentReader.ReadUntilResult readUntil = reader.readUntilEscaped('"');
+        if (!readUntil.foundEnd()) return Result.error("missing end quote");
         if (!reader.atEnd()) {
             if (reader.next() != ' ') return Result.error("cannot have extra characters after end quote");
         }
-        return Result.ok(builder.toString());
+        return Result.ok(readUntil.getRead());
     }
 
     @Override
@@ -50,28 +34,13 @@ class QuotedWordArgumentType implements ArgumentType<String> {
         Arguments arguments = context.arguments();
         String arg = arguments.getString(arguments.size() - 1);
         ArgumentReader reader = new StringArgumentReader(arg);
-        if (arg.isEmpty()) return Collections.singletonList("\"");
-        if (!arg.startsWith("\"")) return ArgumentType.super.getTabComplete(context);
-        if (arg.length() > 1) {
-            boolean foundEndQuote = false;
-            Character prev = null;
-            while (!reader.atEnd()) {
-                char next = reader.next();
-                if (next == '"') {
-                    if (prev == null || prev != '\\') {
-                        foundEndQuote = true;
-                        break;
-                    }
-                }
-                if (next == '\\' && prev != null && prev == '\\') {
-                    prev = null;
-                    continue;
-                }
-                prev = next;
-            }
-            if (!foundEndQuote) {
-                return Collections.singletonList(arg + "\"");
-            }
+        if (reader.size() == 0) return Collections.singletonList("\"");
+        if (reader.get() != '"') return ArgumentType.super.getTabComplete(context);
+        if (reader.size() > 1) {
+            ArgumentReader.ReadUntilResult readUntil = reader.readUntilEscaped('"');
+            if (!readUntil.foundEnd()) return Collections.singletonList(arg + "\"");
+        } else {
+            return Collections.singletonList("\"\"");
         }
         return ArgumentType.super.getTabComplete(context);
     }
