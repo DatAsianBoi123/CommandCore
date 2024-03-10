@@ -309,7 +309,7 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testRangedNumber() {
+    public void testBoundedNumber() {
         ArgumentType<Double> rangedMin = boundedNumber(double.class, 5.2);
         testOk("5.2", rangedMin, 5.2);
         testOk("58.1", rangedMin, 58.1);
