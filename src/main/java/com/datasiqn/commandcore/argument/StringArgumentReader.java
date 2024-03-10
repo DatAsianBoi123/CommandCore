@@ -86,7 +86,7 @@ public class StringArgumentReader implements ArgumentReader {
         }
         StringBuilder builder = new StringBuilder();
         builder.append(get());
-        Character prev = null;
+        Character prev = get();
         boolean foundEnd = false;
         OUTER: while (!atEnd()) {
             char next = next();
