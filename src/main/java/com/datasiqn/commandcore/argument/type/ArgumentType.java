@@ -173,6 +173,7 @@ public interface ArgumentType<T> {
      * @param min The inclusive minimum value
      * @return The newly created {@code ArgumentType}
      * @param <T> The type of the number
+     * @throws IllegalArgumentException If {@code numberClass} isn't a primitive class or a primitive wrapper
      */
     @Contract("_, _ -> new")
     static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> boundedNumber(Class<T> numberClass, T min) {
@@ -186,6 +187,7 @@ public interface ArgumentType<T> {
      * @param max The inclusive maximum value
      * @return The newly created {@code ArgumentType}
      * @param <T> The type of the number
+     * @throws IllegalArgumentException If {@code numberClass} isn't a primitive class or a primitive wrapper
      */
     @Contract("_, _, _ -> new")
     static @NotNull <T extends Number & Comparable<T>> ArgumentType<T> boundedNumber(Class<T> numberClass, T min, T max) {
