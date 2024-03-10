@@ -80,7 +80,7 @@ public class ArgumentParserTest {
         testOk("stone", NAMESPACED_KEY, NamespacedKey.minecraft("stone"));
         testOk("plugin:key", NAMESPACED_KEY, new NamespacedKey("plugin", "key"));
         testErr("invalidkey:::", NAMESPACED_KEY);
-        testErr(" ", NAMESPACED_KEY);
+        testErr("::key", NAMESPACED_KEY);
     }
 
     @Test
