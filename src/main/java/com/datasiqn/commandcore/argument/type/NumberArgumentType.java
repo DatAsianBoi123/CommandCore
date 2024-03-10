@@ -17,7 +17,7 @@ class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
     public NumberArgumentType(Class<T> numberClass) {
         Class<T> primitiveClass = Primitives.unwrap(numberClass);
         if (!primitiveClass.isPrimitive()) throw new IllegalArgumentException(numberClass.getName() + " is an invalid number class");
-        this.numberClass = numberClass.isPrimitive() ? Primitives.wrap(numberClass) : numberClass;
+        this.numberClass = Primitives.wrap(numberClass);
         this.primitiveClass = primitiveClass;
 
         // this is safe because all number wrapper classes have a static `valueOf` method
