@@ -61,14 +61,52 @@ public class StringArgumentReader implements ArgumentReader {
     }
 
     @Override
-    public @NotNull String nextWord() {
-        if (atEnd()) return String.valueOf(get());
+    public @NotNull String readUntil(char... chars) {
+        if (size() == 0) return "";
+        if (atEnd()) {
+            for (char c : chars) if (get() == c) return "";
+            return String.valueOf(get());
+        }
         StringBuilder builder = new StringBuilder();
         builder.append(get());
-        while (!atEnd() && next() != ' ') {
+        OUTER: while (!atEnd()) {
+            char next = next();
+            for (char c : chars) if (next == c) break OUTER;
             builder.append(get());
         }
         return builder.toString();
+    }
+
+    @Override
+    public @NotNull ReadUntilResult readUntilEscaped(char... chars) {
+        if (size() == 0) return ReadUntilResult.notFound("");
+        if (atEnd()) {
+            for (char c : chars) if (get() == c) return ReadUntilResult.found("");
+            return ReadUntilResult.notFound(String.valueOf(get()));
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append(get());
+        Character prev = null;
+        boolean foundEnd = false;
+        OUTER: while (!atEnd()) {
+            char next = next();
+            for (char c : chars) {
+                if (next == c) {
+                    if (prev == null || prev != ESCAPE_CHAR) {
+                        foundEnd = true;
+                        break OUTER;
+                    }
+                    builder.deleteCharAt(builder.length() - 1);
+                }
+            }
+            if (next == ESCAPE_CHAR && prev != null && prev == ESCAPE_CHAR) {
+                prev = null;
+                continue;
+            }
+            builder.append(next);
+            prev = next;
+        }
+        return new ReadUntilResult(builder.toString(), foundEnd);
     }
 
     @Override
