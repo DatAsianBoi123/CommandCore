@@ -12,12 +12,7 @@ class NameArgumentType implements ArgumentType<String> {
 
     @Override
     public @NotNull Result<String, String> parse(@NotNull ArgumentReader reader) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(reader.get());
-        while (!reader.atEnd()) {
-            builder.append(reader.next());
-        }
-        return Result.ok(builder.toString());
+        return Result.ok(reader.rest());
     }
 
     @Override
