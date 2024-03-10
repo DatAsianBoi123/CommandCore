@@ -310,14 +310,14 @@ public class ArgumentParserTest {
 
     @Test
     public void testRangedNumber() {
-        ArgumentType<Double> rangedMin = rangedNumber(double.class, 5.2);
+        ArgumentType<Double> rangedMin = boundedNumber(double.class, 5.2);
         testOk("5.2", rangedMin, 5.2);
         testOk("58.1", rangedMin, 58.1);
         testErr("4.9", rangedMin);
         testErr("-2.1", rangedMin);
         testErr("modernfamily", rangedMin);
 
-        ArgumentType<Double> ranged = rangedNumber(double.class, 0.1, 5.6);
+        ArgumentType<Double> ranged = boundedNumber(double.class, 0.1, 5.6);
         testOk("5", ranged, 5.0);
         testOk("0.1", ranged, 0.1);
         testOk("5.6", ranged, 5.6);
