@@ -48,6 +48,8 @@ public class ArgumentReaderTest {
         assertEquals(ReadUntilResult.found("something"), reader.readUntilEscaped(','));
         reader.next();
         assertEquals(ReadUntilResult.notFound("not found,"), reader.readUntilEscaped(','));
+
+        assertEquals(ReadUntilResult.notFound(","), new StringArgumentReader("\\,").readUntilEscaped(','));
     }
 
     @Test
