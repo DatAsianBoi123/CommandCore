@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Predicate;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "deprecation", "unchecked", "Contract"})
 public class MockWorld implements World {
     private final String name;
 
@@ -1284,7 +1284,7 @@ public class MockWorld implements World {
     }
 
     @Override
-    public void sendPluginMessage(@NotNull Plugin source, @NotNull String channel, @NotNull byte[] message) {
+    public void sendPluginMessage(@NotNull Plugin source, @NotNull String channel, byte[] message) {
 
     }
 

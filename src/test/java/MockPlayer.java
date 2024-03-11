@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.net.InetSocketAddress;
 import java.util.*;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "Contract"})
 public class MockPlayer implements Player {
     private final String name;
 

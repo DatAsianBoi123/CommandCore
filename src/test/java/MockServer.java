@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"ConstantConditions", "deprecation"})
+@SuppressWarnings({"ConstantConditions", "deprecation", "Contract"})
 public class MockServer implements Server {
     private final Set<Player> players;
     private final List<World> worlds;
