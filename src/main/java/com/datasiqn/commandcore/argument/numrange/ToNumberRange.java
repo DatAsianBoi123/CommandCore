@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a {@code NumberRange} that only has an end bound. A range that goes <i>to</i> a number.
- * @param <T>
+ * @param <T> The type of the number
  */
 public class ToNumberRange<T extends Number & Comparable<T>> implements NumberRange<T> {
     private final T end;

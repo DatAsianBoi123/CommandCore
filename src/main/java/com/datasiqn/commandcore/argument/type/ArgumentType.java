@@ -198,11 +198,15 @@ public interface ArgumentType<T> {
      * Creates an {@code ArgumentType} that represents a range. Ranges are typed with a double dot (..) format.
      * <p>
      * <pre>
+     *     {@code
+     *
      *     5        Range that includes any number, x, such that x == 5
      *     0..      Range that includes any number, x, such that 0 <= x
      *     ..0      Range that includes any number, x, such that x <= 0
      *     -3..5    Range that includes any number, x, such that -3 <= x <= 5
      *     ..       Range that includes any number
+     *
+     *     }
      * </pre>
      * @param numberClass The number class. This class must either be a primitive or a primitive wrapper.
      *                    For example, {@code int.class}, {@code Long.class}.
