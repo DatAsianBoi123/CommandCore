@@ -219,7 +219,7 @@ public interface ArgumentType<T> {
      * Creates an {@code ArgumentType} that represents a deserialized json value.
      * If the type you are deserializing is generic, use the method {@link #json(Class, Type)} instead.
      * @param clazz The class of the object that the json will be deserialized into
-     * @return The deserialized object
+     * @return The newly created {@code ArgumentType}
      * @param <T> The type of the deserialized object
      */
     static @NotNull <T> ArgumentType<T> json(Class<T> clazz) {
@@ -237,7 +237,7 @@ public interface ArgumentType<T> {
      *             Type stringSetType = new TypeToken<Set<String>>() {}.getType();
      *             }
      *             </pre>
-     * @return The deserialized object
+     * @return The newly created {@code ArgumentType}
      * @param <T> The type of the deserialized object
      * @see Gson#fromJson(String, Type)
      */
