@@ -89,9 +89,9 @@ public interface ArgumentType<T> {
     ArgumentType<World> WORLD = new WorldArgumentType();
 
     /**
-     * {@code ArgumentType} that represents an entity
+     * {@code ArgumentType} that represents an entity type. This includes all enum constants from {@link EntityType}, except it omits {@link EntityType#UNKNOWN}.
      */
-    ArgumentType<EntityType> ENTITY = new EnumArgumentType<>(EntityType.class, "entity");
+    ArgumentType<EntityType> ENTITY = new FilteredEnumArgumentType<>(EntityType.class, entityType -> entityType != EntityType.UNKNOWN, "entity");
 
     /**
      * {@code ArgumentType} that represents an entity that is living
@@ -101,9 +101,9 @@ public interface ArgumentType<T> {
     /**
      * {@code ArgumentType} that represents an entity that can be spawned using {@link org.bukkit.World#spawnEntity(Location, EntityType)}.
      * <br>
-     * This is the same as the {@code ENTITY} argument type, except that this omits the {@code Player} entity type
+     * This is the same as the {@code ENTITY} argument type, except this omits {@link EntityType#UNKNOWN} as well as {@link EntityType#PLAYER}
      */
-    ArgumentType<EntityType> SPAWNABLE_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, entityType -> entityType != EntityType.PLAYER, "living entity");
+    ArgumentType<EntityType> SPAWNABLE_ENTITY = new FilteredEnumArgumentType<>(EntityType.class, entityType -> entityType != EntityType.PLAYER && entityType != EntityType.UNKNOWN, "entity");
 
     /**
      * {@code ArgumentType} that represents a loot table
