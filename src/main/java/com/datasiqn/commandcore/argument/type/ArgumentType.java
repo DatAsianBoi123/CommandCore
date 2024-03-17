@@ -163,7 +163,7 @@ public interface ArgumentType<T> {
      */
     @Contract("_ -> new")
     static @NotNull <T extends Number> ArgumentType<T> number(Class<T> numberClass) {
-        return new NumberArgumentType<>(numberClass);
+        return NumberArgumentType.number(numberClass);
     }
 
     /**

@@ -12,7 +12,7 @@ class NumberRangeArgumentType<T extends Number & Comparable<T>> implements Simpl
     private final NumberArgumentType<T> numberArgumentType;
 
     public NumberRangeArgumentType(Class<T> numberClass) {
-        numberArgumentType = new NumberArgumentType<>(numberClass);
+        numberArgumentType = NumberArgumentType.number(numberClass);
     }
 
     @Override

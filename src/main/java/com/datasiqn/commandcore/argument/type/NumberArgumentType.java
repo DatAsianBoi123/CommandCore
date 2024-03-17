@@ -7,16 +7,21 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
+    private static final Map<String, NumberArgumentType<? extends Number>> CACHED_TYPES = new HashMap<>();
+
     private final Class<T> numberClass;
     private final Class<T> primitiveClass;
     private final Function<String, Result<T, None>> parser;
 
-    public NumberArgumentType(Class<T> numberClass) {
-        Class<T> primitiveClass = Primitives.unwrap(numberClass);
-        if (!primitiveClass.isPrimitive()) throw new IllegalArgumentException(numberClass.getName() + " is an invalid number class");
+    protected NumberArgumentType(Class<T> numberClass) {
+        this(numberClass, getPrimitive(numberClass).unwrapOrThrow(new IllegalArgumentException(numberClass.getName() + " is an invalid number class")));
+    }
+    private NumberArgumentType(Class<T> numberClass, Class<T> primitiveClass) {
         this.numberClass = Primitives.wrap(numberClass);
         this.primitiveClass = primitiveClass;
 
@@ -54,5 +59,16 @@ class NumberArgumentType<T extends Number> implements SimpleArgumentType<T> {
 
     public Class<T> getPrimitiveClass() {
         return primitiveClass;
+    }
+
+    private static <T> Result<Class<T>, None> getPrimitive(Class<T> clazz) {
+        Class<T> primitiveClass = Primitives.unwrap(clazz);
+        return !primitiveClass.isPrimitive() ? Result.error() : Result.ok(primitiveClass);
+    }
+
+    public static <T extends Number> NumberArgumentType<T> number(Class<T> numberClass) {
+        Class<T> primitiveClass = getPrimitive(numberClass).unwrapOrThrow(new IllegalArgumentException(numberClass.getName() + " is an invalid number class"));
+        //noinspection unchecked
+        return (NumberArgumentType<T>) CACHED_TYPES.computeIfAbsent(primitiveClass.getName(), k -> new NumberArgumentType<>(numberClass, primitiveClass));
     }
 }
