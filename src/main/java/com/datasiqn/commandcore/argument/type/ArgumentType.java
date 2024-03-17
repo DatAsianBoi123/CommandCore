@@ -1,6 +1,9 @@
 package com.datasiqn.commandcore.argument.type;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.numrange.NumberRange;
+import com.datasiqn.commandcore.argument.selector.EntitySelector;
+import com.datasiqn.commandcore.argument.selector.SelectorRequirements;
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.None;
@@ -9,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Recipe;
@@ -132,7 +136,9 @@ public interface ArgumentType<T> {
 
     /**
      * {@code ArgumentType} that represents a player that's online
+     * @deprecated Use {@link #player()} instead
      */
+    @Deprecated
     ArgumentType<Player> ONLINE_PLAYER = new PlayerArgumentType();
 
     /**
@@ -247,6 +253,52 @@ public interface ArgumentType<T> {
      */
     static @NotNull <T> ArgumentType<T> json(Class<T> clazz, Type type) {
         return new JsonArgumentType<>(clazz, type);
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents an entity selector that selects just one entity.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Entity.class)).
+     * @return The newly created {@code ArgumentType}
+     */
+    static @NotNull ArgumentType<EntitySelector<Entity>> entity() {
+        return entitySelector(SelectorRequirements.allowOne(Entity.class));
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents an entity selector that can select any number of entities.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Entity.class)).
+     * @return The newly created {@code ArgumentType}
+     */
+    static @NotNull ArgumentType<EntitySelector<Entity>> entities() {
+        return entitySelector(SelectorRequirements.allowInfinite(Entity.class));
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents an entity selector that selects just one player.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Player.class)).
+     * @return The newly created {@code ArgumentType}
+     */
+    static @NotNull ArgumentType<EntitySelector<Player>> player() {
+        return entitySelector(SelectorRequirements.allowOne(Player.class));
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents an entity selector that can select any number of players.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Player.class)).
+     * @return The newly created {@code ArgumentType}
+     */
+    static @NotNull ArgumentType<EntitySelector<Player>> players() {
+        return entitySelector(SelectorRequirements.allowInfinite(Player.class));
+    }
+
+    /**
+     * Creates an {@code ArgumentType} that represents an entity selector with the requirements of {@code requirements}
+     * @param requirements The requirements that the entity selector must conform to
+     * @return The newly created {@code ArgumentType}
+     * @param <E> The type of the entities being selected
+     */
+    static @NotNull <E extends Entity> ArgumentType<EntitySelector<E>> entitySelector(SelectorRequirements<E> requirements) {
+        return new EntitySelectorArgumentType<>(requirements);
     }
 
     /**
