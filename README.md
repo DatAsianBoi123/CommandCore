@@ -84,9 +84,9 @@ public class GreetCommand {
                 .description("Greets a player")
                 .executes((context, source, arguments) -> source.sendMessage("You ran this command with no arguments")) // Line 5
                 .then(LiteralBuilder.literal("player")
-                        .then(ArgumentBuilder.argument(ArgumentType.ONLINE_PLAYER, "player")
+                        .then(ArgumentBuilder.argument(ArgumentType.player(), "player")
                                 .requiresPlayer()
-                                .executes((context, source, arguments) -> source.getPlayer().chat("Hello " + arguments.get(1, ArgumentType.ONLINE_PLAYER).getName()))))
+                                .executes((context, source, arguments) -> source.getPlayer().chat("Hello " + arguments.get(1, ArgumentType.player()).getFirst(source).getName()))))
                 .then(LiteralBuilder.literal("server")
                         .requiresPlayer()
                         .executes((context, source, arguments) -> source.getPlayer().chat("Hello Server!")));
@@ -128,7 +128,7 @@ This just registers the command, so it appears when we type `/myrootcommand`
 
 Now, lets see this baby in action!
 
-<img src=https://user-images.githubusercontent.com/55264711/197649001-c165521c-7153-44bc-9827-7d7da41a9360.gif width=500px />
+<img src=https://user-images.githubusercontent.com/55264711/197649001-c165521c-7153-44bc-9827-7d7da41a9360.gif width=500px alt="player using command" />
 
 ## Contributing
 You can contribute to this project by
