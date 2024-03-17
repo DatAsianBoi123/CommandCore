@@ -98,6 +98,7 @@ class EntitySelectorArgumentType<E extends Entity> implements ArgumentType<Entit
             if (reader.get() != '=') return createOptionNames(before);
             int beforeValueIndex = reader.index() + 1;
             SelectorOptionType<?> optionType = SelectorOptionType.getAllOptions().get(optionName);
+            if (optionType == null) return Collections.emptyList();
             if (!reader.atEnd()) reader.next();
             ArgumentReader.ReadUntilResult readUntil = reader.readUntilEscaped(',', ']');
             if (readUntil.foundEnd()) {
