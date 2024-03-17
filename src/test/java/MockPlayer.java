@@ -38,9 +38,11 @@ import java.util.*;
 @SuppressWarnings({"ConstantConditions", "Contract"})
 public class MockPlayer implements Player {
     private final String name;
+    private final UUID uuid;
 
-    public MockPlayer(String name) {
+    public MockPlayer(String name, UUID uuid) {
         this.name = name;
+        this.uuid = uuid;
     }
 
     @NotNull
@@ -407,7 +409,7 @@ public class MockPlayer implements Player {
     @NotNull
     @Override
     public UUID getUniqueId() {
-        return null;
+        return uuid;
     }
 
     @Override

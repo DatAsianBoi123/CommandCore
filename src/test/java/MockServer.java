@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
@@ -37,11 +38,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"ConstantConditions", "deprecation", "Contract"})
 public class MockServer implements Server {
     private final Set<Player> players;
+    private final Set<Entity> entities;
     private final List<World> worlds;
     private final Map<NamespacedKey, MockRecipe> recipes;
 
     public MockServer(@NotNull Builder builder) {
-        this.players = builder.players.stream().map(MockPlayer::new).collect(Collectors.toSet());
+        this.players = new HashSet<>(builder.players);
+        this.entities = new HashSet<>(builder.entities);
         this.worlds = builder.worlds.stream().map(MockWorld::new).collect(Collectors.toList());
         this.recipes = builder.recipes;
     }
@@ -257,6 +260,9 @@ public class MockServer implements Server {
     @Nullable
     @Override
     public Player getPlayer(@NotNull UUID id) {
+        for (Player player : players) {
+            if (player.getUniqueId().equals(id)) return player;
+        }
         return null;
     }
 
@@ -759,6 +765,9 @@ public class MockServer implements Server {
     @Nullable
     @Override
     public Entity getEntity(@NotNull UUID uuid) {
+        for (Entity entity : entities) {
+            if (entity.getUniqueId().equals(uuid)) return entity;
+        }
         return null;
     }
 
@@ -858,12 +867,18 @@ public class MockServer implements Server {
     }
 
     public static class Builder {
-        private final Set<String> players = new HashSet<>();
+        private final Set<MockPlayer> players = new HashSet<>();
+        private final Set<MockEntity> entities = new HashSet<>();
         private final Set<String> worlds = new HashSet<>();
         private final Map<NamespacedKey, MockRecipe> recipes = new HashMap<>();
 
-        public Builder addPlayer(String name) {
-            players.add(name);
+        public Builder addPlayer(String name, UUID uuid) {
+            players.add(new MockPlayer(name, uuid));
+            return this;
+        }
+
+        public Builder addEntity(EntityType type, UUID uuid) {
+            entities.add(new MockEntity(type, uuid));
             return this;
         }
 

@@ -1,4 +1,8 @@
 import com.datasiqn.commandcore.argument.StringArgumentReader;
+import com.datasiqn.commandcore.argument.numrange.*;
+import com.datasiqn.commandcore.argument.selector.EntitySelector;
+import com.datasiqn.commandcore.argument.selector.SelectorRequirements;
+import com.datasiqn.commandcore.argument.selector.SingleEntitySelector;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.resultapi.Result;
 import com.google.gson.JsonArray;
@@ -8,8 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +29,18 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("deprecation")
 public class ArgumentParserTest {
+    private static final java.util.UUID BOB_UUID = java.util.UUID.randomUUID();
+    private static final java.util.UUID JIM_UUID = java.util.UUID.randomUUID();
+
+    private static final java.util.UUID PIG_UUID = java.util.UUID.randomUUID();
+    private static final java.util.UUID ITEM_FRAME_UUID = java.util.UUID.randomUUID();
+
     static {
         Bukkit.setServer(new MockServer.Builder()
-                .addPlayer("bob")
-                .addPlayer("jim")
+                .addPlayer("bob", BOB_UUID)
+                .addPlayer("jim", JIM_UUID)
+                .addEntity(EntityType.PIG, PIG_UUID)
+                .addEntity(EntityType.ITEM_FRAME, ITEM_FRAME_UUID)
                 .addWorld("world")
                 .addWorld("nether")
                 .addRecipe(new MockRecipe(new NamespacedKey("coolplugin", "coolrecipe"), new ItemStack(Material.BLACK_DYE)))
@@ -100,22 +111,22 @@ public class ArgumentParserTest {
 
     @Test
     public void testEntity() {
-        testOk("zombie", ENTITY, EntityType.ZOMBIE);
-        testOk("armor_stand", ENTITY, EntityType.ARMOR_STAND);
-        testErr("herobrine", ENTITY);
+        testOk("zombie", ENTITY_TYPE, EntityType.ZOMBIE);
+        testOk("armor_stand", ENTITY_TYPE, EntityType.ARMOR_STAND);
+        testErr("herobrine", ENTITY_TYPE);
     }
 
     @Test
     public void testLivingEntity() {
-        testOk("player", LIVING_ENTITY, EntityType.PLAYER);
-        testOk("enderman", LIVING_ENTITY, EntityType.ENDERMAN);
-        testErr("egg", LIVING_ENTITY);
+        testOk("player", LIVING_ENTITY_TYPE, EntityType.PLAYER);
+        testOk("enderman", LIVING_ENTITY_TYPE, EntityType.ENDERMAN);
+        testErr("egg", LIVING_ENTITY_TYPE);
     }
 
     @Test
     public void testSpawnableEntity() {
-        testOk("dropped_item", SPAWNABLE_ENTITY, EntityType.DROPPED_ITEM);
-        testErr("player", SPAWNABLE_ENTITY);
+        testOk("dropped_item", SPAWNABLE_ENTITY_TYPE, EntityType.DROPPED_ITEM);
+        testErr("player", SPAWNABLE_ENTITY_TYPE);
     }
 
     @Test
@@ -306,6 +317,8 @@ public class ArgumentParserTest {
     @Test
     public void testNumber() {
         assertThrows(IllegalArgumentException.class, () -> number(AtomicInteger.class));
+        // tests if the argument types are being cached
+        assertSame(number(int.class), number(int.class));
     }
 
     @Test
@@ -325,6 +338,114 @@ public class ArgumentParserTest {
         testErr("-10", ranged);
         testErr("28.3", ranged);
         testErr("al", ranged);
+    }
+
+    @Test
+    public void testNumberRange() {
+        ArgumentType<NumberRange<Double>> doubleRange = numberRange(double.class);
+        testOk("3", doubleRange, new SingleNumberRange<>(3.0));
+        testOk("3.2", doubleRange, new SingleNumberRange<>(3.2));
+
+        testOk("..5", doubleRange, new ToNumberRange<>(5.0));
+        testOk("...3", doubleRange, new ToNumberRange<>(0.3));
+        testOk("..2.3", doubleRange, new ToNumberRange<>(2.3));
+
+        testOk("3..", doubleRange, new FromNumberRange<>(3.0));
+        testOk("3.2..", doubleRange, new FromNumberRange<>(3.2));
+        testOk("3..", doubleRange, new FromNumberRange<>(3.0));
+        testOk(".2..", doubleRange, new FromNumberRange<>(0.2));
+
+        testOk("0.2..3.2", doubleRange, new FromToNumberRange<>(0.2, 3.2));
+        testOk("0...3", doubleRange, new FromToNumberRange<>(0.0, 0.3));
+        testOk("10..15", doubleRange, new FromToNumberRange<>(10.0, 15.0));
+        testOk(".8..32.3", doubleRange, new FromToNumberRange<>(0.8, 32.3));
+        testOk("..", doubleRange, new FullNumberRange<>());
+
+        testErr("3...", doubleRange);
+        testErr("...", doubleRange);
+        testErr("1.2.2", doubleRange);
+        testErr(".", doubleRange);
+        testErr("..3..", doubleRange);
+    }
+
+    @Test
+    public void testSingleEntitySelector() {
+        ArgumentType<EntitySelector<Entity>> entities = entities();
+        ArgumentType<EntitySelector<Entity>> entity = entity();
+        ArgumentType<EntitySelector<Player>> player = player();
+
+        testOk("jim", entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk("jim", entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
+        testOk(JIM_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
+
+        testOk("bob", entity, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk("bob", entity, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
+        testOk(BOB_UUID.toString(), player, (Predicate<EntitySelector<Player>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
+
+        testErr("person", entities);
+        testErr(java.util.UUID.randomUUID().toString(), entities);
+        testErr("jim", entitySelector(SelectorRequirements.allowOne(Pig.class)));
+
+        testOk(PIG_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk(PIG_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(PIG_UUID));
+
+        testOk(ITEM_FRAME_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk(ITEM_FRAME_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(ITEM_FRAME_UUID));
+
+        testErr(PIG_UUID.toString(), player);
+        testErr(ITEM_FRAME_UUID.toString(), entitySelector(SelectorRequirements.allowOne(LivingEntity.class)));
+    }
+
+    @Test
+    public void testMultiEntitySelector() {
+        ArgumentType<EntitySelector<Entity>> entities = entities();
+        testOk("@p", entities);
+        testOk("@a", entities);
+        testOk("@e", entities);
+
+        ArgumentType<EntitySelector<Entity>> entity = entity();
+        testOk("@p", entity);
+        testErr("@a", entity);
+        testErr("@e", entity);
+
+        ArgumentType<EntitySelector<Player>> players = players();
+        testOk("@p", players);
+        testOk("@a", players);
+        testErr("@e", players);
+
+        ArgumentType<EntitySelector<Player>> player = player();
+        testOk("@p", player);
+        testErr("@a", player);
+        testErr("@e", player);
+
+        testErr("a", entities);
+        testErr("@m", entities);
+        testErr("@masdfadfad", entities);
+
+        testOk("@e[]", entities);
+        testOk("@e[limit=3]", entities);
+        testOk("@e[sort=nearest]", entities);
+        testOk("@e[limit=10,sort=arbitrary]", entities);
+        testOk("@e[limit=10,sort=arbitrary] some extra characters", entities);
+        testOk("@e[limit=10,]", entities);
+        testOk("@e[limit=3,sort=nearest,name=\"jim\\, bob\",]", entities);
+
+        testErr("@e[", entities);
+        testErr("@e]", entities);
+        testErr("@e[]a", entities);
+        testErr("@e[limit=1", entities);
+        testErr("@e[limit=1,,]", entities);
+        testErr("@e[limit]", entities);
+        testErr("@e[limit=]", entities);
+        testErr("@e[limit=,]", entities);
+        testErr("@e[limit==]", entities);
+        testErr("@e[limit=hi]", entities);
+        testErr("@e[limit=10,sort=some random sort,]", entities);
+
+        testOk("@e[type=player]", players);
+        testOk("@e[type=player,limit=1]", player);
+        testErr("@p[limit=3]", entity);
+        testErr("@p[type=axolotl]", player);
     }
 
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type) {
