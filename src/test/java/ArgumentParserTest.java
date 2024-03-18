@@ -370,82 +370,74 @@ public class ArgumentParserTest {
 
     @Test
     public void testSingleEntitySelector() {
-        ArgumentType<EntitySelector<Entity>> entities = entities();
-        ArgumentType<EntitySelector<Entity>> entity = entity();
-        ArgumentType<EntitySelector<Player>> player = player();
+        testOk("jim", ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk("jim", ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
+        testOk(JIM_UUID.toString(), ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
 
-        testOk("jim", entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
-        testOk("jim", entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
-        testOk(JIM_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(JIM_UUID));
+        testOk("bob", ENTITY, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk("bob", ENTITY, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
+        testOk(BOB_UUID.toString(), PLAYER, (Predicate<EntitySelector<Player>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
 
-        testOk("bob", entity, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
-        testOk("bob", entity, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
-        testOk(BOB_UUID.toString(), player, (Predicate<EntitySelector<Player>>) selector -> selector.getFirst(null).getUniqueId().equals(BOB_UUID));
-
-        testErr("person", entities);
-        testErr(java.util.UUID.randomUUID().toString(), entities);
+        testErr("person", ENTITIES);
+        testErr(java.util.UUID.randomUUID().toString(), ENTITIES);
         testErr("jim", entitySelector(SelectorRequirements.allowOne(Pig.class)));
 
-        testOk(PIG_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
-        testOk(PIG_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(PIG_UUID));
+        testOk(PIG_UUID.toString(), ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk(PIG_UUID.toString(), ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(PIG_UUID));
 
-        testOk(ITEM_FRAME_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
-        testOk(ITEM_FRAME_UUID.toString(), entities, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(ITEM_FRAME_UUID));
+        testOk(ITEM_FRAME_UUID.toString(), ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector instanceof SingleEntitySelector<Entity>);
+        testOk(ITEM_FRAME_UUID.toString(), ENTITIES, (Predicate<EntitySelector<Entity>>) selector -> selector.getFirst(null).getUniqueId().equals(ITEM_FRAME_UUID));
 
-        testErr(PIG_UUID.toString(), player);
+        testErr(PIG_UUID.toString(), PLAYER);
         testErr(ITEM_FRAME_UUID.toString(), entitySelector(SelectorRequirements.allowOne(LivingEntity.class)));
     }
 
     @Test
     public void testMultiEntitySelector() {
-        ArgumentType<EntitySelector<Entity>> entities = entities();
-        testOk("@p", entities);
-        testOk("@a", entities);
-        testOk("@e", entities);
+        testOk("@p", ENTITIES);
+        testOk("@a", ENTITIES);
+        testOk("@e", ENTITIES);
 
-        ArgumentType<EntitySelector<Entity>> entity = entity();
-        testOk("@p", entity);
-        testErr("@a", entity);
-        testErr("@e", entity);
+        testOk("@p", ENTITY);
+        testErr("@a", ENTITY);
+        testErr("@e", ENTITY);
 
-        ArgumentType<EntitySelector<Player>> players = players();
-        testOk("@p", players);
-        testOk("@a", players);
-        testErr("@e", players);
+        testOk("@p", PLAYERS);
+        testOk("@a", PLAYERS);
+        testErr("@e", PLAYERS);
 
-        ArgumentType<EntitySelector<Player>> player = player();
-        testOk("@p", player);
-        testErr("@a", player);
-        testErr("@e", player);
+        testOk("@p", PLAYER);
+        testErr("@a", PLAYER);
+        testErr("@e", PLAYER);
 
-        testErr("a", entities);
-        testErr("@m", entities);
-        testErr("@masdfadfad", entities);
+        testErr("a", ENTITIES);
+        testErr("@m", ENTITIES);
+        testErr("@masdfadfad", ENTITIES);
 
-        testOk("@e[]", entities);
-        testOk("@e[limit=3]", entities);
-        testOk("@e[sort=nearest]", entities);
-        testOk("@e[limit=10,sort=arbitrary]", entities);
-        testOk("@e[limit=10,sort=arbitrary] some extra characters", entities);
-        testOk("@e[limit=10,]", entities);
-        testOk("@e[limit=3,sort=nearest,name=\"jim\\, bob\",]", entities);
+        testOk("@e[]", ENTITIES);
+        testOk("@e[limit=3]", ENTITIES);
+        testOk("@e[sort=nearest]", ENTITIES);
+        testOk("@e[limit=10,sort=arbitrary]", ENTITIES);
+        testOk("@e[limit=10,sort=arbitrary] some extra characters", ENTITIES);
+        testOk("@e[limit=10,]", ENTITIES);
+        testOk("@e[limit=3,sort=nearest,name=\"jim\\, bob\",]", ENTITIES);
 
-        testErr("@e[", entities);
-        testErr("@e]", entities);
-        testErr("@e[]a", entities);
-        testErr("@e[limit=1", entities);
-        testErr("@e[limit=1,,]", entities);
-        testErr("@e[limit]", entities);
-        testErr("@e[limit=]", entities);
-        testErr("@e[limit=,]", entities);
-        testErr("@e[limit==]", entities);
-        testErr("@e[limit=hi]", entities);
-        testErr("@e[limit=10,sort=some random sort,]", entities);
+        testErr("@e[", ENTITIES);
+        testErr("@e]", ENTITIES);
+        testErr("@e[]a", ENTITIES);
+        testErr("@e[limit=1", ENTITIES);
+        testErr("@e[limit=1,,]", ENTITIES);
+        testErr("@e[limit]", ENTITIES);
+        testErr("@e[limit=]", ENTITIES);
+        testErr("@e[limit=,]", ENTITIES);
+        testErr("@e[limit==]", ENTITIES);
+        testErr("@e[limit=hi]", ENTITIES);
+        testErr("@e[limit=10,sort=some random sort,]", ENTITIES);
 
-        testOk("@e[type=player]", players);
-        testOk("@e[type=player,limit=1]", player);
-        testErr("@p[limit=3]", entity);
-        testErr("@p[type=axolotl]", player);
+        testOk("@e[type=player]", PLAYERS);
+        testOk("@e[type=player,limit=1]", PLAYER);
+        testErr("@p[limit=3]", ENTITY);
+        testErr("@p[type=axolotl]", PLAYER);
     }
 
     private <T> void testOk(String arg, @NotNull ArgumentType<T> type) {
