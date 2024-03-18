@@ -23,7 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -136,7 +139,7 @@ public interface ArgumentType<T> {
 
     /**
      * {@code ArgumentType} that represents a player that's online
-     * @deprecated Use {@link #player()} instead
+     * @deprecated Use {@link #PLAYER} instead
      */
     @Deprecated
     ArgumentType<Player> ONLINE_PLAYER = new PlayerArgumentType();
@@ -145,6 +148,30 @@ public interface ArgumentType<T> {
      * {@code ArgumentType} that represents an offline player
      */
     ArgumentType<CompletableFuture<OfflinePlayer>> OFFLINE_PLAYER = new OfflinePlayerArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents an entity selector that selects just one entity.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Entity.class)).
+     */
+    ArgumentType<EntitySelector<Entity>> ENTITY = entitySelector(SelectorRequirements.allowOne(Entity.class));
+
+    /**
+     * {@code ArgumentType} that represents an entity selector that can select any number of entities.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Entity.class)).
+     */
+    ArgumentType<EntitySelector<Entity>> ENTITIES = entitySelector(SelectorRequirements.allowInfinite(Entity.class));
+
+    /**
+     * {@code ArgumentType} that represents an entity selector that selects just one player.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Player.class)).
+     */
+    ArgumentType<EntitySelector<Player>> PLAYER = entitySelector(SelectorRequirements.allowOne(Player.class));
+
+    /**
+     * {@code ArgumentType} that represents an entity selector that can select any number of players.
+     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Player.class)).
+     */
+    ArgumentType<EntitySelector<Player>> PLAYERS = entitySelector(SelectorRequirements.allowInfinite(Player.class));
 
     /**
      * {@code ArgumentType} that represents a {@code CommandCore} command name
@@ -253,42 +280,6 @@ public interface ArgumentType<T> {
      */
     static @NotNull <T> ArgumentType<T> json(Class<T> clazz, Type type) {
         return new JsonArgumentType<>(clazz, type);
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents an entity selector that selects just one entity.
-     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Entity.class)).
-     * @return The newly created {@code ArgumentType}
-     */
-    static @NotNull ArgumentType<EntitySelector<Entity>> entity() {
-        return entitySelector(SelectorRequirements.allowOne(Entity.class));
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents an entity selector that can select any number of entities.
-     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Entity.class)).
-     * @return The newly created {@code ArgumentType}
-     */
-    static @NotNull ArgumentType<EntitySelector<Entity>> entities() {
-        return entitySelector(SelectorRequirements.allowInfinite(Entity.class));
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents an entity selector that selects just one player.
-     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowOne(Class) allowOne}(Player.class)).
-     * @return The newly created {@code ArgumentType}
-     */
-    static @NotNull ArgumentType<EntitySelector<Player>> player() {
-        return entitySelector(SelectorRequirements.allowOne(Player.class));
-    }
-
-    /**
-     * Creates an {@code ArgumentType} that represents an entity selector that can select any number of players.
-     * This is the same as calling {@link #entitySelector(SelectorRequirements) entitySelector}({@link SelectorRequirements}.{@link SelectorRequirements#allowInfinite(Class) allowInfinite}(Player.class)).
-     * @return The newly created {@code ArgumentType}
-     */
-    static @NotNull ArgumentType<EntitySelector<Player>> players() {
-        return entitySelector(SelectorRequirements.allowInfinite(Player.class));
     }
 
     /**
