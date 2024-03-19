@@ -19,6 +19,7 @@ public class SelectorRequirements<E extends Entity> {
     @Contract(pure = true)
     private SelectorRequirements(@NotNull Builder<E> builder) {
         this.entityClass = builder.entityClass;
+        if (builder.limit < 0) throw new IllegalArgumentException("limit must be >= 0");
         this.limit = builder.limit;
     }
 
@@ -142,6 +143,7 @@ public class SelectorRequirements<E extends Entity> {
         /**
          * Creates a new {@code SelectorRequirements} based on this builder
          * @return The newly created {@code SelectorRequirements}
+         * @throws IllegalArgumentException If the limit is < 0
          */
         public SelectorRequirements<E> build() {
             return new SelectorRequirements<>(this);
