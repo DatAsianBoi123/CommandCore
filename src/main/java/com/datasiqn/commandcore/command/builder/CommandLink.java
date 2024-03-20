@@ -11,6 +11,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a link in a command tree.
@@ -86,6 +87,21 @@ public abstract class CommandLink<T extends CommandLink<T>> {
      */
     public T executes(@NotNull Executor executor) {
         this.executor = executor;
+        return getThis();
+    }
+
+    /**
+     * Sets the executor for this command. The executor will be executed asynchronously.
+     * This is the same as wrapping everything inside of {@code executor} in a {@link CompletableFuture}.
+     * @param executor The executor
+     * @return Itself, for chaining
+     */
+    public T executesAsync(@NotNull Executor executor) {
+        this.executor = (context, source, arguments) -> {
+            CompletableFuture.runAsync(() -> executor.execute(context, source, arguments)).exceptionally(err -> {
+                throw new RuntimeException(err);
+            });
+        };
         return getThis();
     }
 
