@@ -72,7 +72,7 @@ public abstract class CommandLink<T extends CommandLink<T>> {
     /**
      * Adds a new node onto this command builder
      * @param node The node
-     * @return The builder, for chaining
+     * @return Itself, for chaining
      */
     public T then(@NotNull CommandNode<?> node) {
         children.add(node);
@@ -82,7 +82,7 @@ public abstract class CommandLink<T extends CommandLink<T>> {
     /**
      * Sets the executor for this command
      * @param executor The executor
-     * @return The builder, for chaining
+     * @return Itself, for chaining
      */
     public T executes(@NotNull Executor executor) {
         this.executor = executor;
