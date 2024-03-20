@@ -373,7 +373,7 @@ public interface ArgumentType<T> {
      * <p>
      * This is a registered {@code ArgumentType} that requires the {@link Limit} annotation to use.
      * There must be a type argument present on {@link EntitySelector}. The type provided will be the limiting entity class.
-     * For example, to select only {@code Players}, you would use an {@code EntitySelector<Player>}
+     * For example, to select only {@code Players}, you would use an {@code EntitySelector<Player>}.
      * @param requirements The requirements that the entity selector must conform to
      * @return The newly created {@code ArgumentType}
      * @param <E> The type of the entities being selected
