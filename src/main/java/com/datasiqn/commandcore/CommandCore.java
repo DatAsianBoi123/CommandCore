@@ -2,6 +2,7 @@ package com.datasiqn.commandcore;
 
 import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.source.*;
+import com.datasiqn.commandcore.managers.ArgumentTypeManager;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.commandcore.managers.HelpManager;
 import net.md_5.bungee.api.ChatColor;
@@ -33,6 +34,7 @@ import java.util.List;
 public class CommandCore {
     private static CommandCore instance;
     private final CommandManager commandManager = new CommandManager();
+    private final ArgumentTypeManager argumentTypeManager = new ArgumentTypeManager();
     private final HelpManager helpManager;
     private final JavaPlugin plugin;
     private final org.bukkit.command.Command bukkitCommand;
@@ -51,6 +53,14 @@ public class CommandCore {
      */
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    /**
+     * Gets the argument type manager
+     * @return The argument type manager
+     */
+    public ArgumentTypeManager getArgumentTypeManager() {
+        return argumentTypeManager;
     }
 
     /**
@@ -216,6 +226,8 @@ public class CommandCore {
         MainCommand mainCommand = new MainCommand(instance);
         command.setExecutor(mainCommand);
         command.setTabCompleter(mainCommand);
+
+        instance.argumentTypeManager.registerBuiltin();
 
         if (options.createHelpCommand()) instance.commandManager.registerCommand(HelpCommand.createCommand());
 

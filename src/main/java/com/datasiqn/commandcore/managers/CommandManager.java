@@ -4,7 +4,10 @@ import com.datasiqn.commandcore.CommandCore;
 import com.datasiqn.commandcore.InitOptions;
 import com.datasiqn.commandcore.InitOptions.Warning;
 import com.datasiqn.commandcore.command.Command;
+import com.datasiqn.commandcore.command.annotation.AnnotationCommand;
+import com.datasiqn.commandcore.command.annotation.CommandBuilderGenerator;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -20,28 +23,46 @@ public class CommandManager {
     private final Map<String, Command> aliasesMap = new HashMap<>();
 
     /**
-     * Registers a new command
-     * @param command The command
+     * Registers an {@code AnnotationCommand} command.
+     * <p>
+     * Behind the scenes, this method uses {@link CommandBuilderGenerator#fromAnnotationCommand(AnnotationCommand)} to generate a {@link CommandBuilder} from an {@link AnnotationCommand}.
+     * <p>
+     * Errors can occur when parsing {@code command}. Any errors encountered will be logged with the {@code [CommandCore]} prefix, and registration will be aborted.
+     * @param command The command to register
+     * @throws IllegalArgumentException If {@code command}'s name or one of its aliases is empty or contains spaces.
+     * If {@code command}'s name or one of its aliases are already used
+     */
+    public void registerCommand(@NotNull AnnotationCommand command) {
+        CommandBuilderGenerator.fromAnnotationCommand(command).match(
+                this::registerCommand,
+                err -> Bukkit.getLogger().severe("[CommandCore] " + err)
+        );
+    }
+    /**
+     * Registers a {@code CommandBuilder} command
+     * @param command The command to register
      * @throws IllegalArgumentException If {@code command}'s name or one of its aliases is empty or contains spaces.
      * If {@code command}'s name or one of its aliases are already used
      */
     public void registerCommand(@NotNull CommandBuilder command) {
-        Command builtCommand = command.build();
-        String name = builtCommand.getName();
+        registerCommand(command.build());
+    }
+    private void registerCommand(@NotNull Command command) {
+        String name = command.getName();
         if (name.contains(" ")) throw new IllegalArgumentException("Command name cannot contain spaces");
         if (name.isEmpty()) throw new IllegalArgumentException("Command name cannot be empty");
         InitOptions options = CommandCore.getInstance().getOptions();
         // the default help command doesn't have a permission, so suppress all warnings if the command is the default help command
-        if (!options.createHelpCommand() || !builtCommand.getName().equals("help")) {
-            options.warnIf(Warning.MISSING_DESCRIPTION, !builtCommand.hasDescription(), name);
-            options.warnIf(Warning.MISSING_PERMISSION, !builtCommand.hasPermission(), name);
+        if (!options.createHelpCommand() || !command.getName().equals("help")) {
+            options.warnIf(Warning.MISSING_DESCRIPTION, !command.hasDescription(), name);
+            options.warnIf(Warning.MISSING_PERMISSION, !command.hasPermission(), name);
         }
-        if (commandMap.putIfAbsent(name, builtCommand) != null) throw new IllegalArgumentException("Command name already in use");
+        if (commandMap.putIfAbsent(name, command) != null) throw new IllegalArgumentException("Command name already in use");
         CommandCore.getInstance().getHelpManager().addCommandName(name);
-        for (String alias : builtCommand.getAliases()) {
+        for (String alias : command.getAliases()) {
             if (alias.contains(" ")) throw new IllegalArgumentException("Command aliases cannot contain spaces");
             if (alias.isEmpty()) throw new IllegalArgumentException("Command aliases cannot be empty");
-            Command prev = aliasesMap.putIfAbsent(alias, builtCommand);
+            Command prev = aliasesMap.putIfAbsent(alias, command);
             if (prev != null) throw new IllegalArgumentException("Command alias already in use (used by " + prev.getName() + ")");
         }
     }
