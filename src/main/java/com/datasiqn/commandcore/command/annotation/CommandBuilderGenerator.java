@@ -55,11 +55,11 @@ public final class CommandBuilderGenerator {
         Method executeMethod = null;
         for (Method method : commandClass.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(Executor.class)) continue;
+            if (executeMethod != null) return Result.error("annotation command " + commandClass.getName() + " cannot have multiple executors");
             if (method.getParameterCount() == 0) {
                 return Result.error("annotation executor " + method.getName() + " (in class " + commandClass.getName() + ") must have at least 1 parameter");
             }
             executeMethod = method;
-            break;
         }
         if (executeMethod != null) {
             executeMethod.setAccessible(true);
@@ -73,7 +73,6 @@ public final class CommandBuilderGenerator {
 
         return Result.ok(commandBuilder);
     }
-
 
     private static Result<None, String> buildCommandBuilder(AnnotationCommand command, @NotNull Method method, CommandBuilder builder) {
         Parameter[] parameters = method.getParameters();
