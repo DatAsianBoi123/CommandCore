@@ -39,7 +39,6 @@ public class HelpManager {
      * @return The help page
      * @throws IllegalArgumentException If {@code page} is {@literal <} 1 or {@literal >} the total number of pages
      */
-    @UnmodifiableView
     public HelpPage getHelpPage(int page, Predicate<String> filter) {
         if (page < 1) throw new IllegalArgumentException("page cannot be <1");
         List<String> filteredNames = commandNames.stream().filter(filter).toList();
@@ -63,5 +62,5 @@ public class HelpManager {
      * @param page The page number the command names are on
      * @param totalPages The total number of pages of help
      */
-    public record HelpPage(List<String> names, int page, int totalPages) { }
+    public record HelpPage(@UnmodifiableView List<String> names, int page, int totalPages) { }
 }
