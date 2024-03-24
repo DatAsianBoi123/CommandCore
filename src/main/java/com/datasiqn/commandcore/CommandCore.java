@@ -82,17 +82,14 @@ public class CommandCore {
     /**
      * Sends command usage to {@code sender}
      * @param sender The sender
-     * @param commandName The name of the command
-     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
+     * @param command The name of the command
      */
-    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull String commandName) {
-        Command command = commandManager.getCommand(commandName, false);
-        if (command == null) throw new IllegalArgumentException("Command " + commandName + " does not exist");
-        sender.sendMessage(ChatColor.GOLD + "Command " + commandName,
+    public void sendCommandHelp(@NotNull CommandSender sender, @NotNull Command command) {
+        sender.sendMessage(ChatColor.GOLD + "Command " + command.getName(),
                 ChatColor.GRAY + " Description: " + ChatColor.WHITE + (command.hasDescription() ? command.getDescription() : "No description provided"),
                 ChatColor.GRAY + " Aliases: [" + ChatColor.WHITE + String.join(ChatColor.GRAY + ", " + ChatColor.WHITE, command.getAliases()) + ChatColor.GRAY + "]",
                 ChatColor.GRAY + " Usage(s):");
-        sender.sendMessage(getUsagesFor(commandName, 2).toArray(new String[0]));
+        sender.sendMessage(getUsagesFor(command).toArray(new String[0]));
     }
 
     /**
@@ -148,22 +145,18 @@ public class CommandCore {
 
     /**
      * Generates a formatted string for each usage of a command
-     * @param commandName The name of the command
-     * @param spaces The # of spaces to add before each usage string
+     * @param command The command
      * @return A list of formatted strings representing all usages for the command
-     * @throws IllegalArgumentException If {@code commandName} is not the name of a command
      */
     @NotNull
-    public List<String> getUsagesFor(String commandName, int spaces) {
-        Command command = commandManager.getCommand(commandName, false);
-        if (command == null) throw new IllegalArgumentException("Command " + commandName + " does not exist");
+    public List<String> getUsagesFor(@NotNull Command command) {
         List<String> usages = new ArrayList<>();
         command.getUsages().forEach(usage -> {
-            String addedUsage = " ".repeat(Math.max(0, spaces)) +
+            String addedUsage = "  " +
                     ChatColor.YELLOW +
                     "/" +
                     this.bukkitCommand.getName() +
-                    " " + ChatColor.WHITE + commandName +
+                    " " + ChatColor.WHITE + command.getName() +
                     " " + usage;
             usages.add(addedUsage);
         });

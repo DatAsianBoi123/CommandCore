@@ -17,13 +17,12 @@ class HelpCommand {
                 .description("Shows the help menu")
                 .then(ArgumentBuilder.argument(ArgumentType.COMMAND_NAME, "command")
                         .executes((context, source, arguments) -> {
-                            Command cmd = arguments.get(0, ArgumentType.COMMAND_NAME);
-                            String commandName = arguments.getString(0);
-                            if (!source.hasPermission(cmd.getPermissionString())) {
-                                source.sendMessage(ChatColor.RED + "No help for " + commandName);
+                            Command command = arguments.get(0, ArgumentType.COMMAND_NAME);
+                            if (!source.hasPermission(command.getPermissionString())) {
+                                source.sendMessage(ChatColor.RED + "No help for " + command.getName());
                                 return;
                             }
-                            instance.sendCommandHelp(source.getSender(), commandName);
+                            instance.sendCommandHelp(source.getSender(), command);
                         }))
                 .then(ArgumentBuilder.argument(ArgumentType.number(int.class), "page")
                         .executes(HelpCommand::sendHelp))

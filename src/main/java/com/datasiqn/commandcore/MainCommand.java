@@ -7,7 +7,9 @@ import com.datasiqn.commandcore.command.TabComplete;
 import com.datasiqn.commandcore.managers.CommandManager;
 import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -44,8 +46,10 @@ class MainCommand implements CommandExecutor, TabCompleter {
             Result<None, List<String>> output = cmd.execute(new CommandContext(CommandCore.createSource(sender), cmd, args[0], new StringArguments(listArgs)));
             output.ifError(messages -> {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
-                sender.sendMessage(ChatColor.GRAY + "Usage(s):");
-                sender.sendMessage(commandCore.getUsagesFor(cmd.getName(), 1).toArray(new String[0]));
+                sender.spigot().sendMessage(new ComponentBuilder()
+                        .append("[View Command Help]").color(ChatColor.GOLD)
+                                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + commandCore.getOptions().getRootCommand() + " help " + cmd.getName()))
+                        .create());
             });
             return true;
         }
