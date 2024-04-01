@@ -104,14 +104,13 @@ public final class CommandBuilderGenerator {
         return addExecutor(link, sourceClass, argumentTypes, method, command);
     }
 
-    private static @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<?> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command) {
-        boolean requireSource;
-        Result<Boolean, String> requireResult = requireClass(sourceClass, link);
+    private static <T> @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<T> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command, int offset) {
+        Result<Function<CommandSource, T>, String> requireResult = requireClass(sourceClass, link);
         if (requireResult.isError()) return requireResult.and(Result.ok()).mapError(err -> "has an invalid source type " + sourceClass.getName());
-        requireSource = requireResult.unwrap();
+        Function<CommandSource, T> getSourceFunction = requireResult.unwrap();
         link.executes((context, source, arguments) -> {
             Object[] args = new Object[method.getParameterCount()];
-            args[0] = requireSource ? sourceClass.cast(source.getSender()) : source;
+            args[0] = getSourceFunction.apply(source);
             for (int i = 0; i < argumentTypes.length; i++) {
                 if (argumentTypes[i] == null) continue;
                 args[i + 1] = arguments.get(i, argumentTypes[i]);
@@ -127,19 +126,28 @@ public final class CommandBuilderGenerator {
         return Result.ok();
     }
 
-    private static Result<Boolean, String> requireClass(Class<?> sourceClass, CommandLink<?> link) {
-        if (sourceClass == CommandSource.class) return Result.ok(false);
+    @SuppressWarnings("unchecked")
+    private static <T> Result<Function<CommandSource, T>, String> requireClass(Class<T> sourceClass, CommandLink<?> link) {
+        if (sourceClass == CommandSource.class) return Result.ok(source -> (T) source);
         if (sourceClass == Player.class) {
             link.requiresPlayer();
-        } else if (sourceClass == Entity.class) {
-            link.requiresEntity();
-        } else if (sourceClass == BlockCommandSender.class) {
-            link.requiresBlock();
-        } else if (sourceClass == LocatableCommandSender.class) {
-            link.requiresLocatable();
-        } else if (sourceClass != CommandSender.class) {
-            return Result.error("class " + sourceClass.getName() + " is invalid");
+            return Result.ok(source -> (T) source.getPlayer());
         }
-        return Result.ok(true);
+        if (sourceClass == Entity.class) {
+            link.requiresEntity();
+            return Result.ok(source -> (T) source.getEntity());
+        }
+        if (sourceClass == BlockCommandSender.class) {
+            link.requiresBlock();
+            return Result.ok(source -> (T) source.getBlock());
+        }
+        if (sourceClass == LocatableCommandSender.class) {
+            link.requiresLocatable();
+            return Result.ok(source -> (T) source.getLocatable());
+        }
+        if (sourceClass == CommandSender.class) {
+            return Result.ok(source -> (T) source.getSender());
+        }
+        return Result.error("class " + sourceClass.getName() + " is invalid");
     }
 }
