@@ -181,7 +181,7 @@ public interface ArgumentType<T> {
     ArgumentType<Material> ITEM = new FilteredEnumArgumentType<>(Material.class, Material::isItem, "item");
 
     /**
-     * {@code ArgumentType} that represents a player that's online
+     * {@code ArgumentType} that represents a player that's online.
      * <p>
      * This is NOT a registered {@code ArgumentType}. See the deprecation notice.
      * @deprecated Use {@link #PLAYER} instead
