@@ -222,7 +222,7 @@ public class CommandCore {
 
         instance.argumentTypeManager.registerBuiltin();
 
-        if (options.createHelpCommand()) instance.commandManager.registerCommand(HelpCommand.createCommand());
+        if (options.createHelpCommand()) instance.commandManager.registerCommand(new HelpCommand());
 
         return instance;
     }
