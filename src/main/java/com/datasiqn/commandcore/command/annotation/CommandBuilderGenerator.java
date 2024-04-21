@@ -109,11 +109,11 @@ public final class CommandBuilderGenerator {
             Parameter parameter = parameters[i];
 
             Argument argument = parameter.getAnnotation(Argument.class);
-            if (argument == null) return Result.error("has an parameter not annotated with @Argument");
+            if (argument == null) return Result.error("Executor has a parameter not annotated with @Argument");
 
             ArgumentType<?> argumentType = CommandCore.getInstance().getArgumentTypeManager().get(parameter);
             if (argumentType == null) {
-                return Result.error("has an invalid argument type " + parameter.getType().getName() + " (is it registered?)");
+                return Result.error("Executor has an invalid argument type " + parameter.getType().getName() + " (is it registered?)");
             }
             if (parameter.isAnnotationPresent(Optional.class)) {
                 Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command, offset);
@@ -131,7 +131,7 @@ public final class CommandBuilderGenerator {
 
     private static <T> @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<T> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command, int offset) {
         Result<Function<CommandSource, T>, String> requireResult = requireClass(sourceClass, link);
-        if (requireResult.isError()) return requireResult.and(Result.ok()).mapError(err -> "has an invalid source type " + sourceClass.getName());
+        if (requireResult.isError()) return requireResult.and(Result.ok()).mapError(err -> "Executor has an invalid source type " + sourceClass.getName());
         Function<CommandSource, T> getSourceFunction = requireResult.unwrap();
         link.executes((context, source, arguments) -> {
             Object[] args = new Object[method.getParameterCount()];
