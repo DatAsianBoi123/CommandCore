@@ -35,7 +35,7 @@ public class CommandManager {
     public void registerCommand(@NotNull AnnotationCommand command) {
         CommandBuilderGenerator.fromAnnotationCommand(command).match(
                 this::registerCommand,
-                err -> Bukkit.getLogger().severe("[CommandCore] " + err)
+                err -> Bukkit.getLogger().severe("[CommandCore] " + err.getMessage())
         );
     }
     /**

@@ -15,6 +15,7 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,11 +40,11 @@ public final class CommandBuilderGenerator {
      * @param command The annotation command to use
      * @return A result with an {@code Ok} value of the generated {@link CommandBuilder}, and an {@code Error} value of the error message
      */
-    public static Result<CommandBuilder, String> fromAnnotationCommand(@NotNull AnnotationCommand command) {
+    public static Result<CommandBuilder, FromAnnotationCommandError> fromAnnotationCommand(@NotNull AnnotationCommand command) {
         Class<? extends AnnotationCommand> commandClass = command.getClass();
         CommandDescription commandDescription = commandClass.getAnnotation(CommandDescription.class);
         if (commandDescription == null) {
-            return Result.error("annotation command " + commandClass.getName() + " is missing a @CommandDescription annotation");
+            return Result.error(FromAnnotationCommandError.fromContext(commandClass, "Annotation command must be annotated with @CommandDescription"));
         }
 
         CommandBuilder commandBuilder = new CommandBuilder(commandDescription.name());
@@ -65,10 +66,10 @@ public final class CommandBuilderGenerator {
             if (!isExecutor && literalExecutor == null) continue;
 
             if (method.getParameterCount() == 0) {
-                return Result.error("annotation executor " + method.getName() + " (in class " + commandClass.getName() + ") must have at least 1 parameter");
+                return Result.error(FromAnnotationCommandError.fromContext(method, "Executor must have at least 1 parameter"));
             }
             if (isExecutor) {
-                if (executeMethod != null) return Result.error("annotation command " + commandClass.getName() + " cannot have multiple executors");
+                if (executeMethod != null) return Result.error(FromAnnotationCommandError.fromContext(commandClass, "Annotation command cannot have multiple executors annotated with @Executor"));
                 executeMethod = method;
             }
             if (literalExecutor != null) literalExecutors.add(new LiteralMethod(literalExecutor, method));
@@ -81,7 +82,7 @@ public final class CommandBuilderGenerator {
             executeMethod.setAccessible(true);
             Result<None, String> buildResult = buildBranch(command, executeMethod, commandBuilder, 0);
             if (buildResult.isError()) {
-                return Result.error("annotation executor " + executeMethod.getName() + " (in class " + commandClass.getName() + ") " + buildResult.unwrapError());
+                return Result.error(FromAnnotationCommandError.fromContext(executeMethod, buildResult.unwrapError()));
             }
         }
         for (LiteralMethod executor : literalExecutors) {
@@ -90,7 +91,7 @@ public final class CommandBuilderGenerator {
             LiteralBuilder literal = LiteralBuilder.literal(executor.literalExecutor.value());
             Result<None, String> buildResult = buildBranch(command, method, literal, 1);
             if (buildResult.isError()) {
-                return Result.error("annotation literal executor " + method.getName() + " (in class " + commandClass.getName() + ") " + buildResult.unwrapError());
+                return Result.error(FromAnnotationCommandError.fromContext(method, buildResult.unwrapError()));
             }
             commandBuilder.then(literal);
         }
@@ -176,4 +177,54 @@ public final class CommandBuilderGenerator {
     }
 
     private record LiteralMethod(LiteralExecutor literalExecutor, Method method) { }
+
+    /**
+     * Represents an error that can occur from generating a {@link CommandBuilder} from a {@link AnnotationCommand}
+     */
+    public static class FromAnnotationCommandError {
+        private final Class<?> commandClass;
+        private final @Nullable Method method;
+        private final String reason;
+
+        private FromAnnotationCommandError(Class<?> commandClass, @Nullable Method method, String reason) {
+            this.commandClass = commandClass;
+            this.method = method;
+            this.reason = reason;
+        }
+
+        /**
+         * Gets the message of the error
+         * @return The message
+         */
+        public String getMessage() {
+            String label;
+            if (method == null) {
+                label = "Error occurred when generating a CommandBuilder from annotation command " + commandClass.getName() + ": ";
+            } else {
+                label = "Error occurred when parsing executor " + method.getName() + " (in annotation command " + commandClass.getName() + ": ";
+            }
+            return label + reason;
+        }
+
+        /**
+         * Creates an error from the parent annotation class and a reason
+         * @param commandClass The annotation command class that generated the error
+         * @param reason The reason for the error
+         * @return The newly created {@code FromAnnotationCommandError}
+         */
+        @Contract(value = "_, _ -> new", pure = true)
+        public static @NotNull FromAnnotationCommandError fromContext(Class<?> commandClass, String reason) {
+            return new FromAnnotationCommandError(commandClass, null, reason);
+        }
+        /**
+         * Creates an error from an executor method and a reason
+         * @param method The executor method that generated the error
+         * @param reason The reason for the error
+         * @return The newly created {@code FromAnnotationCommandError}
+         */
+        @Contract(value = "_, _ -> new", pure = true)
+        public static @NotNull FromAnnotationCommandError fromContext(Method method, String reason) {
+            return new FromAnnotationCommandError(method.getDeclaringClass(), method, reason);
+        }
+    }
 }
