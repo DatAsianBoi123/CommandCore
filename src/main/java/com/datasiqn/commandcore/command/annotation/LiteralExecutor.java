@@ -16,4 +16,10 @@ public @interface LiteralExecutor {
      * @return The literal's label
      */
     String value();
+
+    /**
+     * Gets whether this executor should execute asynchronously or not
+     * @return {@code true} if this executor should execute async, {@code false} otherwise
+     */
+    boolean async() default false;
 }

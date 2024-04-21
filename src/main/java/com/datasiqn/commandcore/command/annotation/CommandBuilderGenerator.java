@@ -58,19 +58,21 @@ public final class CommandBuilderGenerator {
         if (!permission.isEmpty()) commandBuilder.permission(permission);
 
         Method executeMethod = null;
+        boolean executeAsync = false;
         List<LiteralMethod> literalExecutors = new ArrayList<>();
         for (Method method : commandClass.getDeclaredMethods()) {
             LiteralExecutor literalExecutor = method.getAnnotation(LiteralExecutor.class);
-            boolean isExecutor = method.isAnnotationPresent(Executor.class);
+            Executor executor = method.getAnnotation(Executor.class);
 
-            if (!isExecutor && literalExecutor == null) continue;
+            if (executor == null && literalExecutor == null) continue;
 
             if (method.getParameterCount() == 0) {
                 return Result.error(FromAnnotationCommandError.fromContext(method, "Executor must have at least 1 parameter"));
             }
-            if (isExecutor) {
+            if (executor != null) {
                 if (executeMethod != null) return Result.error(FromAnnotationCommandError.fromContext(commandClass, "Annotation command cannot have multiple executors annotated with @Executor"));
                 executeMethod = method;
+                executeAsync = executor.async();
             }
             if (literalExecutor != null) literalExecutors.add(new LiteralMethod(literalExecutor, method));
         }
@@ -80,7 +82,7 @@ public final class CommandBuilderGenerator {
         }
         if (executeMethod != null) {
             executeMethod.setAccessible(true);
-            Result<None, String> buildResult = buildBranch(command, executeMethod, commandBuilder, 0);
+            Result<None, String> buildResult = buildBranch(command, executeMethod, commandBuilder, executeAsync, 0);
             if (buildResult.isError()) {
                 return Result.error(FromAnnotationCommandError.fromContext(executeMethod, buildResult.unwrapError()));
             }
@@ -88,8 +90,9 @@ public final class CommandBuilderGenerator {
         for (LiteralMethod executor : literalExecutors) {
             Method method = executor.method;
             method.setAccessible(true);
-            LiteralBuilder literal = LiteralBuilder.literal(executor.literalExecutor.value());
-            Result<None, String> buildResult = buildBranch(command, method, literal, 1);
+            LiteralExecutor executorAnnotation = executor.literalExecutor;
+            LiteralBuilder literal = LiteralBuilder.literal(executorAnnotation.value());
+            Result<None, String> buildResult = buildBranch(command, method, literal, executorAnnotation.async(), 1);
             if (buildResult.isError()) {
                 return Result.error(FromAnnotationCommandError.fromContext(method, buildResult.unwrapError()));
             }
@@ -99,7 +102,7 @@ public final class CommandBuilderGenerator {
         return Result.ok(commandBuilder);
     }
 
-    private static Result<None, String> buildBranch(AnnotationCommand command, @NotNull Method method, CommandLink<?> builder, int offset) {
+    private static Result<None, String> buildBranch(AnnotationCommand command, @NotNull Method method, CommandLink<?> builder, boolean async, int offset) {
         Parameter[] parameters = method.getParameters();
         Class<?> sourceClass = parameters[0].getType();
         ArgumentType<?>[] argumentTypes = new ArgumentType[parameters.length - 1];
@@ -116,7 +119,7 @@ public final class CommandBuilderGenerator {
                 return Result.error("Executor has an invalid argument type " + parameter.getType().getName() + " (is it registered?)");
             }
             if (parameter.isAnnotationPresent(Optional.class)) {
-                Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command, offset);
+                Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command, async, offset);
                 if (addExecutorResult.isError()) return addExecutorResult;
             }
             argumentTypes[i - 1] = argumentType;
@@ -126,14 +129,14 @@ public final class CommandBuilderGenerator {
             link = node;
         }
 
-        return addExecutor(link, sourceClass, argumentTypes, method, command, offset);
+        return addExecutor(link, sourceClass, argumentTypes, method, command, async, offset);
     }
 
-    private static <T> @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<T> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command, int offset) {
+    private static <T> @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<T> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command, boolean async, int offset) {
         Result<Function<CommandSource, T>, String> requireResult = requireClass(sourceClass, link);
         if (requireResult.isError()) return requireResult.and(Result.ok()).mapError(err -> "Executor has an invalid source type " + sourceClass.getName());
         Function<CommandSource, T> getSourceFunction = requireResult.unwrap();
-        link.executes((context, source, arguments) -> {
+        CommandLink.Executor executor = (context, source, arguments) -> {
             Object[] args = new Object[method.getParameterCount()];
             args[0] = getSourceFunction.apply(source);
             for (int i = 0; i < argumentTypes.length; i++) {
@@ -147,7 +150,9 @@ public final class CommandBuilderGenerator {
             } catch (IllegalAccessException e) {
                 Bukkit.getLogger().severe("[CommandCore] execute method cannot be accessed. Please report this!");
             }
-        });
+        };
+        if (async) link.executesAsync(executor);
+        else link.executes(executor);
         return Result.ok();
     }
 
