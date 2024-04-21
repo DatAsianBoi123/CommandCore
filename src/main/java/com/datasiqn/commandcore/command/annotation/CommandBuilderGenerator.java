@@ -5,6 +5,7 @@ import com.datasiqn.commandcore.argument.type.ArgumentType;
 import com.datasiqn.commandcore.command.builder.ArgumentBuilder;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
 import com.datasiqn.commandcore.command.builder.CommandLink;
+import com.datasiqn.commandcore.command.builder.LiteralBuilder;
 import com.datasiqn.commandcore.command.source.CommandSource;
 import com.datasiqn.commandcore.locatable.LocatableCommandSender;
 import com.datasiqn.resultapi.None;
@@ -20,7 +21,10 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Utility class that is used to convert an {@link AnnotationCommand} to a {@link CommandBuilder}
@@ -53,28 +57,48 @@ public final class CommandBuilderGenerator {
         if (!permission.isEmpty()) commandBuilder.permission(permission);
 
         Method executeMethod = null;
+        List<LiteralMethod> literalExecutors = new ArrayList<>();
         for (Method method : commandClass.getDeclaredMethods()) {
-            if (!method.isAnnotationPresent(Executor.class)) continue;
-            if (executeMethod != null) return Result.error("annotation command " + commandClass.getName() + " cannot have multiple executors");
+            LiteralExecutor literalExecutor = method.getAnnotation(LiteralExecutor.class);
+            boolean isExecutor = method.isAnnotationPresent(Executor.class);
+
+            if (!isExecutor && literalExecutor == null) continue;
+
             if (method.getParameterCount() == 0) {
                 return Result.error("annotation executor " + method.getName() + " (in class " + commandClass.getName() + ") must have at least 1 parameter");
             }
-            executeMethod = method;
+            if (isExecutor) {
+                if (executeMethod != null) return Result.error("annotation command " + commandClass.getName() + " cannot have multiple executors");
+                executeMethod = method;
+            }
+            if (literalExecutor != null) literalExecutors.add(new LiteralMethod(literalExecutor, method));
+        }
+        if (executeMethod == null && literalExecutors.isEmpty()) {
+            Bukkit.getLogger().warning("[CommandCore] annotation command " + commandClass.getName() + " does not contain any executor methods");
+            return Result.ok(commandBuilder);
         }
         if (executeMethod != null) {
             executeMethod.setAccessible(true);
-            Result<None, String> buildResult = buildCommandBuilder(command, executeMethod, commandBuilder);
+            Result<None, String> buildResult = buildBranch(command, executeMethod, commandBuilder, 0);
             if (buildResult.isError()) {
                 return Result.error("annotation executor " + executeMethod.getName() + " (in class " + commandClass.getName() + ") " + buildResult.unwrapError());
             }
-        } else {
-            Bukkit.getLogger().warning("[CommandCore] annotation command " + commandClass.getName() + " does not contain any executor methods");
+        }
+        for (LiteralMethod executor : literalExecutors) {
+            Method method = executor.method;
+            method.setAccessible(true);
+            LiteralBuilder literal = LiteralBuilder.literal(executor.literalExecutor.value());
+            Result<None, String> buildResult = buildBranch(command, method, literal, 1);
+            if (buildResult.isError()) {
+                return Result.error("annotation literal executor " + method.getName() + " (in class " + commandClass.getName() + ") " + buildResult.unwrapError());
+            }
+            commandBuilder.then(literal);
         }
 
         return Result.ok(commandBuilder);
     }
 
-    private static Result<None, String> buildCommandBuilder(AnnotationCommand command, @NotNull Method method, CommandBuilder builder) {
+    private static Result<None, String> buildBranch(AnnotationCommand command, @NotNull Method method, CommandLink<?> builder, int offset) {
         Parameter[] parameters = method.getParameters();
         Class<?> sourceClass = parameters[0].getType();
         ArgumentType<?>[] argumentTypes = new ArgumentType[parameters.length - 1];
@@ -91,7 +115,7 @@ public final class CommandBuilderGenerator {
                 return Result.error("has an invalid argument type " + parameter.getType().getName() + " (is it registered?)");
             }
             if (parameter.isAnnotationPresent(Optional.class)) {
-                Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command);
+                Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command, offset);
                 if (addExecutorResult.isError()) return addExecutorResult;
             }
             argumentTypes[i - 1] = argumentType;
@@ -101,7 +125,7 @@ public final class CommandBuilderGenerator {
             link = node;
         }
 
-        return addExecutor(link, sourceClass, argumentTypes, method, command);
+        return addExecutor(link, sourceClass, argumentTypes, method, command, offset);
     }
 
     private static <T> @NotNull Result<None, String> addExecutor(@NotNull CommandLink<?> link, @NotNull Class<T> sourceClass, @Nullable ArgumentType<?> @NotNull [] argumentTypes, Method method, AnnotationCommand command, int offset) {
@@ -113,7 +137,7 @@ public final class CommandBuilderGenerator {
             args[0] = getSourceFunction.apply(source);
             for (int i = 0; i < argumentTypes.length; i++) {
                 if (argumentTypes[i] == null) continue;
-                args[i + 1] = arguments.get(i, argumentTypes[i]);
+                args[i + 1] = arguments.get(i + offset, argumentTypes[i]);
             }
             try {
                 method.invoke(command, args);
@@ -150,4 +174,6 @@ public final class CommandBuilderGenerator {
         }
         return Result.error("class " + sourceClass.getName() + " is invalid");
     }
+
+    private record LiteralMethod(LiteralExecutor literalExecutor, Method method) { }
 }
