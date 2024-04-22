@@ -33,7 +33,7 @@ public @interface CommandDescription {
 
     /**
      * Gets the permission of the command
-     * @return The permission of the command. A blank string is returned when this command doesn't have a required permission
+     * @return The permission of the command. A blank string is returned when this command doesn't have a required permission.
      */
     @NotNull String permission() default "";
 }

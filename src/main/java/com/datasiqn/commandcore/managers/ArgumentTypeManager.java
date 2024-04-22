@@ -101,8 +101,8 @@ public class ArgumentTypeManager {
      * Number ranges can be of any number, but the only way to know what number class is needed to create the argument type is by looking at the generic T argument of {@link NumberRange}.
      * <pre>
      * Ex.
-     *      {@code NumberRange<Short>}  -> {@code numberRange(short.class)}
-     *      {@code NumberRange<Double>} -> {@code numberRange(double.class)}
+     *      <code>NumberRange&lt;Short></code>  -> <code>numberRange(short.class)</code>
+     *      <code>NumberRange&lt;Double></code> -> <code>numberRange(double.class)</code>
      * </pre>
      * To get class with generics, you can use a {@link TypeToken}.
      * <p>
