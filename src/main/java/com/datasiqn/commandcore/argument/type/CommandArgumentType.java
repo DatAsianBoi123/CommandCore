@@ -2,22 +2,20 @@ package com.datasiqn.commandcore.argument.type;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
 import com.datasiqn.commandcore.argument.Arguments;
+import com.datasiqn.commandcore.argument.ExecutableCommand;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.resultapi.Result;
-import com.google.common.reflect.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-class CommandArgumentType implements ArgumentType<Consumer<CommandSender>> {
+class CommandArgumentType implements ArgumentType<ExecutableCommand> {
     private static final CommandMap COMMAND_MAP;
     static {
         CommandMap commandMap;
@@ -37,7 +35,7 @@ class CommandArgumentType implements ArgumentType<Consumer<CommandSender>> {
     }
 
     @Override
-    public @NotNull Result<Consumer<CommandSender>, String> parse(@NotNull ArgumentReader reader) {
+    public @NotNull Result<ExecutableCommand, String> parse(@NotNull ArgumentReader reader) {
         String rest = reader.rest();
         // stops CommandCore from adding an extra empty tab complete
         if (rest.endsWith(" ")) return Result.error("unreachable");
@@ -61,8 +59,7 @@ class CommandArgumentType implements ArgumentType<Consumer<CommandSender>> {
     }
 
     @Override
-    public @NotNull Class<Consumer<CommandSender>> getArgumentClass() {
-        //noinspection unchecked,UnstableApiUsage
-        return (Class<Consumer<CommandSender>>) new TypeToken<Consumer<CommandSender>>() {}.getRawType();
+    public @NotNull Class<ExecutableCommand> getArgumentClass() {
+        return ExecutableCommand.class;
     }
 }

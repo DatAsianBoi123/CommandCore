@@ -1,6 +1,7 @@
 package com.datasiqn.commandcore.argument.type;
 
 import com.datasiqn.commandcore.argument.ArgumentReader;
+import com.datasiqn.commandcore.argument.ExecutableCommand;
 import com.datasiqn.commandcore.argument.annotation.Block;
 import com.datasiqn.commandcore.argument.annotation.Item;
 import com.datasiqn.commandcore.argument.annotation.Limit;
@@ -21,7 +22,6 @@ import com.datasiqn.resultapi.Result;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -243,7 +242,7 @@ public interface ArgumentType<T> {
      * <p>
      * This is NOT a registered {@code ArgumentType}.
      */
-    ArgumentType<Consumer<CommandSender>> COMMAND = new CommandArgumentType();
+    ArgumentType<ExecutableCommand> COMMAND = new CommandArgumentType();
 
     /**
      * Creates an {@code ArgumentType} that represents a number.
