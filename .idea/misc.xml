@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="1">
-      <item index="0" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="com.datasiqn.commandcore.command.annotation.Executor" />
+      <item index="1" class="java.lang.String" itemvalue="com.datasiqn.commandcore.command.annotation.LiteralExecutor" />
+      <item index="2" class="java.lang.String" itemvalue="org.bukkit.event.EventHandler" />
     </list>
     <pattern value="com.datasiqn.commandcore.CommandCore" method="init" />
   </component>
@@ -13,7 +15,6 @@
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
-    <option name="workspaceImportForciblyTurnedOn" value="true" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
