@@ -3,6 +3,7 @@ package com.datasiqn.commandcore.argument.selector;
 import com.datasiqn.commandcore.argument.numrange.FullNumberRange;
 import com.datasiqn.commandcore.argument.numrange.NumberRange;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
+import com.datasiqn.commandcore.argument.type.EnumArgumentType;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.Contract;
@@ -29,7 +30,7 @@ public final class SelectorOptionType<T> {
     /**
      * Sorts the found entities based on an {@link EntityOrder}. Default value is {@link EntityOrders#ARBITRARY}.
      */
-    public static final SelectorOptionType<EntityOrders> SORT = new SelectorOptionType<>("sort", new ArgumentType.EnumArgumentType<>(EntityOrders.class), EntityOrders.ARBITRARY);
+    public static final SelectorOptionType<EntityOrders> SORT = new SelectorOptionType<>("sort", new EnumArgumentType<>(EntityOrders.class), EntityOrders.ARBITRARY);
     /**
      * Filters the found entities by matching its type. Default value is {@code null}, meaning all types.
      */

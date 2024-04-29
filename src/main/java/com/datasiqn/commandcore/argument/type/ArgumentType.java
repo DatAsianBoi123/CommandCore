@@ -17,7 +17,6 @@ import com.datasiqn.commandcore.command.Command;
 import com.datasiqn.commandcore.command.CommandContext;
 import com.datasiqn.commandcore.command.annotation.AnnotationCommand;
 import com.datasiqn.commandcore.command.builder.CommandBuilder;
-import com.datasiqn.resultapi.None;
 import com.datasiqn.resultapi.Result;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,16 +29,11 @@ import org.bukkit.loot.LootTable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Represents an argument type. {@code ArgumentType}s that are registered only matter for {@link AnnotationCommand}s.
@@ -413,95 +407,4 @@ public interface ArgumentType<T> {
      */
     @NotNull
     Class<T> getArgumentClass();
-
-    /**
-     * Represents a custom {@code ArgumentType} that parses to an enum value
-     * @param <T> The type of the enum
-     */
-    class EnumArgumentType<T extends Enum<T>> implements SimpleArgumentType<T> {
-        private final Class<T> enumClass;
-        private final String enumName;
-        private final List<String> tabCompletes;
-        private final boolean uppercaseValues;
-
-        /**
-         * Creates a new {@code ArgumentType}
-         * @param enumClass The enum's class
-         */
-        public EnumArgumentType(@NotNull Class<T> enumClass) {
-            this(enumClass, enumClass.getSimpleName());
-        }
-        /**
-         * Creates a new {@code ArgumentType}
-         * @param enumClass The enum's class
-         * @param enumName The name of the enum
-         */
-        public EnumArgumentType(@NotNull Class<T> enumClass, @NotNull String enumName) {
-            this.enumClass = enumClass;
-            this.enumName = enumName;
-            this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
-
-            for (T enumConstant : enumClass.getEnumConstants()) {
-                for (char letter : enumConstant.name().toCharArray()) {
-                    if (Character.isLetter(letter) && !Character.isUpperCase(letter)) {
-                        this.uppercaseValues = false;
-                        Bukkit.getLogger().warning("[CommandCore] Enum " + enumName + " includes values that aren't in uppercase!");
-                        return;
-                    }
-                }
-            }
-            this.uppercaseValues = true;
-        }
-
-        @Override
-        public @NotNull String getName() {
-            return enumName;
-        }
-
-        @Override
-        public @NotNull Result<T, None> parseWord(String word) {
-            return Result.resolve(() -> uppercaseValues ? Enum.valueOf(enumClass, word.toUpperCase()) : EnumUtils.findEnumInsensitiveCase(enumClass, word));
-        }
-
-        @Override
-        public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
-            return tabCompletes;
-        }
-
-        @Override
-        public @NotNull Class<T> getArgumentClass() {
-            return enumClass;
-        }
-    }
-
-    /**
-     * Represents a custom {@code ArgumentType} that parses to a filtered enum
-     * @param <T> The type of the enum
-     */
-    class FilteredEnumArgumentType<T extends Enum<T>> extends EnumArgumentType<T> {
-        private final Predicate<T> filter;
-        private final List<String> tabCompletes;
-
-        /**
-         * Creates a new {@code ArgumentType}
-         * @param enumClass The enum's class
-         * @param filter The filter that enum values must pass through
-         * @param enumName The name of the enum. This is used when displaying an error message (Invalid {{@code enumName}} '{val}'
-         */
-        public FilteredEnumArgumentType(@NotNull Class<T> enumClass, Predicate<T> filter, String enumName) {
-            super(enumClass, enumName);
-            this.filter = filter;
-            this.tabCompletes = Arrays.stream(enumClass.getEnumConstants()).filter(filter).map(val -> val.name().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
-        }
-
-        @Override
-        public @NotNull Result<T, None> parseWord(String word) {
-            return super.parseWord(word).andThen(val -> filter.test(val) ? Result.ok(val) : Result.error());
-        }
-
-        @Override
-        public @NotNull List<String> getTabComplete(@NotNull CommandContext context) {
-            return tabCompletes;
-        }
-    }
 }

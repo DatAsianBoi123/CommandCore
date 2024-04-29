@@ -4,6 +4,7 @@ import com.datasiqn.commandcore.argument.selector.EntitySelector;
 import com.datasiqn.commandcore.argument.selector.SelectorRequirements;
 import com.datasiqn.commandcore.argument.selector.SingleEntitySelector;
 import com.datasiqn.commandcore.argument.type.ArgumentType;
+import com.datasiqn.commandcore.argument.type.EnumArgumentType;
 import com.datasiqn.resultapi.Result;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
