@@ -41,6 +41,8 @@ import java.util.concurrent.CompletableFuture;
  * @param <T> The type of the argument
  */
 public interface ArgumentType<T> {
+    //<editor-fold desc="Builtin Argument Types">
+
     /**
      * {@code ArgumentType} that is just a single word.
      * <p>
@@ -374,6 +376,8 @@ public interface ArgumentType<T> {
     static @NotNull <E extends Entity> ArgumentType<EntitySelector<E>> entitySelector(SelectorRequirements<E> requirements) {
         return new EntitySelectorArgumentType<>(requirements);
     }
+
+    //</editor-fold>
 
     /**
      * Gets the name of this argument type
