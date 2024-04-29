@@ -237,7 +237,7 @@ public interface ArgumentType<T> {
      * Note: due to the way vanilla commands are executed, there will be no tabcompletes for those commands. However, custom plugin commands will have tabcompletes.
      * Both types of commands will still be able to execute.
      * <p>
-     * This is NOT a registered {@code ArgumentType}.
+     * This is a registered {@code ArgumentType} and does not require any annotations to use.
      */
     ArgumentType<ExecutableCommand> COMMAND = new CommandArgumentType();
 

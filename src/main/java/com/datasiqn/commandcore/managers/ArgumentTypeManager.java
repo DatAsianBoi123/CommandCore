@@ -169,7 +169,6 @@ public class ArgumentTypeManager {
         // unregistered types:
         // - ONLINE_PLAYER
         // - OFFLINE_PLAYER
-        // - COMMAND
         // - json
 
         registerStringTypes();
@@ -183,6 +182,7 @@ public class ArgumentTypeManager {
         register(ArgumentType.RECIPE);
         registerMaterialTypes();
         register(ArgumentType.COMMAND_NAME);
+        register(ArgumentType.COMMAND);
         registerNumberAndBoundedTypes();
         registerNumberRanges();
         registerEntitySelectorTypes();
