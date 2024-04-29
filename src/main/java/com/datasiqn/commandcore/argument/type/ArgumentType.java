@@ -36,8 +36,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Represents an argument type. {@code ArgumentType}s that are registered only matter for {@link AnnotationCommand}s.
- * Unregistered {@code ArgumentType}s are still usable in {@link CommandBuilder}s
+ * Represents an argument type.
+ * Most builtin {@code ArgumentType}s found as static fields/methods in this interface are registered.
+ * Unregistered {@code ArgumentType}s are still usable in {@link CommandBuilder}s, however they need to be registered to be used in an {@link AnnotationCommand}.
  * @param <T> The type of the argument
  */
 public interface ArgumentType<T> {
