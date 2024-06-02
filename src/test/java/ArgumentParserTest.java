@@ -1,4 +1,6 @@
 import com.datasiqn.commandcore.argument.StringArgumentReader;
+import com.datasiqn.commandcore.argument.duration.Duration;
+import com.datasiqn.commandcore.argument.duration.TimeUnit;
 import com.datasiqn.commandcore.argument.numrange.*;
 import com.datasiqn.commandcore.argument.selector.EntitySelector;
 import com.datasiqn.commandcore.argument.selector.SelectorRequirements;
@@ -80,6 +82,22 @@ public class ArgumentParserTest {
         testOk("false", BOOLEAN, false);
         testOk("TrUE", BOOLEAN, true);
         testErr("1", BOOLEAN);
+    }
+
+    @Test
+    public void testDuration() {
+        testOk("1800t", DURATION, Duration.from(1800, TimeUnit.TICKS));
+        testOk("382ms", DURATION, Duration.from(382, TimeUnit.MILLIS));
+        testOk("38s", DURATION, Duration.from(38, TimeUnit.SECONDS));
+        testOk("5m", DURATION, Duration.from(5, TimeUnit.MINUTES));
+        testOk("1.38h", DURATION, Duration.from(1.38, TimeUnit.HOURS));
+        testErr("", DURATION);
+        testErr("283", DURATION);
+        testErr("3.2.3.4.2t", DURATION);
+        testErr("800a", DURATION);
+        testErr("43dfaas", DURATION);
+        testErr("-30t", DURATION);
+        testErr("ms", DURATION);
     }
 
     @Test
