@@ -173,6 +173,7 @@ public class ArgumentTypeManager {
 
         registerStringTypes();
         register(ArgumentType.BOOLEAN);
+        register(ArgumentType.DURATION);
         register(ArgumentType.UUID);
         register(ArgumentType.NAMESPACED_KEY);
         register(ArgumentType.VECTOR);

@@ -10,6 +10,7 @@ import com.datasiqn.commandcore.argument.annotation.Name;
 import com.datasiqn.commandcore.argument.annotation.QuotedWord;
 import com.datasiqn.commandcore.argument.annotation.Spawnable;
 import com.datasiqn.commandcore.argument.annotation.Word;
+import com.datasiqn.commandcore.argument.duration.Duration;
 import com.datasiqn.commandcore.argument.numrange.NumberRange;
 import com.datasiqn.commandcore.argument.selector.EntitySelector;
 import com.datasiqn.commandcore.argument.selector.SelectorRequirements;
@@ -89,6 +90,13 @@ public interface ArgumentType<T> {
      * This is a registered {@code ArgumentType} and does not require any annotations to use.
      */
     ArgumentType<Boolean> BOOLEAN = new BoolArgumentType();
+
+    /**
+     * {@code ArgumentType} that represents a {@link Duration}.
+     * <p>
+     * This is a registered {@code ArgumentType} and does not require any annotations to use.
+     */
+    ArgumentType<Duration> DURATION = new DurationArgumentType();
 
     /**
      * {@code ArgumentType} that represents a {@link java.util.UUID UUID}.
