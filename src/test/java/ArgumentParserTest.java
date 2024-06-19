@@ -89,7 +89,7 @@ public class ArgumentParserTest {
         testOk("1800t", DURATION, Duration.from(1800, TimeUnit.TICKS));
         testOk("382ms", DURATION, Duration.from(382, TimeUnit.MILLIS));
         testOk("38s", DURATION, Duration.from(38, TimeUnit.SECONDS));
-        testOk("5m", DURATION, Duration.from(5, TimeUnit.MINUTES));
+        testOk("5min", DURATION, Duration.from(5, TimeUnit.MINUTES));
         testOk("1.38h", DURATION, Duration.from(1.38, TimeUnit.HOURS));
         testErr("", DURATION);
         testErr("283", DURATION);
