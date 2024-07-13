@@ -71,7 +71,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
-                            <checksum>required</checksum>
+                            <checksums>required</checksums>
                         </configuration>
                     </plugin>
                 </plugins>
