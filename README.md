@@ -12,18 +12,8 @@ CommandCore is a simple, yet powerful command framework for the Spigot API.
 ## Installation
 **Java 8 or higher is required**
 
-### 1) Install to your local .m2 repo
-> If you are using JitPack, you can skip this step.
-
-Clone this repository onto your local computer and run the command `mvn clean install` in that directory.
-This will install CommandCore onto your local .m2 folder, so you can use the dependency.
-
-
-### 2) Add the dependency
-
 Add the CommandCore dependency
 
-**If you are using JitPack, follow their instructions [here](https://jitpack.io/#DatAsianBoi123/CommandCore/)**
 ```xml
 <dependency>
   <groupId>com.datasiqn</groupId>
@@ -34,7 +24,7 @@ Add the CommandCore dependency
 </dependency>
 ```
 
-Finally, add the maven shade plugin to shade in CommandCore
+Then, add the maven shade plugin to shade in CommandCore
 ```xml
 <build>
   <plugins>
