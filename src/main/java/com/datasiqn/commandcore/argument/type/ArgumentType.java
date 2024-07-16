@@ -54,7 +54,7 @@ public interface ArgumentType<T> {
 
     /**
      * {@code ArgumentType} that represents a word that is enclosed in quotes.
-     * <br>
+     * <p>
      * Examples of this include:
      * <pre>
      *     "name with multiple spaces" -> name with multiple spaces
@@ -70,7 +70,7 @@ public interface ArgumentType<T> {
     /**
      * {@code ArgumentType} that represents the name of something.
      * Can have multiple spaces in the name, and does not need quotes enclosing them.
-     * <br>
+     * <p>
      * Examples of this include:
      * <pre>
      *     cool name

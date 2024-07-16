@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a {@code CommandSource} where the sender is a {@link Player}.\
- * <br><br>
+ * Represents a {@code CommandSource} where the sender is a {@link Player}.
+ * <p>
  * <strong>NOTE: Do not directly instantiate this class! Instead, use the factory method {@link CommandCore#createSource(CommandSender) createSource}</strong>
  */
 public class PlayerCommandSource extends EntityCommandSource {
@@ -16,7 +16,7 @@ public class PlayerCommandSource extends EntityCommandSource {
 
     /**
      * Creates a new {@code CommandSource} with the internal sender of {@code sender}.
-     * <br><br>
+     * <p>
      * <strong>NOTE: Do not directly use this constructor! Instead, use the factory method {@link CommandCore#createSource(CommandSender) createSource}</strong>
      * @param sender The sender
      */

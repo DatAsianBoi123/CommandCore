@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a {@code CommandSource} where the sender is a {@link BlockCommandSender}
- * <br><br>
+ * <p>
  * <strong>NOTE: Do not directly instantiate this class! Instead, use the factory method {@link CommandCore#createSource(CommandSender) createSource}</strong>
  */
 public class BlockCommandSource implements CommandSource {
@@ -19,7 +19,7 @@ public class BlockCommandSource implements CommandSource {
 
     /**
      * Creates a new {@code BlockCommandSource} with the internal sender of {@code sender}.
-     * <br><br>
+     * <p>
      * <strong>NOTE: Do not directly use this constructor! Instead, use the factory method {@link CommandCore#createSource(CommandSender) createSource}</strong>
      * @param sender The {@code BlockCommandSender} to internally use
      */
