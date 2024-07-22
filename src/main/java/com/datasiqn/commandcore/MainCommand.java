@@ -48,7 +48,7 @@ class MainCommand implements CommandExecutor, TabCompleter {
                 for (String message : messages) sender.sendMessage(ChatColor.RED + message);
                 sender.spigot().sendMessage(new ComponentBuilder()
                         .append("[View Command Help]").color(ChatColor.GOLD)
-                                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + commandCore.getOptions().getRootCommand() + " help " + cmd.getName()))
+                                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + commandCore.getOptions().getRootCommand() + " help command " + cmd.getName()))
                         .create());
             });
             return true;
