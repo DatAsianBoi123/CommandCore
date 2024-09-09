@@ -13,8 +13,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.*;
 
 /**
- * Contains a collection of builtin {@link SelectorOption}s that the user can input when creating a {@link MultiEntitySelector}
- * @param <T> The type that is contained in the {@link SelectorOption}
+ * Contains a collection of builtin selector options that the user can input when creating a {@link MultiEntitySelector}
+ * @param <T> The type that is contained in the selector option
  */
 public final class SelectorOptionType<T> {
     private static final Map<String, SelectorOptionType<?>> ALL_OPTIONS = new HashMap<>();
@@ -82,16 +82,7 @@ public final class SelectorOptionType<T> {
      */
     public void uncheckedSet(@NotNull SelectorOptions options, Object value) {
         //noinspection unchecked
-        options.getOption(this).set((T) value);
-    }
-
-    /**
-     * Creates the default option for this option type
-     * @return The newly created {@code SelectorOption}
-     */
-    @Contract(value = " -> new", pure = true)
-    public @NotNull SelectorOption<T> createOption() {
-        return new SelectorOption<>(name, def);
+        options.set(this, (T) value);
     }
 
     /**
@@ -108,6 +99,14 @@ public final class SelectorOptionType<T> {
      */
     public ArgumentType<T> getArgumentType() {
         return argumentType;
+    }
+
+    /**
+     * Gets the default value for this option type
+     * @return The default value
+     */
+    public T getDef() {
+        return def;
     }
 
     /**
