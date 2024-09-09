@@ -32,6 +32,14 @@ public enum SelectorType {
     ALL_PLAYERS('a', new SelectorOptions()
             .set(SelectorOptionType.TYPE, EntityType.PLAYER)),
     /**
+     * Selects the nearest entity
+     * <p>
+     * {@code @n}
+     */
+    NEAREST_ENTITY('n', new SelectorOptions()
+            .set(SelectorOptionType.LIMIT, 1)
+            .set(SelectorOptionType.SORT, EntityOrders.NEAREST)),
+    /**
      * Selects all entities
      * <p>
      * {@code @e}
