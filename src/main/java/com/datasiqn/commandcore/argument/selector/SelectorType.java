@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
  */
 public enum SelectorType {
     /**
-     * Selects the first nearest player
+     * Selects the nearest player
      * <p>
      * {@code @p}
      */
