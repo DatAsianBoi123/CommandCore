@@ -118,7 +118,7 @@ public final class CommandBuilderGenerator {
             if (argumentType == null) {
                 return Result.error("Executor has an invalid argument type " + parameter.getType().getName() + " (is it registered?)");
             }
-            if (parameter.isAnnotationPresent(Optional.class)) {
+            if (argument.optional()) {
                 Result<None, String> addExecutorResult = addExecutor(link, sourceClass, Arrays.copyOf(argumentTypes, argumentTypes.length), method, command, async, offset);
                 if (addExecutorResult.isError()) return addExecutorResult;
             }

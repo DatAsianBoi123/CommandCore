@@ -61,7 +61,7 @@ import org.bukkit.entity.Player;
  * Some registered {@link ArgumentType}s require an annotation to specify extra data or to differentiate between an {@link ArgumentType} of the same inner type.
  * To view specific registration details, you can look at the JavaDoc for that {@link ArgumentType}.
  * <p>
- * By default, all {@code Argument}s are required. To make them optional, you can annotate them with {@link Optional}.
+ * By default, all {@code Argument}s are required. To make them optional, you can set {@link Argument#optional()} to {@code true}.
  * If the user does not supply that {@code Argument}, {@code null} is passed to that parameter.
  * This will cause {@link NullPointerException}s when dealing with optional primitives, so, to avoid this issue, use the boxed version of every optional primitive.
  * <pre>

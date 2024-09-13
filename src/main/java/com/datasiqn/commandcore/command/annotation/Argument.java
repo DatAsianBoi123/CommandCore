@@ -16,4 +16,11 @@ public @interface Argument {
      * @return The name of the argument
      */
     String name();
+
+    /**
+     * Gets whether this argument is optional or not.
+     * By setting this to {@code true}, the value of this (and any subsequent) parameter has the possibility of being {@code null}.
+     * @return Whether this argument is optional or not
+     */
+    boolean optional() default false;
 }
