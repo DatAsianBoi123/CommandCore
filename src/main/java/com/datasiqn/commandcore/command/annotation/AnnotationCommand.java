@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
  * {@code Executor}s are methods in the implementing class that can be executed from a user typing the command.
  * These methods can be of any visibility, and aren't required to be {@code public}.
  * They can also have any return type.
- * The method will be invoked whenever the user
  * To create an {@code Executor}, either annotate a method with {@link Executor} or {@link LiteralExecutor}.
  * The latter prepends a {@link LiteralBuilder} onto that executor's branch.
  * <pre>
@@ -79,7 +78,7 @@ import org.bukkit.entity.Player;
  *         @Argument(name = "entity") @Limit(1) EntitySelector<Entity> entity,
  *         @Argument(name = "name") @QuotedWord String newName
  *     ) { ... }
- *     // To execute this command, the user would type:
+ *     // To execute this command, the user can type:
  *     // /root command @e[limit=1,sort=nearest] "Some Cool Name"
  *
  *     @Executor
@@ -90,6 +89,33 @@ import org.bukkit.entity.Player;
  *     ) { ... }
  *     // This branch is IMPOSSIBLE to execute.
  *     // This is because this branch is not merged into the other executor. The first executor will always be evaluated first.
+ *
+ *     }
+ * </pre>
+ * To get around this, a {@link LiteralExecutor} can be used to add branching paths.
+ * For example, if a {@link LiteralExecutor} is used in the above example instead of an {@link Executor},
+ * it would be possible to execute both branches.
+ * <pre>
+ *     {@code
+ *
+ *     @LiteralExecutor("name")
+ *     public void setName(
+ *         CommandSender source,
+ *         @Argument(name = "entity") @Limit(1) EntitySelector<Entity> entity,
+ *         @Argument(name = "name") @QuotedWord String newName
+ *     ) { ... }
+ *     // To execute this command, the user can type:
+ *     // /root command name @e[limit=1,sort=nearest] "Some Cool Name"
+ *
+ *     @LiteralExecutor("health")
+ *     public void setHealth(
+ *         CommandSender source,
+ *         @Argument(name = "entity") @Limit(1) EntitySelector<Entity> entity,
+ *         @Argument(name = "health") @BoundedDouble(0) double newHealth
+ *     ) { ... }
+ *     // This branch IS possible to execute.
+ *     // The user can type:
+ *     // /root command health @e[limit=1,sort=nearest] 10
  *
  *     }
  * </pre>
